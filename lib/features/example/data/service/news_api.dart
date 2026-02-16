@@ -1,8 +1,7 @@
 import 'package:cropmodel/core/network/API.dart';
 
 enum NewsApi implements API {
-  getHeadlines(Method.get, 'articles'),
-  add(Method.post, 'add');
+  getHeadlines(Method.get, 'articles');
 
   final String path;
   final Method method;

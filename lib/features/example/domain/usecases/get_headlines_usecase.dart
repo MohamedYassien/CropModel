@@ -6,6 +6,6 @@ class GetHeadlinesUseCase {
   NewsServices services = NewsServices();
 
   Future<List<ArticleModel>?> call() {
-    return services.getHeadlines();
+    return services.getHeadlines(3);
   }
 }

@@ -6,8 +6,7 @@ import '../model/article_model.dart';
 class NewsServices {
   final APIClient apiClient = APIClient();
 
-  Future<List<ArticleModel>?> getHeadlines() async {
-    NewsApi repo;
+  Future<List<ArticleModel>?> getHeadlines(int id) async {
     return await apiClient.fetch<void, List<ArticleModel>?>(
       api: NewsApi.getHeadlines,
       mapper: (response) {
@@ -16,7 +15,7 @@ class NewsServices {
         return data
             .map((json) => ArticleModel.fromJson(json))
             .toList();
-      }
+      },
     );
   }
 }

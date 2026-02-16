@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../bloc/example_bloc.dart';
 import '../bloc/example_event.dart';
 import '../bloc/example_state.dart';
 
-class NewsPage extends StatelessWidget {
+class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
+
+  @override
+  State<NewsPage> createState() => _NewsPageState();
+}
+
+class _NewsPageState extends State<NewsPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.setLocale(const Locale('ar'));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Spaceflight News"),
-      ),
+      appBar: AppBar(title: Text("spaceflight_news".tr())),
       body: BlocProvider(
         create: (_) => NewsBloc(),
         child: BlocBuilder<NewsBloc, NewsState>(
           builder: (context, state) {
             if (state is NewsLoading) {
-             EasyLoading.show();
+              EasyLoading.show();
             }
 
             if (state is NewsLoaded) {
@@ -34,10 +45,10 @@ class NewsPage extends StatelessWidget {
                     child: ListTile(
                       leading: article.imageUrl.isNotEmpty
                           ? Image.network(
-                        article.imageUrl,
-                        width: 100,
-                        fit: BoxFit.cover,
-                      )
+                              article.imageUrl,
+                              width: 100.w,
+                              fit: BoxFit.cover,
+                            )
                           : null,
                       title: Text(article.title),
                       subtitle: Text(
