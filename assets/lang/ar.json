@@ -1,3 +1,13 @@
 {
-"spaceflight_news" : "أخبار الفضاء"
+  "login": "تسجيل الدخول",
+  "email_address": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "login_button": "دخول",
+  "new_to_cropmeal": "جديد في CropMeal؟",
+  "register": "إنشاء حساب",
+  "email_required": "يرجى إدخال البريد الإلكتروني",
+  "password_required": "يرجى إدخال كلمة المرور",
+  "password_min_length": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "login_success": "تم تسجيل الدخول بنجاح"
 }
