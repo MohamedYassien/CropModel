@@ -1,4 +1,5 @@
 import 'package:cropmodel/features/example/presentation/UI/example_presenter.dart';
+import 'package:cropmodel/features/sign-up/presentation/UI/sign_up_presenter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const NewsPage(),
+          home: const SignUpPresenter(),
         );
       },
     );
