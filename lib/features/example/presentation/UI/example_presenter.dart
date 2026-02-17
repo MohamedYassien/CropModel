@@ -16,11 +16,6 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    context.setLocale(const Locale('ar'));
-  }
 
   @override
   Widget build(BuildContext context) {
