@@ -12,7 +12,8 @@ void main() async {
     EasyLocalization(
       supportedLocales: const [Locale('en') , Locale('ar')],
       path: 'assets/lang',
-      fallbackLocale: const Locale('ar'),
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('en'),
       child: const MyApp(),
     ),
   );
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(433, 883),
+      designSize: const Size(388, 862),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
