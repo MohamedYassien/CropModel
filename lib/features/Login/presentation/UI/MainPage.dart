@@ -179,11 +179,10 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              context.read<LoginBloc>().add(LogoutEvent());
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginPage()),
-                    (route) => false,
+
               );
             },
           ),
