@@ -1,0 +1,22 @@
+{
+  "spaceflight_news": "أخبار الفضاء",
+  "profile": "الملف الشخصي",
+  "full_name": "الاسم الكامل",
+  "enter_your_name": "أدخل اسمك",
+  "email": "البريد الإلكتروني",
+  "enter_your_email": "أدخل بريدك الإلكتروني",
+  "phone_number": "رقم الهاتف",
+  "enter_your_phone_number": "أدخل رقم هاتفك",
+  "fingerprint_login": "تسجيل الدخول بالبصمة",
+  "reset_password": "إعادة تعيين كلمة المرور",
+  "logout": "تسجيل الخروج",
+  "confirm_logout_message": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "preview_photo": "معاينة الصورة",
+  "no_image_uploaded": "لم يتم رفع صورة",
+  "upload_profile_picture": "رفع صورة الملف الشخصي",
+  "change_photo": "تغيير الصورة",
+  "confirm": "تأكيد",
+  "language_switch": "تغيير اللغة"
+}

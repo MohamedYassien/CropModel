@@ -1,0 +1,22 @@
+{
+  "spaceflight_news": "Spaceflight News",
+  "profile": "Profile",
+  "full_name": "Full Name",
+  "enter_your_name": "Enter your name",
+  "email": "Email",
+  "enter_your_email": "Enter your email",
+  "phone_number": "Phone Number",
+  "enter_your_phone_number": "Enter your phone number",
+  "fingerprint_login": "Fingerprint login",
+  "reset_password": "Reset password",
+  "logout": "Logout",
+  "confirm_logout_message": "Are you sure you want to logout?",
+  "cancel": "Cancel",
+  "save": "Save",
+  "preview_photo": "Preview Photo",
+  "no_image_uploaded": "No image uploaded",
+  "upload_profile_picture": "Upload Profile Picture",
+  "change_photo": "Change Photo",
+  "confirm": "Confirm",
+  "language_switch": "Change Language"
+}
