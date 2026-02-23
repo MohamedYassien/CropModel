@@ -9,5 +9,8 @@
   "email_required": "Please enter your email",
   "password_required": "Please enter your password",
   "password_min_length": "Password must be at least 6 characters",
-  "login_success": "Login successful"
+  "login_success": "Login successful",
+  "enter_valid_email": "enter valid email that has @ and .com",
+  "password_uppercase":" password uppercase",
+  "password_special_char": "password special char"
 }

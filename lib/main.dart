@@ -1,8 +1,12 @@
-import 'package:cropmodel/features/example/presentation/UI/example_presenter.dart';
+import 'package:cropmodel/features/Login/data/service/BiometricService.dart';
+import 'package:cropmodel/features/Login/presentation/bloc/LoginBloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'features/Login/data/service/SecureStorage.dart';
+import 'features/Login/presentation/UI/loginpage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,14 +14,25 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en') , Locale('ar')],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/lang',
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
-      child: const MyApp(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<LoginBloc>(
+            create: (_) => LoginBloc(
+              biometricService: BiometricService(),
+              secureStorage: SecureStorage(),
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
+
 
 
 class MyApp extends StatelessWidget {
@@ -36,7 +51,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const NewsPage(),
+          home: const LoginPage(),
         );
       },
     );
