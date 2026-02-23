@@ -127,7 +127,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                           print("Logged out");
                         },
                         child: Text(
-                          "logout".tr(),
+                          "Confirm".tr(),
                           style: getDynamicStyle(context, size: 16, color: Colors.white),
                         ),
                       ),
@@ -226,7 +226,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 40.h),
                   TextField(
                     focusNode: _nameFocusNode,
                     controller: _nameController,
@@ -346,7 +346,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                       contentPadding: EdgeInsets.symmetric(vertical: 10.h),
                     ),
                   ),
-                  SizedBox(height: 30.h),
+                  SizedBox(height: 38.h),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
                     width: 400.w,
@@ -428,7 +428,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               child: Row(
                                 children: [
                                   Image.asset('assets/images/lockIcon.png', width: 25.w, height: 25.h),
-                                  SizedBox(width: 20.w),
+                                  SizedBox(width: 24.w),
                                   Text("reset_password".tr(), style: getDynamicStyle(context)),
                                 ],
                               ),
@@ -451,7 +451,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               child: Row(
                                 children: [
                                   Image.asset('assets/images/logoutIcon.png', width: 25.w, height: 25.h),
-                                  SizedBox(width: 20.w),
+                                  SizedBox(width: 24.w),
                                   Text(
                                     "logout".tr(),
                                     style: getDynamicStyle(context, color: Colors.red),
@@ -464,7 +464,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 80.h),
+                  SizedBox(height: 55.h),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: AnimatedContainer(
