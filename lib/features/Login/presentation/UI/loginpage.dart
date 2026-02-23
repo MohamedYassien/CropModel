@@ -1,304 +1,308 @@
+import 'dart:io';
+import 'package:cropmodel/features/Login/presentation/UI/widgets/CustomTextField.dart';
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:flutter/widgets.dart' as flutter; // Fully qualified
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-class loginpage extends StatefulWidget {
-  const loginpage({super.key});
+import '../bloc/LoginBloc.dart';
+import '../bloc/LoginEvent.dart';
+import '../bloc/LoginState.dart';
+import '../../data/service/BiometricService.dart';
+import 'MainPage.dart';
+import '../../../../../core/constants/app_colors.dart'; // <-- AppColors
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<loginpage> createState() => _loginpageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _loginpageState extends State<loginpage> {
+class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
-  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  void _login() {
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
 
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    const mockEmail = "user@example.com";
-    const mockPassword = "password123";
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (email == mockEmail && password == mockPassword) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("login_success".tr()),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 1),
-          ),
-        );
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(context, '/main');
-          }
-        });
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("invalid_credentials".tr()),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    }
+    context.read<LoginBloc>().add(
+      LoginWithEmailEvent(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isArabic = context.locale.languageCode == 'ar';
+    final state = context.watch<LoginBloc>().state;
+    final bool isLoading = state is LoginLoading;
 
-    return Scaffold(
-      body: Directionality(
-        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 52.w),
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: 121.h),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: AppColors.labelTextColor,
+          ),
+          floatingLabelStyle: TextStyle(
+            color: AppColors.labelTextColor,
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: AppColors.enabledBorderColor,
+            ),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: AppColors.focusBorderColor,
+              width: 2,
+            ),
+          ),
+        ),
+      ),
+      child: Scaffold(
+        body: BlocListener<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state is LoginSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("login_success".tr()),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MainPage()),
+              );
+            }
 
-                        Image.asset(
-                          "assets/images/logo.png",
-                          height: 130.h,
-                          width: 130.w,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'app_logo'.tr(),
-                        ),
+            if (state is LoginFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
 
-                        SizedBox(height: 25.h),
-
-                        Text(
-                          "login".tr(),
-                          style: TextStyle(
-                            fontSize: 32.sp,
-                            fontWeight: FontWeight.bold,
+            if (state is BiometricNotAvailable) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Biometric not available"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 52.w),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(height: 121.h),
+                          Image.asset(
+                            "assets/images/logo.png",
+                            height: 130.h,
+                            width: 130.w,
                           ),
-                        ),
+                          SizedBox(height: 25.h),
+                          Text(
+                            "login".tr(),
+                            style: TextStyle(
+                              fontSize: 32.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.labelTextColor,
+                            ),
+                          ),
+                          SizedBox(height: 40.h),
 
-                        SizedBox(height: 40.h),
-
-                        TextFormField(
-                          controller: _emailController,
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          enabled: !_isLoading,
-                          style: TextStyle(fontSize: 16.sp),
-                          decoration: InputDecoration(
-                            hintText: "email_address".tr(),
+                          CustomTextField(
+                            controller: _emailController,
+                            enabled: !isLoading,
+                            hintText: "email_required".tr(),
                             labelText: "email_address".tr(),
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14.sp,
-                            ),
-                            labelStyle: TextStyle(fontSize: 16.sp),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFFFCDD2), width: 2.w),
-                            ),
-                            errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red, width: 1.5.w),
-                            ),
-                            focusedErrorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red, width: 2.w),
-                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "email_required".tr();
+                              }
+
+                              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                              if (!emailRegex.hasMatch(value.trim())) {
+                                return "enter_valid_email".tr();
+                              }
+
+                              return null;
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "email_required".tr();
-                            }
-                            final emailRegex = RegExp(
-                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                            );
+                          SizedBox(height: 20.h),
 
-                            if (!emailRegex.hasMatch(value.trim())) {
-                              return "invalid_email".tr();
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: 20.h),
-
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                          textInputAction: TextInputAction.done,
-                          enabled: !_isLoading,
-                          style: TextStyle(fontSize: 16.sp),
-                          onFieldSubmitted: (_) => _login(),
-                          decoration: InputDecoration(
-                            hintText: "password".tr(),
+                          CustomTextField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            enabled: !isLoading,
+                            hintText: "password_required".tr(),
                             labelText: "password".tr(),
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14.sp,
-                            ),
-                            labelStyle: TextStyle(fontSize: 16.sp),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFFFCDD2), width: 2.w),
-                            ),
-                            errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red, width: 1.5.w),
-                            ),
-                            focusedErrorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red, width: 2.w),
-                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "password_required".tr();
+                              }
+                              if (value.trim().length < 6) {
+                                return "password_min_length".tr();
+                              }
 
+                              final uppercaseRegex = RegExp(r'[A-Z]');
+                              if (!uppercaseRegex.hasMatch(value)) {
+                                return "password_uppercase".tr();
+                              }
+
+                              final specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+                              if (!specialCharRegex.hasMatch(value)) {
+                                return "password_special_char".tr();
+                              }
+
+                              return null;
+                            },
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: Colors.grey,
-                                size: 20.w,
+                                size: 24.sp,
+                                color: AppColors.enabledBorderColor,
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                              tooltip: _obscurePassword
-                                  ? 'show_password'.tr()
-                                  : 'hide_password'.tr(),
+                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "password_required".tr();
-                            }
-                            if (value.length < 6) {
-                              return "password_min_length".tr();
-                            }
-                            return null;
-                          },
-                        ),
-                        Align(
-                          alignment: isArabic ? Alignment.centerLeft : Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: _isLoading ? null : () {
-                            },
-                            child: Text(
-                              "forgot_password".tr(),
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14.sp,
+                          Align(
+                            alignment: isArabic
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                "forgot_password".tr(),
+                                style: TextStyle(color: AppColors.errorColor),
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 20.h),
 
-                        SizedBox(height: 20.h),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 55.h,
+                                  child: ElevatedButton(
+                                    onPressed: isLoading ? null : _login,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.buttonColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18.r),
+                                      ),
+                                      elevation: 3,
+                                    ),
+                                    child: isLoading
+                                        ? SizedBox(
+                                      height: 22.h,
+                                      width: 22.w,
+                                      child:
+                                      const CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                        : Text(
+                                      "login_button".tr(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10.w),
 
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _login,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFCF2120),
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: 15.h),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                            ),
-                            child: _isLoading
-                                ? SizedBox(
-                              height: 20.h,
-                              width: 20.w,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.w,
-                              ),
-                            )
-                                : Text(
-                              'login_button'.tr(),
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
+                              FutureBuilder<bool>(
+                                future: BiometricService()
+                                    .checkBiometricAvailability(),
+                                builder: (context, snapshot) {
+                                  final available = snapshot.data ?? false;
+                                  if (!available) return const SizedBox.shrink();
+                                  IconData icon = Platform.isIOS
+                                      ? Icons.face
+                                      : Icons.fingerprint;
 
-                        SizedBox(height: 20.h),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 40.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "new_to_cropmeal".tr(),
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: _isLoading ? null : () {
-                            },
-                            child: Text(
-                              "register".tr(),
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
+                                  return SizedBox(
+                                    width: 55.w,
+                                    height: 55.h,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        icon,
+                                        size: 26.sp,
+                                        color: AppColors.enabledBorderColor,
+                                      ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () {
+                                        context
+                                            .read<LoginBloc>()
+                                            .add(BiometricLoginEvent());
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
+                            ],
                           ),
+                          SizedBox(height: 20.h),
                         ],
                       ),
-                    ),
-                  ],
+
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 40.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "new_to_cropmeal".tr(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: AppColors.labelTextColor,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                "register",
+                                style: TextStyle(
+                                  color: AppColors.errorColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
