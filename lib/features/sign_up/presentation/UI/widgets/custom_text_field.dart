@@ -22,8 +22,14 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       validator: validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      cursorColor: AppColors.cursorColor,
+      cursorErrorColor: AppColors.primaryColor,
       decoration: InputDecoration(
-        labelText: hintText,
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: AppColors.hintTextColor,
+          fontWeight: FontWeight.bold
+        ),
         errorStyle: TextStyle(fontSize: 12.sp, color: Colors.red , fontWeight: FontWeight.bold),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.grey, width: 2),
