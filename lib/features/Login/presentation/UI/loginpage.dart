@@ -11,8 +11,7 @@ import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
 import '../../data/service/BiometricService.dart';
 import 'MainPage.dart';
-import '../../../../../core/constants/app_colors.dart'; // <-- AppColors
-
+import '../../../../../core/constants/app_colors.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -56,33 +55,113 @@ class _LoginPageState extends State<LoginPage> {
           return Scaffold(
             body: BlocListener<LoginBloc, LoginState>(
               listener: (context, state) {
+
+
                 if (state is LoginSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("login_success".tr()),
-                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFF71BC55),
+                      elevation: 0,
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "login_success".tr(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      action: SnackBarAction(
+                        label: "✕",
+                        textColor: Colors.white,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        },
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
+
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) =>  MainPage()),
+                    MaterialPageRoute(builder: (_) => MainPage()),
                   );
                 }
+
 
                 if (state is LoginFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
-                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFFEA2020),
+                      elevation: 0,
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children: [
+                          Icon(Icons.error_rounded, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              state.message,
+                              style: TextStyle(color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      action: SnackBarAction(
+                        label: "✕",
+                        textColor: Colors.white,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        },
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
                 }
 
+
                 if (state is BiometricNotAvailable) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Biometric not available"),
-                      backgroundColor: Colors.red,
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFFEA2020),
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children:  [
+                          Icon(Icons.error_rounded, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "Biometric not available",
+                              style: TextStyle(color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+
+                            ),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
                 }
@@ -114,6 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                                   fontSize: 32.sp,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.labelTextColor,
+                                  fontFamily: 'Nunito',
                                 ),
                               ),
                               SizedBox(height: 40.h),
@@ -163,8 +243,8 @@ class _LoginPageState extends State<LoginPage> {
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     size: 24.sp,
                                     color: AppColors.enabledBorderColor,
                                   ),
@@ -180,7 +260,9 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {},
                                   child: Text(
                                     "forgot_password".tr(),
-                                    style: TextStyle(color: AppColors.errorColor),
+                                    style: TextStyle(color: AppColors.errorColor,
+                                      fontFamily: 'Nunito',
+                                    ),
                                   ),
                                 ),
                               ),
@@ -203,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
                                             ? SizedBox(
                                           height: 22.h,
                                           width: 22.w,
-                                          child: const CircularProgressIndicator(
+                                          child:  CircularProgressIndicator(
                                             strokeWidth: 2.5,
                                             color: Colors.white,
                                           ),
@@ -214,6 +296,7 @@ class _LoginPageState extends State<LoginPage> {
                                             color: Colors.white,
                                             fontSize: 18.sp,
                                             fontWeight: FontWeight.bold,
+                                            fontFamily: 'Nunito',
                                           ),
                                         ),
                                       ),
@@ -264,6 +347,7 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     color: AppColors.labelTextColor,
+                                    fontFamily: 'Nunito',
                                   ),
                                 ),
                                 TextButton(
@@ -273,6 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                                     style: TextStyle(
                                       color: AppColors.errorColor,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'Nunito',
                                     ),
                                   ),
                                 ),
