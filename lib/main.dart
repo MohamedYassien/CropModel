@@ -1,6 +1,6 @@
 import 'package:cropmodel/features/Login/data/service/BiometricService.dart';
+import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:cropmodel/features/Login/presentation/bloc/LoginBloc.dart';
-import 'package:cropmodel/features/sign_up/presentation/UI/sign_up_presenter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const SignUpPresenter(),
+          home: const LoginPage(),
         );
       },
     );

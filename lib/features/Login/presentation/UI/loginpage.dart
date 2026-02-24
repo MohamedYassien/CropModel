@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:cropmodel/features/Login/presentation/UI/widgets/CustomTextField.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' as flutter; // Fully qualified
+import 'package:flutter/material.dart'; // Fully qualified
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import '../../../sign_up/presentation/UI/sign_up_presenter.dart';
 import '../bloc/LoginBloc.dart';
 import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
@@ -289,7 +289,11 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const SignUpPresenter()));
+                              },
                               child: Text(
                                 "register",
                                 style: TextStyle(

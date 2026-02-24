@@ -1,5 +1,6 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:cropmodel/features/sign_up/data/model/sign_up_request.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,10 @@ class SignUpPresenter extends StatefulWidget {
 }
 
 class _SignUpPresenterState extends State<SignUpPresenter> {
-  final List<TextEditingController> _controllers = List.generate(
-    3,
-    (index) => TextEditingController(),
-  );
+
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -68,7 +69,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                         padding: EdgeInsets.symmetric(horizontal: 35.r),
                         child: CustomTextField(
                           hintText: 'full_name'.tr(),
-                          controller: _controllers[0],
+                          controller: _fullNameController,
                           validator: (value) => Helpers.validateFullName(value),
                         ),
                       ),
@@ -77,7 +78,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                         padding: EdgeInsets.symmetric(horizontal: 35.r),
                         child: CustomTextField(
                           hintText: 'email_address'.tr(),
-                          controller: _controllers[1],
+                          controller: _emailController,
                           validator: (value) => Helpers.validateEmail(value),
                         ),
                       ),
@@ -86,7 +87,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                         padding: EdgeInsets.symmetric(horizontal: 35.r),
                         child: CustomTextField(
                           hintText: 'phone_number'.tr(),
-                          controller: _controllers[2],
+                          controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           validator: (value) => Helpers.validatePhone(value),
                         ),
@@ -120,9 +121,9 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                                     context.read<SignUpBloc>().add(
                                       SignUpButtonPressed(
                                         signUpRequest: SignUpRequest(
-                                          name: _controllers[0].text,
-                                          email: _controllers[1].text,
-                                          phone: _controllers[2].text,
+                                          name: _fullNameController.text,
+                                          email: _emailController.text,
+                                          phone: _phoneController.text,
                                         ),
                                       ),
                                     );
@@ -145,7 +146,9 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                             child: Text(
                               "login".tr(),
                               style: TextStyle(
