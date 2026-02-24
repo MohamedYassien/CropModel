@@ -24,17 +24,20 @@ class CustomTextField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       cursorColor: AppColors.cursorColor,
       cursorErrorColor: AppColors.primaryColor,
+      style: TextStyle(
+        color: AppColors.labelTextColor,
+        fontWeight: FontWeight.w600
+      ),
       decoration: InputDecoration(
-        labelText: hintText,
-        labelStyle: TextStyle(
-          color: AppColors.labelTextColor,
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: AppColors.hintTextColor,
           fontWeight: FontWeight.bold
         ),
         errorStyle: TextStyle(fontSize: 12.sp, color: Colors.red , fontWeight: FontWeight.bold),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.grey, width: 2),
         ),
-        focusColor: AppColors.primaryColor,
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.grey, width: 2),
         ),
