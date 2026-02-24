@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../../sign_up/presentation/UI/sign_up_presenter.dart';
+import '../../data/service/SecureStorage.dart';
 import '../bloc/LoginBloc.dart';
 import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
@@ -254,36 +255,28 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(height: 20.h),
                             ],
                           ),
-                          SizedBox(height: 20.h),
-                        ],
-                      ),
-
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 40.h),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "new_to_cropmeal".tr(),
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: AppColors.labelTextColor,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const SignUpPresenter()));
-                              },
-                              child: Text(
-                                "register",
-                                style: TextStyle(
-                                  color: AppColors.errorColor,
-                                  fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 40.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "new_to_cropmeal".tr(),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: AppColors.labelTextColor,
+                                  ),
                                 ),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignUpPresenter(),
+                                      ),
+                                    );
+                                  },
                                   child: Text(
                                     "register",
                                     style: TextStyle(
