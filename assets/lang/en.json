@@ -12,5 +12,20 @@
   "login_success": "Login successful",
   "enter_valid_email": "enter valid email that has @ and .com",
   "password_uppercase":" password uppercase",
-  "password_special_char": "password special char"
+  "password_special_char": "password special char",
+  "sign_up_success": "Sign up Success",
+  "sign_up": "Sign up",
+  "full_name": "Full name",
+  "email_address" : "Email address",
+  "phone_number": "Phone number",
+  "continue": "Continue",
+  "have_an_account_already": "Have an account already?",
+  "login": "login",
+  "full_name_required": "Full name is required",
+  "full_name_too_short": "Full name must be at least 3 characters",
+  "full_name_invalid": "Full name must contain only letters",
+  "email_required": "Email address is required",
+  "email_invalid": "Email address is invalid",
+  "phone_number_required": "Phone number is required",
+  "phone_invalid": "Phone number invalid"
 }
