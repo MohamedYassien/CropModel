@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class AppColors {
+  static const Color primaryColor = Color(0xffCF2120);
   static const hintTextColor = Color(0xFF9E9E9E);
   static const labelTextColor = Colors.black;
   static const cursorColor = Colors.black;
