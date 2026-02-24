@@ -18,17 +18,9 @@ void main() async {
       path: 'assets/lang',
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<LoginBloc>(
-            create: (_) => LoginBloc(
-              biometricService: BiometricService(),
-              secureStorage: SecureStorage(),
-            ),
-          ),
-        ],
+
         child: const MyApp(),
-      ),
+
     ),
   );
 }
