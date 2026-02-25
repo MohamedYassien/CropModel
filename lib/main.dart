@@ -1,12 +1,8 @@
-import 'package:cropmodel/features/Login/data/service/BiometricService.dart';
 import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
-import 'package:cropmodel/features/Login/presentation/bloc/LoginBloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'features/Login/data/service/SecureStorage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +15,7 @@ void main() async {
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
 
-        child: const MyApp(),
+      child: const MyApp(),
 
     ),
   );

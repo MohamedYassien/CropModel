@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:cropmodel/features/Login/presentation/UI/widgets/CustomTextField.dart';
+import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
-
+import '../../../../core/shared/custom_text_field.dart';
 import '../../../sign_up/presentation/UI/sign_up_presenter.dart';
 import '../../data/service/SecureStorage.dart';
 import '../bloc/LoginBloc.dart';
@@ -12,8 +12,7 @@ import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
 import '../../data/service/BiometricService.dart';
 import 'MainPage.dart';
-import '../../../../../core/constants/app_colors.dart'; // <-- AppColors
-
+import '../../../../../core/constants/app_colors.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -22,7 +21,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _obscurePassword = true;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -57,33 +55,113 @@ class _LoginPageState extends State<LoginPage> {
           return Scaffold(
             body: BlocListener<LoginBloc, LoginState>(
               listener: (context, state) {
+
+
                 if (state is LoginSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text("login_success".tr()),
-                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFF71BC55),
+                      elevation: 0,
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "login_success".tr(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      action: SnackBarAction(
+                        label: "✕",
+                        textColor: Colors.white,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        },
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
+
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) =>  MainPage()),
+                    MaterialPageRoute(builder: (_) => MainPage()),
                   );
                 }
+
 
                 if (state is LoginFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
-                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFFEA2020),
+                      elevation: 0,
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children: [
+                          Icon(Icons.error_rounded, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              state.message,
+                              style: TextStyle(color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      action: SnackBarAction(
+                        label: "✕",
+                        textColor: Colors.white,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        },
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
                 }
 
+
                 if (state is BiometricNotAvailable) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Biometric not available"),
-                      backgroundColor: Colors.red,
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Color(0xFFEA2020),
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      content: Row(
+                        children:  [
+                          Icon(Icons.error_rounded, color: Colors.white),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "Biometric not available",
+                              style: TextStyle(color: Colors.white,
+                                fontFamily: 'Nunito',
+                              ),
+
+                            ),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 3),
                     ),
                   );
                 }
@@ -112,67 +190,46 @@ class _LoginPageState extends State<LoginPage> {
                               Text(
                                 "login".tr(),
                                 style: TextStyle(
-                                  fontSize: 32.sp,
+                                  fontSize: 35.sp,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.labelTextColor,
                                 ),
                               ),
                               SizedBox(height: 40.h),
                               CustomTextField(
-                                controller: _emailController,
-                                enabled: !isLoading,
                                 hintText: "email_required".tr(),
-                                labelText: "email_address".tr(),
+                                controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "email_required".tr();
-                                  }
-                                  final emailRegex = RegExp(
-                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                                  if (!emailRegex.hasMatch(value.trim())) {
-                                    return "enter_valid_email".tr();
-                                  }
-                                  return null;
-                                },
+                                validator: (value) => Helpers.validateEmail(value)
                               ),
-                              SizedBox(height: 20.h),
+                              SizedBox(height: 23.h),
                               CustomTextField(
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                enabled: !isLoading,
                                 hintText: "password_required".tr(),
-                                labelText: "password".tr(),
+                                controller: _passwordController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return "password_required".tr();
                                   }
+
                                   if (value.trim().length < 6) {
                                     return "password_min_length".tr();
                                   }
+
                                   final uppercaseRegex = RegExp(r'[A-Z]');
                                   if (!uppercaseRegex.hasMatch(value)) {
                                     return "password_uppercase".tr();
                                   }
+
                                   final specialCharRegex =
                                   RegExp(r'[!@#$%^&*(),.?":{}|<>]');
                                   if (!specialCharRegex.hasMatch(value)) {
                                     return "password_special_char".tr();
                                   }
+
                                   return null;
                                 },
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    size: 24.sp,
-                                    color: AppColors.enabledBorderColor,
-                                  ),
-                                  onPressed: () =>
-                                      setState(() => _obscurePassword = !_obscurePassword),
-                                ),
                               ),
+                              SizedBox(height: 20.h),
                               Align(
                                 alignment: isArabic
                                     ? Alignment.centerLeft
@@ -181,7 +238,9 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {},
                                   child: Text(
                                     "forgot_password".tr(),
-                                    style: TextStyle(color: AppColors.errorColor),
+                                    style: TextStyle(color: AppColors.primaryColor,
+                                      fontFamily: 'Nunito',
+                                    ),
                                   ),
                                 ),
                               ),
@@ -204,7 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                                             ? SizedBox(
                                           height: 22.h,
                                           width: 22.w,
-                                          child: const CircularProgressIndicator(
+                                          child:  CircularProgressIndicator(
                                             strokeWidth: 2.5,
                                             color: Colors.white,
                                           ),
@@ -214,6 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 18.sp,
+                                            fontFamily: 'Nunito',
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -264,24 +324,27 @@ class _LoginPageState extends State<LoginPage> {
                                   "new_to_cropmeal".tr(),
                                   style: TextStyle(
                                     fontSize: 14.sp,
-                                    color: AppColors.labelTextColor,
+                                    color: Color(0xff62707D),
+                                    fontFamily: 'Nunito',
                                   ),
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignUpPresenter(),
-                                      ),
-                                    );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                          const SignUpPresenter(),
+                                        ),
+                                      );
                                   },
                                   child: Text(
                                     "register",
                                     style: TextStyle(
-                                      color: AppColors.errorColor,
+                                      color: AppColors.primaryColor,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'Nunito',
+                                      fontSize: 15.sp,
                                     ),
                                   ),
                                 ),
