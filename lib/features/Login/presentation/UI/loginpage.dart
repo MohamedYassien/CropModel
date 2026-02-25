@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/features/Login/presentation/UI/widgets/SnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,7 @@ import '../bloc/LoginState.dart';
 import '../../data/service/BiometricService.dart';
 import 'MainPage.dart';
 import '../../../../../core/constants/app_colors.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -48,94 +50,41 @@ class _LoginPageState extends State<LoginPage> {
       ),
       child: Builder(
         builder: (context) {
-
           final state = context.watch<LoginBloc>().state;
           final bool isLoading = state is LoginLoading;
 
           return Scaffold(
             body: BlocListener<LoginBloc, LoginState>(
               listener: (context, state) {
-
-
+                if (!mounted) return;
                 if (state is LoginSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Color(0xFF71BC55),
-                      elevation: 0,
-                      margin: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Row(
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.white),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "login_success".tr(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Nunito',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      action: SnackBarAction(
-                        label: "✕",
-                        textColor: Colors.white,
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        },
-                      ),
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
+                  if (state is LoginSuccess) {
+                    AppSnackBar.show(
+                      context: context,
+                      message: "Login successful",
+                      backgroundColor: const Color(0xFF71BC55),
+                      icon: Icons.check_circle_rounded,
+                    );
 
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MainPage()),
+                    );
+                  }
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => MainPage()),
+                    MaterialPageRoute(builder: (_) => const MainPage()),
                   );
                 }
-
 
                 if (state is LoginFailure) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Color(0xFFEA2020),
-                      elevation: 0,
-                      margin: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Row(
-                        children: [
-                          Icon(Icons.error_rounded, color: Colors.white),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              state.message,
-                              style: TextStyle(color: Colors.white,
-                                fontFamily: 'Nunito',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      action: SnackBarAction(
-                        label: "✕",
-                        textColor: Colors.white,
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        },
-                      ),
-                      duration: Duration(seconds: 3),
-                    ),
+                  AppSnackBar.show(
+                    context: context,
+                    message: state.message,
+                    backgroundColor: const Color(0xFFEA2020),
+                    icon: Icons.error_rounded,
                   );
                 }
-
 
                 if (state is BiometricNotAvailable) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -147,16 +96,16 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       content: Row(
-                        children:  [
+                        children: [
                           Icon(Icons.error_rounded, color: Colors.white),
                           SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               "Biometric not available",
-                              style: TextStyle(color: Colors.white,
+                              style: TextStyle(
+                                color: Colors.white,
                                 fontFamily: 'Nunito',
                               ),
-
                             ),
                           ),
                         ],
@@ -200,7 +149,8 @@ class _LoginPageState extends State<LoginPage> {
                                 hintText: "email_required".tr(),
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                validator: (value) => Helpers.validateEmail(value)
+                                validator: (value) =>
+                                    Helpers.validateEmail(value),
                               ),
                               SizedBox(height: 23.h),
                               CustomTextField(
@@ -220,8 +170,9 @@ class _LoginPageState extends State<LoginPage> {
                                     return "password_uppercase".tr();
                                   }
 
-                                  final specialCharRegex =
-                                  RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+                                  final specialCharRegex = RegExp(
+                                    r'[!@#$%^&*(),.?":{}|<>]',
+                                  );
                                   if (!specialCharRegex.hasMatch(value)) {
                                     return "password_special_char".tr();
                                   }
@@ -238,7 +189,8 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {},
                                   child: Text(
                                     "forgot_password".tr(),
-                                    style: TextStyle(color: AppColors.primaryColor,
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor,
                                       fontFamily: 'Nunito',
                                     ),
                                   ),
@@ -253,30 +205,34 @@ class _LoginPageState extends State<LoginPage> {
                                       child: ElevatedButton(
                                         onPressed: () => _login(context),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.buttonColor,
+                                          backgroundColor:
+                                              AppColors.buttonColor,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(18.r),
+                                            borderRadius: BorderRadius.circular(
+                                              18.r,
+                                            ),
                                           ),
                                           elevation: 3,
                                         ),
                                         child: isLoading
                                             ? SizedBox(
-                                          height: 22.h,
-                                          width: 22.w,
-                                          child:  CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            color: Colors.white,
-                                          ),
-                                        )
+                                                height: 22.h,
+                                                width: 22.w,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2.5,
+                                                      color: Colors.white,
+                                                    ),
+                                              )
                                             : Text(
-                                          "login_button".tr(),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18.sp,
-                                            fontFamily: 'Nunito',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                                "login_button".tr(),
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18.sp,
+                                                  fontFamily: 'Nunito',
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ),
@@ -286,9 +242,11 @@ class _LoginPageState extends State<LoginPage> {
                                         .checkBiometricAvailability(),
                                     builder: (context, snapshot) {
                                       final available = snapshot.data ?? false;
-                                      if (!available) return const SizedBox.shrink();
-                                      IconData icon =
-                                      Platform.isIOS ? Icons.face : Icons.fingerprint;
+                                      if (!available)
+                                        return const SizedBox.shrink();
+                                      IconData icon = Platform.isIOS
+                                          ? Icons.face
+                                          : Icons.fingerprint;
 
                                       return SizedBox(
                                         width: 55.w,
@@ -302,10 +260,10 @@ class _LoginPageState extends State<LoginPage> {
                                           onPressed: isLoading
                                               ? null
                                               : () {
-                                            context
-                                                .read<LoginBloc>()
-                                                .add(BiometricLoginEvent());
-                                          },
+                                                  context.read<LoginBloc>().add(
+                                                    BiometricLoginEvent(),
+                                                  );
+                                                },
                                         ),
                                       );
                                     },
@@ -330,13 +288,13 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                          const SignUpPresenter(),
-                                        ),
-                                      );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignUpPresenter(),
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     "register",
