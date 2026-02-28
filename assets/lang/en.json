@@ -1,3 +1,21 @@
 {
-  "spaceflight_news" : "Spaceflight News"
+
+  "spaceflight_news" : "Spaceflight News",
+  "forget_password_title": "Forget your password",
+  "forget_password_subtitle_line1": "Enter the email address associated",
+  "forget_password_subtitle_line2": "with your account",
+  "email_address": "Email address",
+  "continue": "Continue",
+  "confirm": "Confirm",
+  "otp_verification": "OTP Verification",
+  "otp_subtitle": "Please OTP code sent to John***@gmail.com",
+  "didnt_receive_code": "If you didn’t receive code",
+  "resend_otp": "Resend the OTP",
+  "continue": "Continue",
+  "attempts_left": "Attempts left",
+  "password_changed": "Your password has been changed",
+  "reset_password_title": "Reset Your Password",
+  "enter_pass": "Enter your password",
+  "enter_confirm_pass": "Confirm your password"
+
 }

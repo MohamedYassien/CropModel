@@ -1,3 +1,15 @@
 {
-"spaceflight_news" : "أخبار الفضاء"
+
+  "spaceflight_news" : "أخبار الفضاء",
+  "forget_password_title": "نسيت كلمة المرور",
+  "forget_password_subtitle_line1": "أدخل البريد الإلكتروني المرتبط",
+  "forget_password_subtitle_line2": "بحسابك",
+  "email_address": "البريد الإلكتروني",
+  "continue": "متابعة",
+  "confirm": "تأكيد",
+  "reset_password_title": "إعادة تعيين كلمة المرور الخاصة بك",
+  "enter_pass": "أدخل كلمة المرور الخاصة بك",
+  "enter_confirm_pass": "تأكيد كلمة المرور الخاصة بك"
+
+
 }
