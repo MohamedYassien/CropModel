@@ -27,5 +27,12 @@
   "email_required": "Email address is required",
   "email_invalid": "Email address is invalid",
   "phone_number_required": "Phone number is required",
-  "phone_invalid": "Phone number invalid"
+  "phone_invalid": "Phone number invalid",
+  "otp_verification": "OTP Verification",
+  "please_otp_code_sent_to": "Please OTP code sent to {email}",
+  "if_you_did_not_receive_code": "If you did not receive the code",
+  "resend_the_otp": "Resend the OTP",
+  "otp_cannot_be_empty": "OTP cannot be empty",
+  "otp_must_be_6_digits": "OTP must be 6 digits",
+  "attempts_left": "{attempts} Attempts left"
 }
