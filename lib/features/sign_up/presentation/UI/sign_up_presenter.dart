@@ -1,14 +1,16 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
-import 'package:cropmodel/features/sign_up/data/model/sign_up_request.dart';
+import 'package:cropmodel/features/sign_up/data/model/sign-up/sign_up_request.dart';
+import 'package:cropmodel/features/sign_up/presentation/UI/otp_presenter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/shared/custom_text_field.dart';
-import '../bloc/sign_up_bloc.dart';
-import '../bloc/sign_up_event.dart';
-import '../bloc/sign_up_state.dart';
+import '../bloc/sign-up/sign_up_bloc.dart';
+import '../bloc/sign-up/sign_up_event.dart';
+import '../bloc/sign-up/sign_up_state.dart';
 
 class SignUpPresenter extends StatefulWidget {
   const SignUpPresenter({super.key});
@@ -37,9 +39,13 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
           }
 
           if (state is SignUpSuccess) {
-            ScaffoldMessenger.of(
+            Navigator.push(
               context,
-            ).showSnackBar(SnackBar(content: Text('sign_up_success'.tr())));
+              MaterialPageRoute(
+                builder: (context) =>
+                    OTPPresenter(email: _emailController.text),
+              ),
+            );
           }
         },
         child: BlocBuilder<SignUpBloc, SignUpState>(
@@ -79,7 +85,8 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                             child: CustomTextField(
                               hintText: 'email_address'.tr(),
                               controller: _emailController,
-                              validator: (value) => Helpers.validateEmail(value),
+                              validator: (value) =>
+                                  Helpers.validateEmail(value),
                             ),
                           ),
                           SizedBox(height: 20.h),
@@ -89,7 +96,8 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                               hintText: 'phone_number'.tr(),
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
-                              validator: (value) => Helpers.validatePhone(value),
+                              validator: (value) =>
+                                  Helpers.validatePhone(value),
                             ),
                           ),
                           SizedBox(height: 70.h),
@@ -97,39 +105,22 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                               ? CircularProgressIndicator(
                                   color: AppColors.primaryColor,
                                 )
-                              : Container(
-                                  width: 284.w,
-                                  height: 52.h,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  child: MaterialButton(
-                                    child: Text(
-                                      'continue'.tr(),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.sp,
-                                        fontFamily: 'Nunito',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      FocusScope.of(context).unfocus();
-              
-                                      if (_formKey.currentState!.validate()) {
-                                        context.read<SignUpBloc>().add(
-                                          SignUpButtonPressed(
-                                            signUpRequest: SignUpRequest(
-                                              name: _fullNameController.text,
-                                              email: _emailController.text,
-                                              phone: _phoneController.text,
-                                            ),
+                              : CustomButton(
+                                  onPressed: () {
+                                    FocusScope.of(context).unfocus();
+
+                                    if (_formKey.currentState!.validate()) {
+                                      context.read<SignUpBloc>().add(
+                                        SignUpButtonPressed(
+                                          signUpRequest: SignUpRequest(
+                                            name: _fullNameController.text,
+                                            email: _emailController.text,
+                                            phone: _phoneController.text,
                                           ),
-                                        );
-                                      }
-                                    },
-                                  ),
+                                        ),
+                                      );
+                                    }
+                                  },
                                 ),
                           SizedBox(height: 100.h),
                           Row(

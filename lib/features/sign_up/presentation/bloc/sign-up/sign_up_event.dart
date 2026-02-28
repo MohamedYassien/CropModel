@@ -1,4 +1,4 @@
-import 'package:cropmodel/features/sign_up/data/model/sign_up_request.dart';
+import 'package:cropmodel/features/sign_up/data/model/sign-up/sign_up_request.dart';
 
 abstract class SignUpEvent{}
 

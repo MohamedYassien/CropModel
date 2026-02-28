@@ -1,16 +1,27 @@
 import 'package:easy_localization/easy_localization.dart';
 
 class Helpers {
+
+  static String validateItemNotNull(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'field_required'.tr();
+    }
+    return '';
+  }
+
   static String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'full_name_required'.tr();
     }
+
     if (value.trim().length < 3) {
       return 'full_name_too_short'.tr();
     }
-    if (!RegExp(r"^[a-zA-Z ]+$").hasMatch(value)) {
+
+    if (!RegExp(r"^[a-zA-Z\u0600-\u06FF\s]+$").hasMatch(value)) {
       return 'full_name_invalid'.tr();
     }
+
     return null;
   }
 
@@ -39,7 +50,30 @@ class Helpers {
     if (!phoneRegex.hasMatch(trimmedValue)) {
       return 'phone_invalid'.tr();
     }
-
     return null;
   }
+
+  static String translateNumber(String input, String language) {
+    const englishToArabicDigits = {
+      '0': '٠',
+      '1': '١',
+      '2': '٢',
+      '3': '٣',
+      '4': '٤',
+      '5': '٥',
+      '6': '٦',
+      '7': '٧',
+      '8': '٨',
+      '9': '٩',
+    };
+
+    if (language == 'en'){
+      return input;
+    }
+
+    return input.split('').map((e) => englishToArabicDigits[e] ?? e).join();
+  }
+
+
+
 }
