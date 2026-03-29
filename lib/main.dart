@@ -1,4 +1,4 @@
-import 'package:cropmodel/features/example/presentation/UI/example_presenter.dart';
+import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -10,14 +10,17 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en') , Locale('ar')],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/lang',
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
+
       child: const MyApp(),
+
     ),
   );
 }
+
 
 
 class MyApp extends StatelessWidget {
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const NewsPage(),
+          home: const LoginPage(),
         );
       },
     );
