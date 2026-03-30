@@ -91,12 +91,10 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 22.w),
+          padding: EdgeInsets.symmetric(horizontal: 22.w),
           child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios),
           ),
         ),
         title: Text(
@@ -138,7 +136,10 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                           SizedBox(height: 16.h),
                           Text(
                             "no_image_uploaded".tr(),
-                            style: getDynamicStyle(context, size: 18, color: Colors.grey, weight: FontWeight.bold),
+                            style: getDynamicStyle(context,
+                                size: 18,
+                                color: Colors.grey,
+                                weight: FontWeight.bold),
                           ),
                         ],
                       )
@@ -163,7 +164,7 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                         initEditorConfigHandler: (state) => EditorConfig(
                           maxScale: 8.0,
                           cropAspectRatio: 1.0,
-                          cornerColor:AppColors.primaryColor,
+                          cornerColor: AppColors.primaryColor,
                         ),
                       ),
                     ),
@@ -184,8 +185,10 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                         ),
                       ),
                       child: Text(
-                        (!hasImage ? "upload_profile_picture" : "change_photo").tr(),
-                        style: getDynamicStyle(context, size: 20, color: AppColors.primaryColor),
+                        (!hasImage ? "upload_profile_picture" : "change_photo")
+                            .tr(),
+                        style: getDynamicStyle(context,
+                            size: 20, color: AppColors.primaryColor),
                       ),
                     ),
                     SizedBox(height: 15.h),
@@ -201,7 +204,8 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                         ),
                         child: Text(
                           "confirm".tr(),
-                          style: getDynamicStyle(context, size: 20, color: Colors.white),
+                          style: getDynamicStyle(context,
+                              size: 20, color: Colors.white),
                         ),
                       ),
                   ],
