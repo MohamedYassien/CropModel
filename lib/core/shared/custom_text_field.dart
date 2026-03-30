@@ -2,11 +2,17 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../utils/text_font_transformer.dart';
+
 class CustomTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
+  final FocusNode? focusNode;
+  final Widget? suffixIcon;
+  final bool enabled;
+  final TextStyle? textStyle;
 
   const CustomTextField({
     super.key,
@@ -14,6 +20,10 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.focusNode,
+    this.suffixIcon,
+    this.enabled = true,
+    this.textStyle,
   });
 
   @override
@@ -22,35 +32,54 @@ class CustomTextField extends StatelessWidget {
       height: 50.h,
       child: TextFormField(
         controller: controller,
+        focusNode: focusNode,
+        enabled: enabled,
         validator: validator,
+        keyboardType: keyboardType,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        cursorColor: AppColors.cursorColor,
-        cursorErrorColor: AppColors.primaryColor,
-        style: TextStyle(
-          color: AppColors.labelTextColor,
-          fontWeight: FontWeight.w600
-        ),
+
+        style: textStyle ?? getDynamicStyle(context),
+
         decoration: InputDecoration(
           hintText: hintText,
+          suffixIcon: suffixIcon,
+
+          errorStyle: TextStyle(
+            height: 1.2, // control spacing
+          ),
+
+          helperText: ' ',
+
           hintStyle: TextStyle(
             color: AppColors.hintTextColor,
-            fontWeight: FontWeight.bold
+            fontWeight: FontWeight.w400,
           ),
-          errorStyle: TextStyle(fontSize: 12.sp, color: Colors.red , fontWeight: FontWeight.bold),
-          enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey, width: 2),
+
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5.w),
           ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey, width: 2),
+
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.red.withOpacity(0.2),
+              width: 2.w,
+            ),
           ),
+
+          disabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5.w),
+          ),
+
           errorBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.red, width: 2),
           ),
+
           focusedErrorBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.red, width: 2),
           ),
+
+          contentPadding: EdgeInsets.symmetric(vertical: 10.h),
         ),
-        keyboardType: keyboardType,
       ),
     );
   }

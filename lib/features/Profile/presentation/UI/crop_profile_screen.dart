@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image/image.dart' as img;
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/imageHelper.dart';
 import '../../../../core/utils/text_font_transformer.dart';
 
@@ -162,7 +163,7 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                         initEditorConfigHandler: (state) => EditorConfig(
                           maxScale: 8.0,
                           cropAspectRatio: 1.0,
-                          cornerColor: const Color(0xFFCF2120),
+                          cornerColor:AppColors.primaryColor,
                         ),
                       ),
                     ),
@@ -184,7 +185,7 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                       ),
                       child: Text(
                         (!hasImage ? "upload_profile_picture" : "change_photo").tr(),
-                        style: getDynamicStyle(context, size: 20, color: const Color(0xFFCF2120)),
+                        style: getDynamicStyle(context, size: 20, color: AppColors.primaryColor),
                       ),
                     ),
                     SizedBox(height: 15.h),
@@ -193,7 +194,7 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
                         onPressed: _isLoading ? null : _cropImage,
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(double.infinity, 55.h),
-                          backgroundColor: const Color(0xFFCF2120),
+                          backgroundColor: AppColors.primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.r),
                           ),
@@ -213,7 +214,7 @@ class _CropProfileScreenState extends State<CropProfileScreen> {
               color: Colors.black.withOpacity(0.3),
               child: Center(
                 child: CircularProgressIndicator(
-                  color: const Color(0xFFCF2120),
+                  color: AppColors.primaryColor,
                 ),
               ),
             ),
