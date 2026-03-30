@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../Login/presentation/UI/loginpage.dart';
+
 class Passwordchanged extends StatefulWidget {
   const Passwordchanged({super.key});
 
@@ -26,7 +28,7 @@ class _PasswordchangedState extends State<Passwordchanged> {
                     fontSize: 26.sp,
                     fontFamily: 'Nunito',
                     fontWeight: FontWeight.w700,
-                ),
+                  ),
                 ),
                 Image.asset("assets/images/success.png"),
                 SizedBox(height: 70.h),
@@ -34,13 +36,18 @@ class _PasswordchangedState extends State<Passwordchanged> {
                   width: double.infinity,
                   height: 50.h,
                   child: ElevatedButton(
-                    onPressed:() {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => LoginPage()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
-                      )
+                      ),
                     ),
                     child: Text(
                       "confirm".tr(),

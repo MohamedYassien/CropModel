@@ -3,12 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+// Bloc & Service Imports
+import '../../../../core/shared/custom_text_field.dart';
 import '../bloc/forgotPass_bloc.dart';
+import '../bloc/forgotPass_event.dart';
 import '../bloc/forgotPass_state.dart';
+import '../../data/service/forgotpass_services.dart';
+
+// UseCase Imports
+import '../../domain/usecases/send_otp_usecase.dart';
+import '../../domain/usecases/verify_otp_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
+
+// UI Imports
 import 'PasswordChanged.dart';
+import '../../../../../core/constants/app_colors.dart';
 
 class Resetpassword extends StatefulWidget {
-  const Resetpassword({super.key});
+  final String email; // Added email to identify the user for reset
+  const Resetpassword({super.key, required this.email});
 
   @override
   State<Resetpassword> createState() => _ResetpasswordState();
@@ -16,159 +29,202 @@ class Resetpassword extends StatefulWidget {
 
 class _ResetpasswordState extends State<Resetpassword> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
+  bool _isObscure = true;
+  bool _isConfirmObscure = true;
 
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Password is required";
+  void _onConfirm(BuildContext context) {
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<ForgotPassBloc>().add(
+        ResetPasswordEvent(widget.email, passwordController.text.trim()),
+      );
     }
-
-    if (value.length < 8) {
-      return "Minimum length is 8 characters";
-    }
-
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return "Must include an uppercase letter";
-    }
-
-    if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return "Must include a lowercase letter";
-    }
-
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return "Must include a number";
-    }
-
-    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-      return "Must include a special character";
-    }
-
-    return null;
   }
 
-  String? validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Please confirm your password";
-    }
+  void _showSnackBar(BuildContext context, String message, Color color, IconData icon) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 20.sp),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(fontFamily: 'Nunito', color: Colors.white, fontSize: 14.sp),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(16.w),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ),
+    );
+  }
 
-    if (confirmController.text != passwordController.text) {
-      return "Passwords do not match";
-    }
-
-    return null;
+  @override
+  void dispose() {
+    passwordController.dispose();
+    confirmController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocListener<ForgotPassBloc, ForgotPassState>(
-        listener: (context, state) {
-          if (state is ForgotPassPasswordReset) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const Passwordchanged()),
-            );
-          }
+    return BlocProvider(
+      create: (_) {
+        final service = ForgotpassServices();
+        return ForgotPassBloc(
+          sendOtpUseCase: SendOtpUseCase(service),
+          verifyOtpUseCase: VerifyOtpUseCase(service),
+          resetPasswordUseCase: ResetPasswordUseCase(service),
+        );
+      },
+      child: Builder(
+        builder: (context) {
+          final state = context.watch<ForgotPassBloc>().state;
+          final bool isLoading = state is ForgotPassLoading;
 
-          if (state is ForgotPassError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
-          }
-        },
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios),
-                      ),
-                    ),
-                    Image.asset("assets/images/reset_pass.png"),
+          return Scaffold(
+            body: BlocListener<ForgotPassBloc, ForgotPassState>(
+              listener: (context, state) {
+                if (!mounted) return;
 
-                    Text(
-                      "reset_password_title".tr(),
-                      style: TextStyle(fontSize: 25.sp, fontFamily: 'Nunito'),
-                    ),
+                if (state is ForgotPassPasswordReset) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Passwordchanged()),
+                  );
+                }
 
-                    SizedBox(height: 20.h),
+                if (state is ForgotPassError) {
+                  String displayMessage;
 
-                    TextFormField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                        hintText: "enter_pass".tr(),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14.sp,
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey,
-                      ),
 
-                      validator: validatePassword,
-                    ),
-                    SizedBox(height: 20.h),
-                    TextFormField(
-                      controller: confirmController,
-                      decoration: InputDecoration(
-                        hintText: "enter_confirm_pass".tr(),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14.sp,
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey,
-                      ),
-                      validator: validateConfirmPassword,
-                    ),
+                  if (state.message.contains('not found') ||
+                      state.message.contains('404')) {
+                    displayMessage = "no_account_found".tr();
+                  } else if (state.message.contains('network') ||
+                      state.message.contains('SocketException')) {
+                    displayMessage = "check_connection".tr();
+                  } else if (state.message.contains('too many') ||
+                      state.message.contains('429')) {
+                    displayMessage = "too_many_requests".tr();
+                  } else {
+                    displayMessage = "something_went_wrong".tr();
+                  }
 
-                    SizedBox(height: 20.h),
-
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Passwordchanged(),
+                  _showSnackBar(
+                    context,
+                    displayMessage,
+                    const Color(0xFFEA2020),
+                    Icons.error_outline,
+                  );
+                }
+              },
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 25.w),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.arrow_back_ios),
                             ),
-                          );
-                        }
-                      },
-                      child: Text(
-                        "confirm".tr(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        minimumSize: Size(double.infinity, 48.h),
+                          ),
+                          Image.asset(
+                            "assets/images/reset_pass.png",
+                            height: 200.h,
+                            width: 200.w,
+                          ),
+                          Text(
+                            "reset_password_title".tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 25.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.labelTextColor,
+                              fontFamily: 'Nunito',
+                            ),
+                          ),
+                          SizedBox(height: 40.h),
+
+                          // New Password Field
+                          CustomTextField(
+                            controller: passwordController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return "password_required".tr();
+                              if (value.length < 8) return "password_min_length".tr();
+                              return null;
+                            }, hintText: 'Password',
+                          ),
+
+                          SizedBox(height: 20.h),
+
+                          // Confirm Password Field
+                          CustomTextField(
+                            controller: confirmController,
+                            hintText: 'Confirm Password',
+                            validator: (value) {
+                              if (value != passwordController.text) return "passwords_do_not_match".tr();
+                              return null;
+                            },
+                          ),
+
+                          SizedBox(height: 40.h),
+
+                          // Confirm Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 55.h,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : () => _onConfirm(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.buttonColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.r),
+                                ),
+                                elevation: 3,
+                              ),
+                              child: isLoading
+                                  ? SizedBox(
+                                height: 22.h,
+                                width: 22.w,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                                  : Text(
+                                "confirm".tr(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
