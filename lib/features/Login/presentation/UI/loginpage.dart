@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/shared/custom_text_field.dart';
+import '../../../ForgotPassword/presentation/UI/ForgetPasswordScreen.dart';
 import '../../../sign_up/presentation/UI/sign_up_presenter.dart';
 import '../../data/service/SecureStorage.dart';
 import '../bloc/LoginBloc.dart';
@@ -186,7 +187,15 @@ class _LoginPageState extends State<LoginPage> {
                                     ? Alignment.centerLeft
                                     : Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Forgetpasswordscreen(),
+                                      ),
+                                    );
+                                  },
                                   child: Text(
                                     "forgot_password".tr(),
                                     style: TextStyle(
