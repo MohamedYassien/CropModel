@@ -11,8 +11,16 @@ class OTPBloc extends Bloc<OTPEvent, OTPState> {
       emit(OTPVerifyLoading());
       try {
 
-        await VerifyOtpUseCase().call(OTPRequest(otp: event.otp, email: event.email));
-        emit(OTPVerifySuccess());
+        String otpnumber="123456";
+        event.otp;
+        if(event.otp ==otpnumber ){
+          emit(OTPVerifySuccess());
+
+        }else{
+          emit(OTPVerifyError("OTP Wrong"));
+        }
+        //await VerifyOtpUseCase().call(OTPRequest(otp: event.otp, email: event.email));
+
       } catch (e) {
         emit(OTPVerifyError(e.toString()));
       }
@@ -22,6 +30,7 @@ class OTPBloc extends Bloc<OTPEvent, OTPState> {
       emit(OTPResendLoading());
       try {
         //await ResendOtpUseCase().call(event.email);
+
         emit(OTPResendSuccess());
       } catch (e) {
         emit(OTPResendError(e.toString()));

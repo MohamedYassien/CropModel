@@ -25,14 +25,14 @@ class _OTPPresenterState extends State<OTPPresenter> {
     6,
     (_) => TextEditingController(),
   );
+
   late final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   int _secondsRemaining = 0;
-
   int _attemptsLeft = 5;
+  final int _maxAttempts = 5;
 
   bool _hasResent = false;
-
   Timer? _timer;
 
   @override
@@ -59,11 +59,55 @@ class _OTPPresenterState extends State<OTPPresenter> {
     });
   }
 
+  void _clearOtpFields() {
+    for (var controller in _controllers) {
+      controller.clear();
+    }
+  }
+
   String get timerText {
     final minutes = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
     final seconds = (_secondsRemaining % 60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
+
+  void _showSnackBar(
+    BuildContext context,
+    String message,
+    Color color,
+    IconData icon,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 20.sp),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(16.w),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+      ),
+    );
+  }
+
+  bool get _canResend => _secondsRemaining == 0 && _attemptsLeft == 0;
+
+  bool get _canVerify => _attemptsLeft > 0;
 
   @override
   void dispose() {
@@ -86,9 +130,33 @@ class _OTPPresenterState extends State<OTPPresenter> {
           if (state is OTPResendSuccess) {
             setState(() {
               _hasResent = true;
-              if (_attemptsLeft > 0) _attemptsLeft--;
+              _attemptsLeft = _maxAttempts;
             });
             _startTimer();
+          }
+
+          if (state is OTPVerifyError) {
+            setState(() {
+              if (_attemptsLeft > 0) {
+                _attemptsLeft--;
+              }
+            });
+            _clearOtpFields();
+            _showSnackBar(
+              context,
+              state.message,
+              const Color(0xFFEA2020),
+              Icons.error_outline,
+            );
+          }
+
+          if (state is OTPVerifySuccess) {
+            _showSnackBar(
+              context,
+              "otp verified success".tr(),
+              const Color(0xFF71BC55),
+              Icons.check_circle,
+            );
           }
         },
         child: BlocBuilder<OTPBloc, OTPState>(
@@ -114,6 +182,7 @@ class _OTPPresenterState extends State<OTPPresenter> {
                         ),
                         Image.asset('assets/images/otp_lock.png'),
                         SizedBox(height: 20.h),
+
                         Text(
                           'otp_verification'.tr(),
                           style: TextStyle(
@@ -121,7 +190,9 @@ class _OTPPresenterState extends State<OTPPresenter> {
                             fontFamily: 'Nunito',
                           ),
                         ),
+
                         SizedBox(height: 10.h),
+
                         Text(
                           'please_otp_code_sent_to'.tr(
                             namedArgs: {'email': widget.email},
@@ -132,7 +203,9 @@ class _OTPPresenterState extends State<OTPPresenter> {
                             fontFamily: 'Nunito',
                           ),
                         ),
+
                         SizedBox(height: 30.h),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(6, (index) {
@@ -148,34 +221,17 @@ class _OTPPresenterState extends State<OTPPresenter> {
                                   } else if (value.isEmpty && index > 0) {
                                     _focusNodes[index - 1].requestFocus();
                                   }
+                                  if (index == 5) {
+                                    FocusScope.of(context).unfocus();
+                                  }
                                 },
                               ),
                             );
                           }),
                         ),
-                        if (state is OTPVerifyError) ...[
-                          SizedBox(height: 10.h),
-                          Text(
-                            state.message,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 10.sp,
-                              fontFamily: 'Nunito',
-                            ),
-                          ),
-                        ],
-                        if (state is OTPResendError) ...[
-                          SizedBox(height: 10.h),
-                          Text(
-                            state.message,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 10.sp,
-                              fontFamily: 'Nunito',
-                            ),
-                          ),
-                        ],
+
                         SizedBox(height: 20.h),
+
                         if (_secondsRemaining > 0) ...[
                           Text(
                             timerText,
@@ -187,6 +243,7 @@ class _OTPPresenterState extends State<OTPPresenter> {
                           ),
                           SizedBox(height: 8.h),
                         ],
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -199,13 +256,16 @@ class _OTPPresenterState extends State<OTPPresenter> {
                             ),
                             TextButton(
                               onPressed:
-                                  (_secondsRemaining == 0 &&
-                                      _attemptsLeft > 0 &&
-                                      state is! OTPResendLoading)
+                                  (_canResend && state is! OTPResendLoading)
                                   ? () {
+                                      String otp = _controllers
+                                          .map((c) => c.text)
+                                          .join();
+                                      _clearOtpFields();
                                       context.read<OTPBloc>().add(
                                         OTPResendButtonPressed(
                                           email: widget.email,
+                                          otp: otp,
                                         ),
                                       );
                                     }
@@ -214,11 +274,9 @@ class _OTPPresenterState extends State<OTPPresenter> {
                                 'resend_the_otp'.tr(),
                                 style: TextStyle(
                                   color:
-                                      (_secondsRemaining == 0 &&
-                                          _attemptsLeft > 0 &&
-                                          state is! OTPResendLoading)
+                                      (_canResend && state is! OTPResendLoading)
                                       ? AppColors.primaryColor
-                                      : AppColors.primaryColor.withOpacity(0.5),
+                                      : Colors.grey,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -226,35 +284,43 @@ class _OTPPresenterState extends State<OTPPresenter> {
                             ),
                           ],
                         ),
-                        if (_hasResent && _attemptsLeft >= 0) ...[
+
+                        if (_hasResent ||
+                            _attemptsLeft < _maxAttempts &&
+                                _attemptsLeft > 0) ...[
                           SizedBox(height: 8.h),
                           Text(
-                            "attempts_left".tr(namedArgs: {'attempts': Helpers.translateNumber(_attemptsLeft.toString(), context.locale.languageCode)}),
+                            "attempts_left".tr(
+                              namedArgs: {
+                                'attempts': Helpers.translateNumber(
+                                  _attemptsLeft.toString(),
+                                  context.locale.languageCode,
+                                ),
+                              },
+                            ),
                             style: TextStyle(
                               color: AppColors.hintTextColor,
                               fontSize: 12.sp,
                             ),
                           ),
                         ],
+
                         SizedBox(height: 30.h),
-                        state is OTPVerifyLoading
-                            ? CircularProgressIndicator(
-                                color: AppColors.primaryColor,
-                              )
-                            : CustomButton(
-                                onPressed: () {
-                                  FocusScope.of(context).unfocus();
-                                  String otp = _controllers
-                                      .map((c) => c.text)
-                                      .join();
-                                  context.read<OTPBloc>().add(
-                                    OTPButtonPressed(
-                                      otp: otp,
-                                      email: widget.email,
-                                    ),
-                                  );
-                                },
-                              ),
+
+                        CustomButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            String otp = _controllers.map((c) => c.text).join();
+                            print('the otp: $otp');
+
+                            context.read<OTPBloc>().add(
+                              OTPButtonPressed(otp: otp, email: widget.email),
+                            );
+                          },
+                          state: state is OTPVerifyLoading,
+                          canVerify: _canVerify,
+                        ),
+
                         SizedBox(height: 200.h),
                       ],
                     ),
