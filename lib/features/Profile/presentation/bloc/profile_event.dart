@@ -2,26 +2,26 @@ import 'dart:typed_data';
 
 abstract class ProfileEvent {}
 
-class LoadProfileEvent extends ProfileEvent {}
+class LoadProfilePressed extends ProfileEvent {}
 
-class ProfileImageChangedEvent extends ProfileEvent {
-  final Uint8List newImage;
-  ProfileImageChangedEvent(this.newImage);
-}
-
-class ProfileFieldsChangedEvent extends ProfileEvent {
-  final String name;
-  final String phone;
-  ProfileFieldsChangedEvent({required this.name, required this.phone});
-}
-
-class SaveProfileEvent extends ProfileEvent {
-  final String name;
-  final String phone;
-  SaveProfileEvent({required this.name, required this.phone});
-}
-
-class ToggleFingerprintEvent extends ProfileEvent {
+class ToggleFingerprintPressed extends ProfileEvent {
   final bool isEnabled;
-  ToggleFingerprintEvent(this.isEnabled);
+  ToggleFingerprintPressed(this.isEnabled);
+}
+
+class ProfileImageChanged extends ProfileEvent {
+  final Uint8List newImage;
+  ProfileImageChanged(this.newImage);
+}
+
+class ProfileFieldsChanged extends ProfileEvent {
+  final String name;
+  final String phone;
+  ProfileFieldsChanged({required this.name, required this.phone});
+}
+
+class SaveProfilePressed extends ProfileEvent {
+  final String name;
+  final String phone;
+  SaveProfilePressed({required this.name, required this.phone});
 }

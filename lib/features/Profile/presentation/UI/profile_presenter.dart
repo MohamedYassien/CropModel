@@ -7,7 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/text_font_transformer.dart';
-import '../../data/service/user_service_impl.dart';
+import '../../data/service/profile_service.dart';
 import '../bloc/profile_block.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -65,33 +65,52 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
   }
 
   void _onFieldsChanged() {
-    context.read<ProfileBloc>().add(
-      ProfileFieldsChangedEvent(
-        name: _nameController.text,
-        phone: _phoneNumberController.text,
-      ),
-    );
+    if (context.read<ProfileBloc>().state is ProfileLoaded) {
+      context.read<ProfileBloc>().add(
+        ProfileFieldsChanged(
+          name: _nameController.text,
+          phone: _phoneNumberController.text,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ProfileBloc>(
-        create: (context) => ProfileBloc(UserRepositoryImpl())..add(LoadProfileEvent()),
-    child: BlocConsumer<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state.user != null && !_isInitialized) {
-          _nameController.text = state.user!.name;
-          _phoneNumberController.text = state.user!.phoneNumber;
-          _emailController.text = state.user!.email;
-          _isInitialized = true;
-        }
-      },
-      builder: (context, state) {
-        if (state.isLoading && !_isInitialized) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+        create: (context) => ProfileBloc()..add(LoadProfilePressed()),
+        child: BlocConsumer<ProfileBloc, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileLoaded && !_isInitialized) {
+              _nameController.text = state.user.name;
+              _phoneNumberController.text = state.user.phoneNumber;
+              _emailController.text = state.user.email;
+              _isInitialized = true;
+            }
+
+            if (state is ProfileUpdateSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Profile Updated!")),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is ProfileLoading && !_isInitialized) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (state is ProfileError) {
+              return Scaffold(
+                body: Center(child: Text(state.message)),
+              );
+            }
+
+            ///////////////
+            final bool isLoading = state is ProfileLoading;
+            final bool hasChanges = state is ProfileLoaded ? state.hasChanges : false;
+            final Uint8List? tempImage = state is ProfileLoaded ? state.tempImage : null;
+            final user = state is ProfileLoaded ? state.user : null;
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -132,16 +151,11 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                           CircleAvatar(
                             radius: 60.r,
                             backgroundColor: Colors.grey[200],
-                            backgroundImage: state.tempImage != null
-                                ? MemoryImage(state.tempImage!)
-                                : (state.user?.profileImage != null
-                                          ? MemoryImage(
-                                              state.user!.profileImage!,
-                                            )
-                                          : const AssetImage(
-                                              'assets/images/profilePlaceholder2.png',
-                                            ))
-                                      as ImageProvider,
+                            backgroundImage:tempImage != null
+                                ? MemoryImage(tempImage)
+                                : (user?.profileImage != null
+                                ? MemoryImage(user!.profileImage!)
+                                : const AssetImage('assets/images/profilePlaceholder2.png')) as ImageProvider,
                           ),
                           Positioned(
                             bottom: -22.h,
@@ -151,16 +165,12 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => CropProfileScreen(
-                                      initialImageBytes:
-                                          state.tempImage ??
-                                          state.user?.profileImage,
+                                      initialImageBytes: tempImage ?? user?.profileImage,
                                     ),
                                   ),
                                 );
                                 if (result != null && result is Uint8List) {
-                                  context.read<ProfileBloc>().add(
-                                    ProfileImageChangedEvent(result),
-                                  );
+                                  context.read<ProfileBloc>().add(ProfileImageChanged(result));
                                 }
                               },
                               child: Container(
@@ -279,11 +289,9 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 const Spacer(),
                                 Switch(
                                   value:
-                                      state.user?.isFingerprintEnabled ?? false,
+                                      user?.isFingerprintEnabled ?? false,
                                   onChanged: (value) {
-                                    context.read<ProfileBloc>().add(
-                                      ToggleFingerprintEvent(value),
-                                    );
+                                    context.read<ProfileBloc>().add(ToggleFingerprintPressed(value));
                                   },
                                   thumbColor: WidgetStateProperty.resolveWith(
                                     (states) =>
@@ -421,17 +429,17 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                       Align(
                         alignment: Alignment.bottomRight,
                         child: ElevatedButton(
-                          onPressed: state.hasChanges
+                          onPressed: (hasChanges && !isLoading)
                               ? () => context.read<ProfileBloc>().add(
-                                  SaveProfileEvent(
-                                    name: _nameController.text,
-                                    phone: _phoneNumberController.text,
-                                  ),
-                                )
+                            SaveProfilePressed(
+                              name: _nameController.text,
+                              phone: _phoneNumberController.text,
+                            ),
+                          )
                               : null,
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(95.w, 45.h),
-                            backgroundColor: state.hasChanges
+                            backgroundColor: hasChanges
                                 ? const Color(0xFFCF2120)
                                 : const Color(0x33CF2120),
                             disabledBackgroundColor: const Color(0x33CF2120),
@@ -439,7 +447,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               borderRadius: BorderRadius.circular(15.r),
                             ),
                           ),
-                          child: state.isLoading
+                          child: isLoading
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
@@ -463,6 +471,8 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                 ),
               ),
             ),
+
+
           ),
         );
       },

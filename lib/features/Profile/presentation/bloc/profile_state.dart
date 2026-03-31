@@ -1,34 +1,43 @@
 import 'dart:typed_data';
 import '../../data/model/user_model.dart';
 
-class ProfileState {
-  final UserModel? user;
-  final bool isLoading;
-  final String? errorMessage;
+abstract class ProfileState {}
+
+class ProfileInitial extends ProfileState {}
+
+class ProfileLoading extends ProfileState {}
+
+class ProfileLoaded extends ProfileState {
+  final UserModel user;
   final bool hasChanges;
   final Uint8List? tempImage;
+  final String? errorMessage;
 
-  ProfileState({
-    this.user,
-    this.isLoading = false,
-    this.errorMessage,
+  ProfileLoaded({
+    required this.user,
     this.hasChanges = false,
     this.tempImage,
+    this.errorMessage,
   });
 
-  ProfileState copyWith({
+  ProfileLoaded copyWith({
     UserModel? user,
-    bool? isLoading,
-    String? errorMessage,
     bool? hasChanges,
     Uint8List? tempImage,
+    String? errorMessage,
   }) {
-    return ProfileState(
+    return ProfileLoaded(
       user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
       hasChanges: hasChanges ?? this.hasChanges,
       tempImage: tempImage ?? this.tempImage,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
+}
+
+class ProfileUpdateSuccess extends ProfileState {}
+
+class ProfileError extends ProfileState {
+  final String message;
+  ProfileError(this.message);
 }

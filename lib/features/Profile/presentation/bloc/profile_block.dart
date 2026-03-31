@@ -1,63 +1,80 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/service/user_service.dart';
+import '../../data/model/user_model.dart';
+import '../../domain/usecases/get_user_profile_usecase.dart';
+import '../../domain/usecases/update_profile_usecase.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  final UserRepository userRepository;
+  final GetProfileUseCase _getProfileUseCase = GetProfileUseCase();
+  final UpdateProfileUseCase _updateProfileUseCase = UpdateProfileUseCase();
 
-  ProfileBloc(this.userRepository) : super(ProfileState()) {
+  ProfileBloc() : super(ProfileInitial()) {
 
-    on<ToggleFingerprintEvent>((event, emit) {
-      if (state.user != null) {
-        final updatedUser = state.user!.copyWith(isFingerprintEnabled: event.isEnabled);
-
-        emit(state.copyWith(
-          user: updatedUser,
-          hasChanges: true,
-        ));
-      }
-    });
-
-    on<LoadProfileEvent>((event, emit) async {
-      emit(state.copyWith(isLoading: true));
+    on<LoadProfilePressed>((event, emit) async {
+      emit(ProfileLoading());
       try {
-        final user = await userRepository.getProfile();
-        emit(state.copyWith(user: user, isLoading: false));
+        final user = await _getProfileUseCase.call();
+        if (user != null) {
+          emit(ProfileLoaded(user: user));
+        }
       } catch (e) {
-        emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+        emit(ProfileLoaded(user: _createDefaultUser()));
       }
     });
 
-    on<ProfileImageChangedEvent>((event, emit) {
-      emit(state.copyWith(
-        tempImage: event.newImage,
-        hasChanges: true,
-      ));
-    });
-
-    on<ProfileFieldsChangedEvent>((event, emit) {
-      if (state.user != null) {
-        final bool changed = event.name != state.user!.name ||
-            event.phone != state.user!.phoneNumber;
-        emit(state.copyWith(hasChanges: changed));
+    on<ToggleFingerprintPressed>((event, emit) {
+      if (state is ProfileLoaded) {
+        final currentState = state as ProfileLoaded;
+        final updatedUser = currentState.user.copyWith(isFingerprintEnabled: event.isEnabled);
+        emit(currentState.copyWith(user: updatedUser, hasChanges: true));
       }
     });
 
-    on<SaveProfileEvent>((event, emit) async {
-      emit(state.copyWith(isLoading: true));
-      final updatedUser = state.user!.copyWith(
-        name: event.name,
-        phoneNumber: event.phone,
-        profileImage: state.tempImage ?? state.user!.profileImage,
-      );
+    on<ProfileImageChanged>((event, emit) {
+      if (state is ProfileLoaded) {
+        final currentState = state as ProfileLoaded;
+        emit(currentState.copyWith(tempImage: event.newImage, hasChanges: true));
+      }
+    });
 
-      try {
-        await userRepository.updateProfile(updatedUser);
-        emit(state.copyWith(user: updatedUser, isLoading: false, hasChanges: false));
-      } catch (e) {
-        emit(state.copyWith(isLoading: false, errorMessage: "Save Failed"));
+    on<ProfileFieldsChanged>((event, emit) {
+      if (state is ProfileLoaded) {
+        final currentState = state as ProfileLoaded;
+        final bool changed = event.name != currentState.user.name ||
+            event.phone != currentState.user.phoneNumber;
+        emit(currentState.copyWith(hasChanges: changed));
+      }
+    });
+
+    on<SaveProfilePressed>((event, emit) async {
+      if (state is ProfileLoaded) {
+        final currentState = state as ProfileLoaded;
+        emit(ProfileLoading());
+
+        final updatedUser = currentState.user.copyWith(
+          name: event.name,
+          phoneNumber: event.phone,
+          profileImage: currentState.tempImage ?? currentState.user.profileImage,
+        );
+
+        try {
+          await _updateProfileUseCase.call(updatedUser);
+          emit(ProfileUpdateSuccess());
+        } catch (e) {
+          emit(ProfileError("Save Failed"));
+        }
       }
     });
   }
 }
+
+UserModel _createDefaultUser() {
+  return UserModel(
+    name: "New User",
+    email: "example@mail.com",
+    phoneNumber: "0000000000",
+    isFingerprintEnabled: false,
+  );
+}
+

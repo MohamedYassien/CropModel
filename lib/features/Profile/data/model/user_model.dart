@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:convert';
 
 class UserModel {
   final String name;
@@ -36,6 +37,10 @@ class UserModel {
       name: json['full_name'] ?? '',
       email: json['email'] ?? '',
       phoneNumber: json['phone'] ?? '',
+      // FIX: Convert Base64 String from API back to Uint8List for Flutter
+      profileImage: json['profile_image'] != null
+          ? base64Decode(json['profile_image'])
+          : null,
       isFingerprintEnabled: json['fingerprint_enabled'] ?? false,
     );
   }
@@ -46,6 +51,9 @@ class UserModel {
       'email': email,
       'phone': phoneNumber,
       'fingerprint_enabled': isFingerprintEnabled,
+      'profile_image': profileImage != null
+          ? base64Encode(profileImage!)
+          : null,
     };
   }
 }
