@@ -21,6 +21,7 @@ class OTPPresenter extends StatefulWidget {
 }
 
 class _OTPPresenterState extends State<OTPPresenter> {
+  String? otp;
   late final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -32,7 +33,6 @@ class _OTPPresenterState extends State<OTPPresenter> {
   int _attemptsLeft = 5;
   final int _maxAttempts = 5;
 
-  bool _hasResent = false;
   Timer? _timer;
 
   @override
@@ -107,7 +107,9 @@ class _OTPPresenterState extends State<OTPPresenter> {
 
   bool get _canResend => _secondsRemaining == 0 && _attemptsLeft == 0;
 
-  bool get _canVerify => _attemptsLeft > 0;
+  bool get _isOtpFilled => _controllers.every((c) => c.text.isNotEmpty);
+
+  bool get _canVerify => _attemptsLeft > 0 && _isOtpFilled;
 
   @override
   void dispose() {
@@ -129,7 +131,6 @@ class _OTPPresenterState extends State<OTPPresenter> {
         listener: (context, state) {
           if (state is OTPResendSuccess) {
             setState(() {
-              _hasResent = true;
               _attemptsLeft = _maxAttempts;
             });
             _startTimer();
@@ -258,14 +259,13 @@ class _OTPPresenterState extends State<OTPPresenter> {
                               onPressed:
                                   (_canResend && state is! OTPResendLoading)
                                   ? () {
-                                      String otp = _controllers
+                                      otp = _controllers
                                           .map((c) => c.text)
                                           .join();
                                       _clearOtpFields();
                                       context.read<OTPBloc>().add(
                                         OTPResendButtonPressed(
                                           email: widget.email,
-                                          otp: otp,
                                         ),
                                       );
                                     }
@@ -285,19 +285,20 @@ class _OTPPresenterState extends State<OTPPresenter> {
                           ],
                         ),
 
-                        if (_hasResent ||
+                        if (
                             _attemptsLeft < _maxAttempts &&
-                                _attemptsLeft > 0) ...[
+                                _attemptsLeft >= 0) ...[
                           SizedBox(height: 8.h),
                           Text(
-                            "attempts_left".tr(
+                          _attemptsLeft > 0
+                          ? "attempts_left".tr(
                               namedArgs: {
                                 'attempts': Helpers.translateNumber(
                                   _attemptsLeft.toString(),
                                   context.locale.languageCode,
                                 ),
                               },
-                            ),
+                            ) : 'You Don\'t Have Any Attempts Please Resend the OTP',
                             style: TextStyle(
                               color: AppColors.hintTextColor,
                               fontSize: 12.sp,
@@ -308,17 +309,28 @@ class _OTPPresenterState extends State<OTPPresenter> {
                         SizedBox(height: 30.h),
 
                         CustomButton(
-                          onPressed: () {
+                          onPressed: _canVerify
+                            ? () {
                             FocusScope.of(context).unfocus();
-                            String otp = _controllers.map((c) => c.text).join();
+                            otp = _controllers.map((c) => c.text).join();
                             print('the otp: $otp');
 
                             context.read<OTPBloc>().add(
-                              OTPButtonPressed(otp: otp, email: widget.email),
+                              OTPButtonPressed(otp: otp!, email: widget.email),
                             );
-                          },
-                          state: state is OTPVerifyLoading,
-                          canVerify: _canVerify,
+                          } : null,
+                          child: state is OTPVerifyLoading
+                              ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2,)
+                              : Text(
+                            'continue'.tr(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
                         ),
 
                         SizedBox(height: 200.h),

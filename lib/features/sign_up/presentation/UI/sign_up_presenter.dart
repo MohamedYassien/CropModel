@@ -121,6 +121,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                                       );
                                     }
                                   },
+                            buttonText: 'continue',
                                 ),
                           SizedBox(height: 100.h),
                           Row(
