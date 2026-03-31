@@ -25,7 +25,7 @@
   "email_address": "Email address",
   "continue": "Continue",
   "otp_verification": "OTP Verification",
-  "otp_subtitle": "Please OTP code sent to John***@gmail.com",
+  "otp_subtitle": "Please OTP code sent to ",
   "didnt_receive_code": "If you didn’t receive code",
   "resend_otp": "Resend the OTP",
   "attempts_left": "Attempts left",
@@ -33,6 +33,7 @@
   "reset_password_title": "Reset Your Password",
   "enter_pass": "Enter your password",
   "enter_confirm_pass": "Confirm your password",
+
   "login": "Login",
   "password": "Password",
   "forgot_password": "Forgot Password?",
@@ -40,7 +41,7 @@
   "new_to_cropmeal": "New to CropMeal?",
   "register": "Register",
   "email_required": "Please enter your email",
-  "password_required": "Please enter your password",
+  "password_required": "Password",
   "password_min_length": "Password must be at least 6 characters",
   "login_success": "Login successful",
   "enter_valid_email": "enter valid email that has @ and .com",
@@ -54,5 +55,22 @@
   "full_name_invalid": "Full name must contain only letters",
   "email_invalid": "Email address is invalid",
   "phone_number_required": "Phone number is required",
-  "phone_invalid": "Phone number invalid"
+  "phone_invalid": "Phone number invalid",
+
+  "forget_password": "Forgot Password",
+  "forget_password_subtitle": "Enter your email address to receive a verification code.",
+  "email_address": "Email Address",
+  "email_required": "Email is required",
+  "invalid_email": "Please enter a valid email address",
+  "continue": "Continue",
+  "otp_sent_success": "Verification code sent successfully!",
+
+    "no_account_found": "We couldn't find an account with this email.",
+    "check_connection": "Please check your internet connection and try again.",
+    "too_many_requests": "Too many attempts. Please try again in a few minutes.",
+    "something_went_wrong": "An error occurred. Please try again later.",
+    "server_error": "Server is currently unavailable. Please try later.",
+    "passwords_do_not_match": "Passwords do not match"
+
+
 }

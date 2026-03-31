@@ -1,8 +1,10 @@
-import 'dart:io';
+import 'package:cropmodel/features/Login/presentation/UI/widgets/ShowBiometricDialog.dart';
+import 'package:cropmodel/features/Login/presentation/UI/widgets/showLogoutDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../data/service/SecureStorage.dart';
 import 'loginpage.dart';
+
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -11,199 +13,130 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
+class _MainPageState extends State<MainPage> {
   final SecureStorage _storage = SecureStorage();
   bool _biometricEnabled = false;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadBiometricStatus();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-
-    _scaleAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadBiometricStatus() async {
     final enabled = await _storage.isBiometricEnabled();
+
+    if (!mounted) return;
     setState(() => _biometricEnabled = enabled);
 
     if (!enabled) {
-      Future.delayed(Duration.zero, () => _showBiometricDialog());
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+
+        showBiometricDialog(
+          context: context,
+          onEnable: () async {
+            await _toggleBiometric(true);
+          },
+          onSkip: () async {
+            await _toggleBiometric(false);
+          },
+        );
+      });
     }
   }
 
   Future<void> _toggleBiometric(bool value) async {
     await _storage.setBiometricEnabled(value);
+
+    if (!mounted) return;
     setState(() => _biometricEnabled = value);
   }
 
-  void _showBiometricDialog() {
-    _animationController.forward();
-
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierLabel: "Biometric",
-      transitionDuration: const Duration(milliseconds: 350),
-      pageBuilder: (context, anim1, anim2) {
-        return Center(
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 30.w),
-              padding: EdgeInsets.all(20.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 15.r,
-                    offset: Offset(0, 5.h),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Platform.isIOS ? Icons.face_3 : Icons.fingerprint,
-                    size: 60.sp,
-                    color: const Color(0xFFCF2120),
-                  ),
-                  SizedBox(height: 15.h),
-                  Text(
-                    "Enable Biometric Login",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "Would you like to enable fingerprint or faceID login for faster access?",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  SizedBox(height: 25.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          _toggleBiometric(false);
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 12.h),
-                          backgroundColor: Colors.grey[200],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        child: Text(
-                          "No",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          _toggleBiometric(true);
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFCF2120),
-                          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 12.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        child: Text(
-                          "Yes",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, anim1, anim2, child) {
-        return FadeTransition(
-          opacity: anim1,
-          child: child,
-        );
-      },
+  void _logout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
-        title: const Text("Main Page"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          "Main Page",
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Color(0xFFCF2120)),
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-
-              );
+              showLogoutDialog(context, _logout);
             },
           ),
         ],
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "You are logged in",
-              style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.bold,
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 30.h),
-            SwitchListTile(
-              title: Text(
-                "Enable Biometric Login",
-                style: TextStyle(fontSize: 16.sp),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: const Color(0xFFCF2120),
+                    size: 60.sp,
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "You are logged in",
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: const Color(0xFFCF2120),
+                    title: Text(
+                      "Enable Biometric Login",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    value: _biometricEnabled,
+                    onChanged: _toggleBiometric,
+                  ),
+                ],
               ),
-              value: _biometricEnabled,
-              onChanged: _toggleBiometric,
             ),
           ],
         ),

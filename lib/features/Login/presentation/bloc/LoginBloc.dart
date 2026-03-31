@@ -1,6 +1,8 @@
+import 'package:cropmodel/features/Login/domain/usecases/BiometricAuth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/service/BiometricService.dart';
 import '../../data/service/SecureStorage.dart';
+import '../../domain/usecases/checkBiometricAvailability.dart';
 import 'LoginEvent.dart';
 import 'LoginState.dart';
 
@@ -42,13 +44,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       return;
     }
 
-    final isAvailable = await biometricService.checkBiometricAvailability();
+    final isAvailable = await CheckBiometricAvailabilty().call();
     if (!isAvailable) {
       emit(BiometricNotAvailable());
       return;
     }
 
-    final authenticated = await biometricService.authenticate();
+    final authenticated = await Biometricauth(BiometricService()).call();
     if (!authenticated) {
       emit(LoginFailure('Biometric authentication failed'));
       return;
