@@ -7,8 +7,10 @@ import '../constants/app_colors.dart';
 class CustomButton extends StatelessWidget {
 
   final void Function()? onPressed;
+  final bool? canVerify;
+  final bool? state;
 
-  const CustomButton({super.key, this.onPressed});
+  const CustomButton({super.key, this.onPressed , this.canVerify = true, this.state = false});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +19,13 @@ class CustomButton extends StatelessWidget {
       height: 52.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: AppColors.primaryColor,
+        color: canVerify! && !state! ? AppColors.primaryColor : Colors.grey.shade400,
       ),
       child: MaterialButton(
-        onPressed: onPressed,
-        child: Text(
+        onPressed: canVerify! ? onPressed : null,
+        child: state!
+            ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2,)
+            : Text(
           'continue'.tr(),
           style: TextStyle(
             color: Colors.white,
