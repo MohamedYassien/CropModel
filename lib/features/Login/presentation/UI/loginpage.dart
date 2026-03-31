@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               SizedBox(height: 40.h),
                               CustomTextField(
-                                hintText: "email_required".tr(),
+                                hintText: "email_address".tr(),
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) =>
@@ -247,32 +247,48 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   SizedBox(width: 10.w),
                                   FutureBuilder<bool>(
-                                    future: BiometricService()
-                                        .checkBiometricAvailability(),
+                                    future: BiometricService().checkBiometricAvailability(),
                                     builder: (context, snapshot) {
                                       final available = snapshot.data ?? false;
-                                      if (!available)
-                                        return const SizedBox.shrink();
+                                      if (!available) return const SizedBox.shrink();
+
                                       IconData icon = Platform.isIOS
-                                          ? Icons.face
+                                          ? Icons.face_retouching_natural
                                           : Icons.fingerprint;
 
-                                      return SizedBox(
-                                        width: 55.w,
-                                        height: 55.h,
-                                        child: IconButton(
-                                          icon: Icon(
-                                            icon,
-                                            size: 26.sp,
-                                            color: AppColors.enabledBorderColor,
+                                      return GestureDetector(
+                                        onTap: isLoading
+                                            ? null
+                                            : () {
+                                          context.read<LoginBloc>().add(
+                                            BiometricLoginEvent(),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: 55.w,
+                                          height: 55.h,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(14.r),
+                                            border: Border.all(
+                                              color: const Color(0xFFF1F1F1),
+                                              width: 1,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.08),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                          onPressed: isLoading
-                                              ? null
-                                              : () {
-                                                  context.read<LoginBloc>().add(
-                                                    BiometricLoginEvent(),
-                                                  );
-                                                },
+                                          child: Center(
+                                            child: Icon(
+                                              icon,
+                                              size: 26.sp,
+                                              color: const Color(0xFF444444),
+                                            ),
+                                          ),
                                         ),
                                       );
                                     },
