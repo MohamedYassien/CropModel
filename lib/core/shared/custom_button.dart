@@ -8,7 +8,7 @@ class CustomButton extends StatelessWidget {
   final void Function()? onPressed;
   final Color? color;
   final Widget? child;
-  final String? buttonText;
+  final String? buttonTextKey;
   final double? width;
   final double? height;
   final double borderRadius;
@@ -16,6 +16,7 @@ class CustomButton extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final BorderSide? border;
   final Color? disabledColor;
+  final bool? isLoading;
 
   const CustomButton({
     super.key,
@@ -25,44 +26,51 @@ class CustomButton extends StatelessWidget {
     this.width = 284,
     this.height = 52,
     this.borderRadius = 15,
-    this.elevation = 2,
+    this.elevation = 0,
     this.padding,
     this.border,
-    this.disabledColor = Colors.grey,
-    this.buttonText,
+    this.disabledColor = AppColors.primaryColor,
+    this.buttonTextKey,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final bool isDisabled = onPressed == null;
 
-    return SizedBox(
+    return isLoading!
+        ? CircularProgressIndicator(
+      color: AppColors.primaryColor,
+      strokeWidth: 4,
+    )
+        : SizedBox(
       width: width?.w,
       height: height?.h,
       child: Material(
-        color: isDisabled ? disabledColor : color,
-        borderRadius: BorderRadius.circular(borderRadius),
-        elevation: elevation,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(borderRadius),
-          onTap: isDisabled ? null : onPressed,
-          child: Padding(
-            padding: padding ?? EdgeInsets.symmetric(horizontal: 16.w),
-            child: Center(
-              child: child ??
-                  Text(
-                    '$buttonText'.tr(),
-                    style: TextStyle(
-                      color: isDisabled ? Colors.black38 : Colors.white,
-                      fontSize: 16.sp,
-                      fontFamily: 'Nunito',
-                      fontWeight: FontWeight.bold,
-                    ),
+              color: isDisabled ? disabledColor?.withOpacity(0.5) : color,
+              borderRadius: BorderRadius.circular(borderRadius),
+              elevation: elevation,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(borderRadius),
+                onTap: isDisabled ? null : onPressed,
+                child: Padding(
+                  padding: padding ?? EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Center(
+                    child:
+                        child ??
+                        Text(
+                          '$buttonTextKey'.tr(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17.sp,
+                            fontFamily: 'Nunito',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                   ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

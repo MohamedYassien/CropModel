@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/widgets/otp_field.dart';
@@ -71,40 +72,6 @@ class _OTPPresenterState extends State<OTPPresenter> {
     return "$minutes:$seconds";
   }
 
-  void _showSnackBar(
-    BuildContext context,
-    String message,
-    Color color,
-    IconData icon,
-  ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 20.sp),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(16.w),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
-  }
-
   bool get _canResend => _secondsRemaining == 0 && _attemptsLeft == 0;
 
   bool get _isOtpFilled => _controllers.every((c) => c.text.isNotEmpty);
@@ -127,220 +94,220 @@ class _OTPPresenterState extends State<OTPPresenter> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => OTPBloc(),
-      child: BlocListener<OTPBloc, OTPState>(
-        listener: (context, state) {
-          if (state is OTPResendSuccess) {
-            setState(() {
-              _attemptsLeft = _maxAttempts;
-            });
-            _startTimer();
-          }
+      child: Scaffold(
+        body: BlocListener<OTPBloc, OTPState>(
+          listener: (context, state) {
+            if (state is OTPResendSuccess) {
+              setState(() {
+                _attemptsLeft = _maxAttempts;
+              });
+              _startTimer();
+            }
 
-          if (state is OTPVerifyError) {
-            setState(() {
-              if (_attemptsLeft > 0) {
-                _attemptsLeft--;
-              }
-            });
-            _clearOtpFields();
-            _showSnackBar(
-              context,
-              state.message,
-              const Color(0xFFEA2020),
-              Icons.error_outline,
-            );
-          }
+            if (state is OTPVerifyError) {
+              setState(() {
+                if (_attemptsLeft > 0) {
+                  _attemptsLeft--;
+                }
+              });
+              _clearOtpFields();
+              AppMessage.showSnackBar(
+                context,
+                state.message,
+                const Color(0xFFEA2020),
+                Icons.error_outline,
+              );
+            }
 
-          if (state is OTPVerifySuccess) {
-            _showSnackBar(
-              context,
-              "otp verified success".tr(),
-              const Color(0xFF71BC55),
-              Icons.check_circle,
-            );
-          }
-        },
-        child: BlocBuilder<OTPBloc, OTPState>(
-          builder: (context, state) {
-            return SafeArea(
-              child: Scaffold(
-                body: Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 15.w),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
+            if (state is OTPVerifySuccess) {
+              AppMessage.showSnackBar(
+                context,
+                "otp verified success".tr(),
+                const Color(0xFF71BC55),
+                Icons.check_circle,
+              );
+            }
+          },
+          child: BlocBuilder<OTPBloc, OTPState>(
+            builder: (context, state) {
+              return SafeArea(
+                child: Scaffold(
+                  body: Center(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 15.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                ),
+                                color: const Color(0xff1C1B1F),
                               ),
-                              color: const Color(0xff1C1B1F),
+                            ],
+                          ),
+                          Image.asset('assets/images/otp_lock.png'),
+                          SizedBox(height: 20.h),
+
+                          Text(
+                            'otp_verification'.tr(),
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontFamily: 'Nunito',
                             ),
+                          ),
+
+                          SizedBox(height: 10.h),
+
+                          Text(
+                            'please_otp_code_sent_to'.tr(
+                              namedArgs: {'email': widget.email},
+                            ),
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: AppColors.hintTextColor,
+                              fontFamily: 'Nunito',
+                            ),
+                          ),
+
+                          SizedBox(height: 30.h),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(6, (index) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6.w),
+                                child: OTPField(
+                                  controller: _controllers[index],
+                                  focusNode: _focusNodes[index],
+                                  index: index,
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty) {
+                                      if (index < _focusNodes.length - 1) {
+                                        _focusNodes[index + 1].requestFocus();
+                                      } else {
+                                        FocusScope.of(context).unfocus();
+                                      }
+                                    } else {
+                                      if (index > 0) {
+                                        _focusNodes[index - 1].requestFocus();
+                                      }
+                                    }
+                                  },
+                                ),
+                              );
+                            }),
+                          ),
+
+                          SizedBox(height: 20.h),
+
+                          if (_secondsRemaining > 0) ...[
+                            Text(
+                              timerText,
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
                           ],
-                        ),
-                        Image.asset('assets/images/otp_lock.png'),
-                        SizedBox(height: 20.h),
 
-                        Text(
-                          'otp_verification'.tr(),
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            fontFamily: 'Nunito',
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'if_you_did_not_receive_code'.tr(),
+                                style: TextStyle(
+                                  color: AppColors.hintTextColor,
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed:
+                                    (_canResend && state is! OTPResendLoading)
+                                    ? () {
+                                        otp = _controllers
+                                            .map((c) => c.text)
+                                            .join();
+                                        _clearOtpFields();
+                                        context.read<OTPBloc>().add(
+                                          OTPResendButtonPressed(
+                                            email: widget.email,
+                                          ),
+                                        );
+                                      }
+                                    : null,
+                                child: Text(
+                                  'resend_the_otp'.tr(),
+                                  style: TextStyle(
+                                    color:
+                                        (_canResend &&
+                                            state is! OTPResendLoading)
+                                        ? AppColors.primaryColor
+                                        : Colors.grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
 
-                        SizedBox(height: 10.h),
-
-                        Text(
-                          'please_otp_code_sent_to'.tr(
-                            namedArgs: {'email': widget.email},
-                          ),
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColors.hintTextColor,
-                            fontFamily: 'Nunito',
-                          ),
-                        ),
-
-                        SizedBox(height: 30.h),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(6, (index) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 6.w),
-                              child: OTPField(
-                                controller: _controllers[index],
-                                focusNode: _focusNodes[index],
-                                index: index,
-                                onChanged: (value) {
-                                  if (value.isNotEmpty && index < 5) {
-                                    _focusNodes[index + 1].requestFocus();
-                                  } else if (value.isEmpty && index > 0) {
-                                    _focusNodes[index - 1].requestFocus();
-                                  }
-                                  if (index == 5) {
-                                    FocusScope.of(context).unfocus();
-                                  }
+                          if (_attemptsLeft < _maxAttempts &&
+                              _attemptsLeft > 0) ...[
+                            SizedBox(height: 8.h),
+                            Text(
+                              "attempts_left".tr(
+                                namedArgs: {
+                                  'attempts': Helpers.translateNumber(
+                                    _attemptsLeft.toString(),
+                                    context.locale.languageCode,
+                                  ),
                                 },
                               ),
-                            );
-                          }),
-                        ),
-
-                        SizedBox(height: 20.h),
-
-                        if (_secondsRemaining > 0) ...[
-                          Text(
-                            timerText,
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                        ],
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'if_you_did_not_receive_code'.tr(),
                               style: TextStyle(
                                 color: AppColors.hintTextColor,
                                 fontSize: 12.sp,
                               ),
                             ),
-                            TextButton(
-                              onPressed:
-                                  (_canResend && state is! OTPResendLoading)
-                                  ? () {
-                                      otp = _controllers
-                                          .map((c) => c.text)
-                                          .join();
-                                      _clearOtpFields();
-                                      context.read<OTPBloc>().add(
-                                        OTPResendButtonPressed(
-                                          email: widget.email,
-                                        ),
-                                      );
-                                    }
-                                  : null,
-                              child: Text(
-                                'resend_the_otp'.tr(),
-                                style: TextStyle(
-                                  color:
-                                      (_canResend && state is! OTPResendLoading)
-                                      ? AppColors.primaryColor
-                                      : Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
                           ],
-                        ),
 
-                        if (
-                            _attemptsLeft < _maxAttempts &&
-                                _attemptsLeft >= 0) ...[
-                          SizedBox(height: 8.h),
-                          Text(
-                          _attemptsLeft > 0
-                          ? "attempts_left".tr(
-                              namedArgs: {
-                                'attempts': Helpers.translateNumber(
-                                  _attemptsLeft.toString(),
-                                  context.locale.languageCode,
-                                ),
-                              },
-                            ) : 'You Don\'t Have Any Attempts Please Resend the OTP',
-                            style: TextStyle(
-                              color: AppColors.hintTextColor,
-                              fontSize: 12.sp,
-                            ),
+                          SizedBox(height: 30.h),
+
+                          CustomButton(
+                            onPressed: _canVerify
+                                ? () {
+                                    FocusScope.of(context).unfocus();
+                                    otp = _controllers
+                                        .map((c) => c.text)
+                                        .join();
+                                    print('the otp: $otp');
+
+                                    context.read<OTPBloc>().add(
+                                      OTPButtonPressed(
+                                        otp: otp!,
+                                        email: widget.email,
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            buttonTextKey: 'continue',
+                            isLoading: state is OTPVerifyLoading,
                           ),
+
+                          SizedBox(height: 200.h),
                         ],
-
-                        SizedBox(height: 30.h),
-
-                        CustomButton(
-                          onPressed: _canVerify
-                            ? () {
-                            FocusScope.of(context).unfocus();
-                            otp = _controllers.map((c) => c.text).join();
-                            print('the otp: $otp');
-
-                            context.read<OTPBloc>().add(
-                              OTPButtonPressed(otp: otp!, email: widget.email),
-                            );
-                          } : null,
-                          child: state is OTPVerifyLoading
-                              ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2,)
-                              : Text(
-                            'continue'.tr(),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontFamily: 'Nunito',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                        ),
-
-                        SizedBox(height: 200.h),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
