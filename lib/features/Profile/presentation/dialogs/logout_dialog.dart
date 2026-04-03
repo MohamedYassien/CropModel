@@ -1,3 +1,4 @@
+import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -41,7 +42,15 @@ void showLogoutDialog(BuildContext context) {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context); // close dialog
+
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginPage(),
+                          ),
+                              (route) => false,
+                        );
                       },
                       child: Text("Confirm".tr(), style: getDynamicStyle(context, size: 16, color: Colors.white)),
                     ),
