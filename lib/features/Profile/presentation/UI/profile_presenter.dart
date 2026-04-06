@@ -99,45 +99,42 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. This 'context' CANNOT see the Bloc.
     return BlocProvider<ProfileBloc>(
-        create: (context) => ProfileBloc()..add(LoadProfilePressed()),
-        child: Builder(
-            builder: (blocContext) {
-              // 2. This 'blocContext' CAN see the Bloc perfectly.
-              return BlocConsumer<ProfileBloc, ProfileState>(
-                listener: (context, state) {
-                  if (state is ProfileLoaded && !_isInitialized) {
-                    // Fix: Ensure your controllers don't trigger a 'read' on the wrong context
-                    _nameController.text = state.user.name;
-                    _phoneNumberController.text = state.user.phoneNumber;
-                    _emailController.text = state.user.email;
-                    _isInitialized = true;
-                  }
+      create: (context) => ProfileBloc()..add(LoadProfilePressed()),
+      child: Builder(
+        builder: (blocContext) {
+          return BlocConsumer<ProfileBloc, ProfileState>(
+            listener: (context, state) {
+              if (state is ProfileLoaded && !_isInitialized) {
+                _nameController.text = state.user.name;
+                _phoneNumberController.text = state.user.phoneNumber;
+                _emailController.text = state.user.email;
+                _isInitialized = true;
+              }
 
-                  if (state is ProfileUpdateSuccess) {
-                    ScaffoldMessenger.of(blocContext).showSnackBar(
-                      const SnackBar(content: Text("Profile Updated!")),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is ProfileLoading && !_isInitialized) {
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
-                  }
+              if (state is ProfileUpdateSuccess) {
+                ScaffoldMessenger.of(blocContext).showSnackBar(
+                  const SnackBar(content: Text("Profile Updated!")),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is ProfileLoading && !_isInitialized) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
 
-                  if (state is ProfileError) {
-                    return Scaffold(
-                      body: Center(child: Text(state.message)),
-                    );
-                  }
+              if (state is ProfileError) {
+                return Scaffold(
+                  body: Center(child: Text(state.message)),
+                );
+              }
 
-                  final bool isLoading = state is ProfileLoading;
-                  final bool hasChanges = state is ProfileLoaded ? state.hasChanges : false;
-                  final Uint8List? tempImage = state is ProfileLoaded ? state.tempImage : null;
-                  final user = state is ProfileLoaded ? state.user : null;
+              final bool isLoading = state is ProfileLoading;
+              final bool hasChanges = state is ProfileLoaded ? state.hasChanges : false;
+              final Uint8List? tempImage = state is ProfileLoaded ? state.tempImage : null;
+              final user = state is ProfileLoaded ? state.user : null;
 
 
 
@@ -174,40 +171,39 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                             child: Column(
                               children: [
                                 SizedBox(height: 20.h),
-                                Stack(
-                                  alignment: Alignment.center,
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 60.r,
-                                      backgroundColor: Colors.grey[200],
-                                      backgroundImage: tempImage != null
-                                          ? MemoryImage(tempImage)
-                                          : (user?.profileImage != null
-                                          ? MemoryImage(user!.profileImage!)
-                                          : const AssetImage(
-                                          'assets/images/profilePlaceholder2.png')) as ImageProvider,
-                                    ),
-                                    Positioned(
-                                      bottom: -22.h,
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          final result = await Navigator.push(
-                                            blocContext,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CropProfileScreen(
-                                                    initialImageBytes: tempImage ??
-                                                        user?.profileImage,
-                                                  ),
-                                            ),
-                                          );
-                                          if (result != null &&
-                                              result is Uint8List) {
-                                            blocContext.read<ProfileBloc>().add(
-                                                ProfileImageChanged(result));
-                                          }
-                                        },
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      blocContext,
+                                      MaterialPageRoute(
+                                        builder: (context) => CropProfileScreen(
+                                          initialImageBytes: tempImage ?? user?.profileImage,
+                                        ),
+                                      ),
+                                    );
+                                    if (result != null && result is Uint8List) {
+                                      blocContext.read<ProfileBloc>().add(
+                                        ProfileImageChanged(result),
+                                      );
+                                    }
+                                  },
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 60.r,
+                                        backgroundColor: Colors.grey[200],
+                                        backgroundImage: tempImage != null
+                                            ? MemoryImage(tempImage)
+                                            : (user?.profileImage != null
+                                            ? MemoryImage(user!.profileImage!)
+                                            : const AssetImage('assets/images/profilePlaceholder2.png'))
+                                        as ImageProvider,
+                                      ),
+                                      Positioned(
+                                        bottom: -22.h,
                                         child: Container(
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
@@ -218,8 +214,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                           ),
                                           child: CircleAvatar(
                                             radius: 20.r,
-                                            backgroundColor: const Color(
-                                                0xFFaca9a9),
+                                            backgroundColor: const Color(0xFFaca9a9),
                                             child: Image.asset(
                                               'assets/images/cameraIcons2.png',
                                               width: 24.w,
@@ -228,8 +223,8 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 SizedBox(height: 40.h),
                                 Form(
@@ -326,10 +321,12 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                           ),
                                           const Spacer(),
                                           Switch(
-                                            value:_biometricEnabled,
-                                            // user?.isFingerprintEnabled ?? false,
-                                            onChanged: (value) async {
-                                              await _toggleBiometric(value);
+                                            value:
+                                            user?.isFingerprintEnabled ?? false,
+                                            onChanged: (value) {
+                                              blocContext.read<ProfileBloc>().add(
+                                                  ToggleFingerprintPressed(
+                                                      value));
                                             },
                                             thumbColor: WidgetStateProperty
                                                 .resolveWith(

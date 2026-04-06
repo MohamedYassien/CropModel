@@ -34,10 +34,9 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      name: json['full_name'] ?? '',
+      name: json['name'] ?? '',
       email: json['email'] ?? '',
       phoneNumber: json['phone'] ?? '',
-      // FIX: Convert Base64 String from API back to Uint8List for Flutter
       profileImage: json['profile_image'] != null
           ? base64Decode(json['profile_image'])
           : null,
@@ -47,7 +46,7 @@ class UserModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'full_name': name,
+      'name': name,
       'email': email,
       'phone': phoneNumber,
       'fingerprint_enabled': isFingerprintEnabled,

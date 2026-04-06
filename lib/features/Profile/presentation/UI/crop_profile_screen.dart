@@ -2,12 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/imageHelper.dart';
 import '../../../../core/utils/text_font_transformer.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
 
 class CropProfileScreen extends StatefulWidget {
   final File? initialImageFile;
@@ -24,206 +25,269 @@ class CropProfileScreen extends StatefulWidget {
 }
 
 class _CropProfileScreenState extends State<CropProfileScreen> {
-  final editorKey = GlobalKey<ExtendedImageEditorState>();
   File? _currentFile;
   Uint8List? _currentBytes;
   bool _isLoading = false;
+  bool _isEditing = false;
+  final GlobalKey _renderKey = GlobalKey();
+
+  final TransformationController _transformationController = TransformationController();
 
   @override
   void initState() {
     super.initState();
     _currentFile = widget.initialImageFile;
     _currentBytes = widget.initialImageBytes;
-  }
-
-  Future<void> _pickNewImage() async {
-    final File? file = await ImageHelper.pickFromGallery();
-    if (file != null) {
-      setState(() {
-        _currentFile = file;
-        _currentBytes = null;
-      });
+    if (_currentBytes != null || _currentFile != null) {
+      _isEditing = false;
     }
   }
 
-  Future<void> _cropImage() async {
-    final state = editorKey.currentState;
-    if (state == null || (_currentFile == null && _currentBytes == null)) return;
+  void _updateZoom(double factor) {
+    _transformationController.value = _transformationController.value.clone()..scale(factor);
+  }
 
-    setState(() => _isLoading = true);
-
+  Future<Uint8List?> _captureCroppedImage() async {
     try {
-      final Rect? cropRect = state.getCropRect();
-      final Uint8List data = state.rawImageData;
-
-      if (cropRect != null) {
-        final img.Image? decoded = img.decodeImage(data);
-        if (decoded != null) {
-          final img.Image cropped = img.copyCrop(
-            decoded,
-            x: cropRect.left.toInt(),
-            y: cropRect.top.toInt(),
-            width: cropRect.width.toInt(),
-            height: cropRect.height.toInt(),
-          );
-
-          final Uint8List result =
-          Uint8List.fromList(img.encodeJpg(cropped, quality: 80));
-
-          if (mounted) {
-            Navigator.pop(context, result);
-          }
-        }
-      }
+      RenderRepaintBoundary boundary =
+      _renderKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
     } catch (e) {
-      debugPrint("Crop error: $e");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint("Error capturing image: $e");
+      return null;
     }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedImage = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 100,
+      );
+
+      if (pickedImage == null) return;
+      final Uint8List bytes = await pickedImage.readAsBytes();
+
+      setState(() {
+        _currentFile = File(pickedImage.path);
+        _currentBytes = bytes;
+        _isEditing = true;
+        _transformationController.value = Matrix4.identity();
+      });
+    } catch (e) {
+      debugPrint("Error picking image: $e");
+    }
+  }
+
+  Future<void> _handlePermissionAndPick(ImageSource source) async {
+    PermissionStatus status = source == ImageSource.camera
+        ? await Permission.camera.request()
+        : (Platform.isAndroid ? await Permission.photos.request() : await Permission.photos.request());
+
+    if (status.isGranted) {
+      _pickImage(source);
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text("gallery".tr()),
+              onTap: () { Navigator.pop(context); _handlePermissionAndPick(ImageSource.gallery); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text("camera".tr()),
+              onTap: () { Navigator.pop(context); _handlePermissionAndPick(ImageSource.camera); },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     bool hasImage = _currentFile != null || _currentBytes != null;
+    String buttonText = hasImage ? "change_photo".tr() : "upload_profile_picture".tr();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: Colors.white,
-        leading: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 22.w),
-          child: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios),
-          ),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
         ),
-        title: Text(
-          "preview_photo".tr(),
-          style: getDynamicStyle(context, size: 24, weight: FontWeight.bold),
-        ),
+        title: Text("preview_photo".tr(), style: getDynamicStyle(context, size: 24, weight: FontWeight.bold)),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(45.r),
+          Expanded(
+            child: Center(
+              child: _isEditing
+                  ? _buildEditorView(hasImage)
+                  : _buildPreviewView(hasImage),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              children: [
+                OutlinedButton(
+                  onPressed: () => _showPickerOptions(context),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 55.h),
+                    side: BorderSide(color: AppColors.primaryColor.withOpacity(0.5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+                  ),
+                  child: Text(buttonText, style: getDynamicStyle(context, size: 18, color: AppColors.primaryColor)),
+                ),
+                if (_isEditing) ...[
+                  SizedBox(height: 12.h),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : () async {
+                      setState(() => _isLoading = true);
+                      Uint8List? croppedImage = await _captureCroppedImage();
+                      setState(() => _isLoading = false);
+                      if (croppedImage != null) {
+                        Navigator.pop(context, croppedImage);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 55.h),
+                      backgroundColor: AppColors.primaryColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(45.r),
-                      child: !hasImage
-                          ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(30.w),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFBDBDBD),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.image_not_supported,
-                              size: 50.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            "no_image_uploaded".tr(),
-                            style: getDynamicStyle(context,
-                                size: 18,
-                                color: Colors.grey,
-                                weight: FontWeight.bold),
-                          ),
-                        ],
-                      )
-                          : _currentFile != null
-                          ? ExtendedImage.file(
-                        _currentFile!,
-                        fit: BoxFit.contain,
-                        cacheRawData: true,
-                        mode: ExtendedImageMode.editor,
-                        extendedImageEditorKey: editorKey,
-                        initEditorConfigHandler: (state) => EditorConfig(
-                          maxScale: 8.0,
-                          cropAspectRatio: 1.0,
-                        ),
-                      )
-                          : ExtendedImage.memory(
-                        _currentBytes!,
-                        fit: BoxFit.contain,
-                        cacheRawData: true,
-                        mode: ExtendedImageMode.editor,
-                        extendedImageEditorKey: editorKey,
-                        initEditorConfigHandler: (state) => EditorConfig(
-                          maxScale: 8.0,
-                          cropAspectRatio: 1.0,
-                          cornerColor: AppColors.primaryColor,
+                    child: _isLoading
+                        ? SizedBox(height: 20.h, width: 20.h, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Text("confirm".tr(), style: getDynamicStyle(context, size: 18, color: Colors.white)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreviewView(bool hasImage) {
+    return CircleAvatar(
+      radius: 140.r,
+      backgroundColor: Colors.grey[100],
+      backgroundImage: _currentBytes != null
+          ? MemoryImage(_currentBytes!)
+          : (hasImage ? FileImage(_currentFile!) : null) as ImageProvider?,
+      child: !hasImage
+          ? Icon(Icons.person, size: 100.sp, color: Colors.grey[400])
+          : null,
+    );
+  }
+
+  Widget _buildEditorView(bool hasImage) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 24.w),
+          width: double.infinity,
+          height: 550.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30.r),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30.r),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                RepaintBoundary(
+                  key: _renderKey,
+                  child: Container(
+                    color: Colors.white,
+                    width: double.infinity,
+                    height: 550.h,
+                    child: InteractiveViewer(
+                      transformationController: _transformationController,
+                      boundaryMargin: EdgeInsets.zero, // The "Wall"
+                      minScale: 1.0,
+                      maxScale: 8.0,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 550.h,
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: _currentBytes != null
+                              ? Image.memory(_currentBytes!)
+                              : Image.file(_currentFile!),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                child: Column(
-                  children: [
-                    OutlinedButton(
-                      onPressed: _isLoading ? null : _pickNewImage,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 55.h),
-                        side: const BorderSide(color: Colors.grey, width: 0.5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.r),
-                        ),
-                      ),
-                      child: Text(
-                        (!hasImage ? "upload_profile_picture" : "change_photo")
-                            .tr(),
-                        style: getDynamicStyle(context,
-                            size: 20, color: AppColors.primaryColor),
-                      ),
+                IgnorePointer(
+                  child: ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.6),
+                      BlendMode.srcOut,
                     ),
-                    SizedBox(height: 15.h),
-                    if (hasImage)
-                      ElevatedButton(
-                        onPressed: _isLoading ? null : _cropImage,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 55.h),
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.r),
+                    child: Stack(
+                      children: [
+                        Container(decoration: const BoxDecoration(color: Colors.black, backgroundBlendMode: BlendMode.dstOut)),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            width: 280.w,
+                            height: 280.w,
+                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                           ),
                         ),
-                        child: Text(
-                          "confirm".tr(),
-                          style: getDynamicStyle(context,
-                              size: 20, color: Colors.white),
-                        ),
-                      ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primaryColor,
-                ),
-              ),
+              ],
             ),
-        ],
-      ),
+          ),
+        ),
+        Positioned(
+          bottom: 10.h,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30.r),
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(onPressed: () => _updateZoom(1.1), icon: const Icon(Icons.add)),
+                IconButton(onPressed: () => _updateZoom(0.9), icon: const Icon(Icons.remove)),
+                Container(width: 1, height: 20, color: Colors.grey[300]),
+                TextButton(
+                  onPressed: () => setState(() => _transformationController.value = Matrix4.identity()),
+                  child: const Text("Reset", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
+
   }
 }
