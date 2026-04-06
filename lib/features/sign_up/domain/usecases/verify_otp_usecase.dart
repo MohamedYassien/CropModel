@@ -7,13 +7,6 @@ class VerifyOtpUseCase {
   final SignUpService _signUpService = SignUpService();
 
   Future<OTPResponse?> call(OTPRequest otpRequest) async {
-    if (otpRequest.otp.isEmpty) {
-      throw Exception("otp_cannot_be_empty".tr());
-    }
-    if (otpRequest.otp.length != 6) {
-      throw Exception("otp_must_be_6_digits".tr());
-    }
-
     return await _signUpService.verifyOtp(otpRequest);
   }
 }

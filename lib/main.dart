@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const ResetPasswordScreen(),
+          home: const LoginPage(),
         );
       },
     );

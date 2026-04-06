@@ -1,11 +1,11 @@
 {
   "spaceflight_news": "Spaceflight News",
   "profile": "Profile",
-  "full_name": "Full Name",
+  "full_name": "Full name",
   "enter_your_name": "Enter your name",
   "email": "Email",
   "enter_your_email": "Enter your email",
-  "phone_number": "Phone Number",
+  "phone_number": "Phone number",
   "enter_your_phone_number": "Enter your phone number",
   "fingerprint_login": "Fingerprint login",
   "reset_password": "Reset password",
@@ -25,10 +25,9 @@
   "email_address": "Email address",
   "continue": "Continue",
   "otp_verification": "OTP Verification",
-  "otp_subtitle": "Please OTP code sent to ",
-  "didnt_receive_code": "If you didn’t receive code",
-  "resend_otp": "Resend the OTP",
-  "attempts_left": "Attempts left",
+  "if_you_did_not_receive_code": "If you didn’t receive code",
+  "resend_the_otp": "Resend the OTP",
+  "attempts_left": "{attempts} Attempts left",
   "password_changed": "Your password has been changed",
   "reset_password_title": "Reset Your Password",
   "enter_pass": "Enter your password",
@@ -59,7 +58,7 @@
 
   "forget_password": "Forgot Password",
   "forget_password_subtitle": "Enter your email address to receive a verification code.",
-  "email_address": "Email Address",
+  "email_address": "Email address",
   "email_required": "Email is required",
   "invalid_email": "Please enter a valid email address",
   "continue": "Continue",
@@ -70,7 +69,8 @@
     "too_many_requests": "Too many attempts. Please try again in a few minutes.",
     "something_went_wrong": "An error occurred. Please try again later.",
     "server_error": "Server is currently unavailable. Please try later.",
-    "passwords_do_not_match": "Passwords do not match"
+    "passwords_do_not_match": "Passwords do not match",
+     "please_otp_code_sent_to": "Please OTP code sent to {email}"
 
 
 }
