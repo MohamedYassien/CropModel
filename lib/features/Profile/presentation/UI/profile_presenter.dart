@@ -321,12 +321,10 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                           ),
                                           const Spacer(),
                                           Switch(
-                                            value:
-                                            user?.isFingerprintEnabled ?? false,
-                                            onChanged: (value) {
-                                              blocContext.read<ProfileBloc>().add(
-                                                  ToggleFingerprintPressed(
-                                                      value));
+                                            value:_biometricEnabled,
+                                            // user?.isFingerprintEnabled ?? false,
+                                            onChanged: (value) async {
+                                              await _toggleBiometric(value);
                                             },
                                             thumbColor: WidgetStateProperty
                                                 .resolveWith(
