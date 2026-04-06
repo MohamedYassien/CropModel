@@ -1,3 +1,4 @@
+import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,12 +32,10 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
   final TextEditingController emailController = TextEditingController();
 
   // Enhanced SnackBar with Icons and better styling
-  void _showSnackBar(
-    BuildContext context,
-    String message,
-    Color color,
-    IconData icon,
-  ) {
+  void _showSnackBar(BuildContext context,
+      String message,
+      Color color,
+      IconData icon,) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -85,7 +84,9 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
       },
       child: Builder(
         builder: (context) {
-          final state = context.watch<ForgotPassBloc>().state;
+          final state = context
+              .watch<ForgotPassBloc>()
+              .state;
           final bool isLoading = state is ForgotPassLoading;
 
           return Scaffold(
@@ -103,31 +104,27 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => OTPVerificationScreen(
-                        email: emailController.text.trim(),
-                      ),
+                      builder: (_) =>
+                          OTPVerificationScreen(
+                            email: emailController.text.trim(),
+                          ),
                     ),
                   );
                 }
                 if (state is ForgotPassError) {
                   String displayMessage;
 
-                  // Enhance the message based on the error content
                   if (state.message.contains('not found') ||
                       state.message.contains('404')) {
-                    displayMessage = "no_account_found"
-                        .tr(); // "We couldn't find an account with that email."
+                    displayMessage = "no_account_found".tr();
                   } else if (state.message.contains('network') ||
                       state.message.contains('SocketException')) {
-                    displayMessage = "check_connection"
-                        .tr(); // "Please check your internet connection."
+                    displayMessage = "check_connection".tr();
                   } else if (state.message.contains('too many') ||
                       state.message.contains('429')) {
-                    displayMessage = "too_many_requests"
-                        .tr(); // "Too many attempts. Please try again later."
+                    displayMessage = "too_many_requests".tr();
                   } else {
-                    displayMessage = "something_went_wrong"
-                        .tr(); // Fallback friendly message
+                    displayMessage = "something_went_wrong".tr();
                   }
 
                   _showSnackBar(
@@ -181,7 +178,9 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                           CustomTextField(
                             controller: emailController,
                             validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
+                              if (value == null || value
+                                  .trim()
+                                  .isEmpty) {
                                 return "Email is required";
                               }
                               final emailRegex = RegExp(
@@ -195,31 +194,17 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                             hintText: 'Enter Your Email',
                           ),
                           SizedBox(height: 20.h),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                context.read<ForgotPassBloc>().add(
-                                  SendOtpEvent(emailController.text.trim()),
-                                );
+                          CustomButton(
+                            buttonTextKey: "continue".tr(),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  context.read<ForgotPassBloc>().add(
+                                    SendOtpEvent(emailController.text.trim()),
+                                  );
+                                }
                               }
-                            },
-                            child: Text(
-                              "continue".tr(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.sp,
-                                fontFamily: 'Nunito',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              minimumSize: Size(double.infinity, 48.h),
-                            ),
                           ),
+
                           SizedBox(height: 20.h),
                         ],
                       ),
