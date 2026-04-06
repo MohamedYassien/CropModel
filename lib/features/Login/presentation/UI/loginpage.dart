@@ -13,7 +13,7 @@ import '../bloc/LoginBloc.dart';
 import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
 import '../../data/service/BiometricService.dart';
-import 'MainPage.dart';
+import 'LoginDetails.dart';
 import '../../../../../core/constants/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -67,14 +67,14 @@ class _LoginPageState extends State<LoginPage> {
                       icon: Icons.check_circle_rounded,
                     );
 
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const MainPage()),
-                    );
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(builder: (_) => const LoginDetails()),
+                    // );
                   }
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const MainPage()),
+                    MaterialPageRoute(builder: (_) => const LoginDetails()),
                   );
                 }
 
