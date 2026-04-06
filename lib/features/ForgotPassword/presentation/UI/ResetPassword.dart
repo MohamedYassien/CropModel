@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Bloc & Service Imports
+import '../../../../core/shared/custom_button.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../bloc/forgotPass_bloc.dart';
 import '../bloc/forgotPass_event.dart';
@@ -158,7 +159,6 @@ class _ResetpasswordState extends State<Resetpassword> {
                           ),
                           SizedBox(height: 40.h),
 
-                          // New Password Field
                           CustomTextField(
                             controller: passwordController,
                             validator: (value) {
@@ -170,7 +170,6 @@ class _ResetpasswordState extends State<Resetpassword> {
 
                           SizedBox(height: 20.h),
 
-                          // Confirm Password Field
                           CustomTextField(
                             controller: confirmController,
                             hintText: 'Confirm Password',
@@ -181,39 +180,10 @@ class _ResetpasswordState extends State<Resetpassword> {
                           ),
 
                           SizedBox(height: 40.h),
-
-                          // Confirm Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 55.h,
-                            child: ElevatedButton(
-                              onPressed: isLoading ? null : () => _onConfirm(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.buttonColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.r),
-                                ),
-                                elevation: 3,
-                              ),
-                              child: isLoading
-                                  ? SizedBox(
-                                height: 22.h,
-                                width: 22.w,
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                                  : Text(
-                                "confirm".tr(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.sp,
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                          CustomButton(
+                            buttonTextKey: "confirm".tr(),
+                            onPressed: () => _onConfirm(context),
+                            isLoading: state is ForgotPassLoading,
                           ),
                           SizedBox(height: 20.h),
                         ],
