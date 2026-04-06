@@ -9,6 +9,7 @@ class AppSnackBar {
   }) {
     final messenger = ScaffoldMessenger.of(context);
 
+    messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
@@ -34,13 +35,13 @@ class AppSnackBar {
             ),
           ],
         ),
-        action: SnackBarAction(
-          label: "✕",
-          textColor: Colors.white,
-          onPressed: () {
-            messenger.hideCurrentSnackBar();
-          },
-        ),
+        // action: SnackBarAction(
+        //   label: "✕",
+        //   textColor: Colors.white,
+        //   onPressed: () {
+        //     messenger.hideCurrentSnackBar();
+        //   },
+        // ),
       ),
     );
   }
