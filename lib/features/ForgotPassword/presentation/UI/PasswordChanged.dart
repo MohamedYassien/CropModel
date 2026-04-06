@@ -1,3 +1,4 @@
+import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,34 +33,15 @@ class _PasswordchangedState extends State<Passwordchanged> {
                 ),
                 Image.asset("assets/images/success.png"),
                 SizedBox(height: 70.h),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50.h,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      "confirm".tr(),
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(
+                  buttonTextKey: "confirm".tr(),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginPage()),
+                    );
+                  },
+                )
               ],
             ),
           ),
