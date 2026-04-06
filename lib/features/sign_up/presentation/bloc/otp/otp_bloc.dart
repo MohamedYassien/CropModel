@@ -1,6 +1,3 @@
-import 'package:cropmodel/features/sign_up/data/model/otp/otp_request.dart';
-import 'package:cropmodel/features/sign_up/domain/usecases/resend_otp_usecase.dart';
-import 'package:cropmodel/features/sign_up/domain/usecases/verify_otp_usecase.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,13 +7,14 @@ class OTPBloc extends Bloc<OTPEvent, OTPState> {
     on<OTPButtonPressed>((event, emit) async {
       emit(OTPVerifyLoading());
       try {
+        await Future.delayed(Duration(seconds: 2));
 
         String otpnumber="123456";
-        event.otp;
-        if(event.otp ==otpnumber ){
+
+        if(event.otp == otpnumber ){
           emit(OTPVerifySuccess());
 
-        }else{
+        } else{
           emit(OTPVerifyError("OTP Wrong"));
         }
         //await VerifyOtpUseCase().call(OTPRequest(otp: event.otp, email: event.email));

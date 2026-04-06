@@ -11,7 +11,6 @@ class OTPButtonPressed extends OTPEvent {
 class OTPResendButtonPressed extends OTPEvent {
 
   final String email;
-  final String otp;
 
-  OTPResendButtonPressed({required this.email, required this.otp});
+  OTPResendButtonPressed({required this.email});
 }
