@@ -1,7 +1,9 @@
+import 'package:cropmodel/core/shared/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../../core/constants/app_colors.dart';
+import '../../../Profile/presentation/UI/profile_presenter.dart';
 
 class ConfirmResetPasswordScreen extends StatelessWidget {
   const ConfirmResetPasswordScreen({super.key});
@@ -10,7 +12,7 @@ class ConfirmResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.only(top: 150.h),
+        padding: EdgeInsets.only(top: 50.h),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -29,29 +31,15 @@ class ConfirmResetPasswordScreen extends StatelessWidget {
                 height: 300.h,
               ),
               SizedBox(height: 20.h),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.buttonColor,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 120.w,
-                    vertical: 19.h,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                ),
-                child: Text(
-                  'Confirm',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    color: Colors.white,
-                    fontFamily: "Nunito",
-                  ),
-                ),
-              ),
+             CustomButton(
+               buttonTextKey: "continue".tr(),
+               onPressed: () {
+                 Navigator.pushReplacement(
+                   context,
+                   MaterialPageRoute(builder: (context) => const ProfilePresenter()),
+                 );
+                 }
+             )
             ],
           ),
         ),
