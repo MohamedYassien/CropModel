@@ -1,10 +1,17 @@
-import '../../data/model/reset_password_model.dart';
-import '../../data/service/reset_password_service.dart';
+import '../repositories/change_password_repository.dart';
 
-class ConfirmResetPasswordUseCase {
-  final ResetPasswordService _service = ResetPasswordService();
+class ChangePasswordUseCase {
+  final ChangePasswordRepository repository;
 
-  Future<ResetPasswordModel?> call(String newPassword) {
-    return _service.confirmResetPassword(newPassword);
+  ChangePasswordUseCase(this.repository);
+
+  Future<void> call({
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    return repository.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
   }
 }

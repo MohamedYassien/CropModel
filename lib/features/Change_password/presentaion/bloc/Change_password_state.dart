@@ -1,13 +1,13 @@
 abstract class ChangePasswordState {}
 
-class ResetPasswordInitial extends ChangePasswordState {}
+class ChangePasswordInitial extends ChangePasswordState {}
 
-class ResetPasswordLoading extends ChangePasswordState {}
+class ChangePasswordLoading extends ChangePasswordState {}
 
-class ResetPasswordSuccess extends ChangePasswordState {}
+class ChangePasswordSuccess extends ChangePasswordState {}
 
-class ResetPasswordError extends ChangePasswordState {
+class ChangePasswordError extends ChangePasswordState {
   final String message;
 
-  ResetPasswordError({required this.message});
+  ChangePasswordError({required this.message});
 }

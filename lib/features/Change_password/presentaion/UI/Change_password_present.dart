@@ -6,7 +6,6 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../bloc/Change_password_bloc.dart';
-import '../bloc/Change_password_event.dart';
 import '../bloc/Change_password_state.dart';
 import 'Change_Password_Success.dart';
 
@@ -20,7 +19,7 @@ class ChangePasswordScreen extends StatefulWidget {
 class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _newpasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
 
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -37,12 +36,12 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       body: BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
         listener: (context, state) {
-          if (state is ResetPasswordSuccess) {
+          if (state is ChangePasswordSuccess) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const ConfirmResetPasswordScreen()),
             );
-          } else if (state is ResetPasswordError) {
+          } else if (state is ChangePasswordError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
@@ -54,88 +53,93 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back_ios),
+                        ),
                       ),
-                    ),
 
-                    Image.asset(
-                      'assets/images/reset_password.png',
-                      height: 200.h,
-                    ),
-                    SizedBox(height: 30.h),
-                    Text(
-                      'Change Your Password'.tr(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.labelTextColor,
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Nunito",
+                      Image.asset(
+                        'assets/images/reset_password.png',
+                        height: 200.h,
                       ),
-                    ),
-                    SizedBox(height: 60.h),
+                      SizedBox(height: 30.h),
+                      Text(
+                        'Change Your Password'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.labelTextColor,
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Nunito",
+                        ),
+                      ),
+                      SizedBox(height: 60.h),
 
-                    CustomTextField(
-                      hintText: "Enter current password".tr(),
-                      controller: _passwordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return "Password Required".tr();
-                        if (value.trim().length < 6) return "Password Min Length".tr();
+                      CustomTextField(
+                        hintText: "Enter current password".tr(),
+                        controller: _passwordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return "Password Required".tr();
+                          if (value.trim().length < 6) return "Password Min Length".tr();
 
-                        final uppercaseRegex = RegExp(r'[A-Z]');
-                        if (!uppercaseRegex.hasMatch(value)) return "Password Uppercase".tr();
+                          final uppercaseRegex = RegExp(r'[A-Z]');
+                          if (!uppercaseRegex.hasMatch(value)) return "Password Uppercase".tr();
 
-                        final specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
-                        if (!specialCharRegex.hasMatch(value)) return "Password Special Char".tr();
+                          final specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+                          if (!specialCharRegex.hasMatch(value)) return "Password Special Char".tr();
 
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 30.h),
-                    CustomTextField(
-                      hintText: "New password".tr(),
-                      controller: _newpasswordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return "password_required".tr();
-                        if (value.length < 8) return "password_min_length".tr();
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 30.h),
-                    CustomTextField(
-                      hintText: "Confirm your password".tr(),
-                      controller: _confirmPasswordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Password Required".tr();
-                        }
-                        if (value != _newpasswordController.text) {
-                          return "Passwords Do Not Match".tr();
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 50.h),
-                    CustomButton(
-                      buttonTextKey: "continue".tr(),
-                      onPressed: state is ResetPasswordLoading
-                          ? null
-                          : () {
-                        if (_formKey.currentState!.validate()) {
-                          context.read<ChangePasswordBloc>().add(
-                            ConfirmResetPasswordEvent(newPassword: _passwordController.text),
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 30.h),
+                      CustomTextField(
+                        hintText: "New password".tr(),
+                        controller: _newPasswordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return "Password Required".tr();
+                          if (value.length < 8) return "password_min_length".tr();
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 30.h),
+                      CustomTextField(
+                        hintText: "Confirm your password".tr(),
+                        controller: _confirmPasswordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Password Required".tr();
+                          }
+                          if (value != _newPasswordController.text) {
+                            return "Passwords Do Not Match".tr();
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 50.h),
+                      CustomButton(
+                        buttonTextKey: "continue".tr(),
+                        onPressed: state is ChangePasswordLoading
+                            ? null
+                            : () {
+                          if (_formKey.currentState!.validate()) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ConfirmResetPasswordScreen(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

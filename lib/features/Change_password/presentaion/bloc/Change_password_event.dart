@@ -1,7 +1,11 @@
 abstract class ChangePasswordEvent {}
 
-class ConfirmResetPasswordEvent extends ChangePasswordEvent {
+class ChangePasswordSubmitted extends ChangePasswordEvent {
+  final String currentPassword;
   final String newPassword;
 
-  ConfirmResetPasswordEvent({required this.newPassword});
+  ChangePasswordSubmitted({
+    required this.currentPassword,
+    required this.newPassword,
+  });
 }
