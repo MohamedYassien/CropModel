@@ -70,7 +70,17 @@
     "something_went_wrong": "An error occurred. Please try again later.",
     "server_error": "Server is currently unavailable. Please try later.",
     "passwords_do_not_match": "Passwords do not match",
-     "please_otp_code_sent_to": "Please OTP code sent to {email}"
-
-
+     "please_otp_code_sent_to": "Please OTP code sent to {email}",
+  "no_attempts_left": "No Attempts Left, Please try again at another time",
+  "password_is_required": "Password is required",
+    "password_must_be_at_least_6_characters": "Password must be at least 6 characters",
+  "Add_at_least_one_uppercase_letter": "Add at least one uppercase letter",
+    "Add_at_least_one_special_character": "Add at least one special character",
+  "add_at_least_one_number": "Add at least one number",
+  "add_at_least_one_lowercase_letter": "Add at least one lowercase letter",
+  "create_password": "Create Your Password",
+  "confirm_password": "Confirm Password",
+  "enter_your_password": "Enter your password",
+  "confirm_password_is_required": "Confirm password is required",
+  "Your_account_has_created_successfully": "Your account has created successfully"
 }
