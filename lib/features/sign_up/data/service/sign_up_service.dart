@@ -1,3 +1,5 @@
+import 'package:cropmodel/features/sign_up/data/model/create-password/create_password_request.dart';
+import 'package:cropmodel/features/sign_up/data/model/create-password/create_password_response.dart';
 import 'package:cropmodel/features/sign_up/data/model/otp/otp_request.dart';
 import 'package:cropmodel/features/sign_up/data/model/otp/otp_response.dart';
 import 'package:cropmodel/features/sign_up/data/model/sign-up/sign_up_request.dart';
@@ -31,6 +33,16 @@ class SignUpService {
     return await apiClient.fetch<String, OTPResponse?>(
       api: SignUpApi.resendOTP,
       body: email,
+      mapper: (response) {
+        return null;
+      },
+    );
+  }
+
+  Future<CreatePasswordResponse?> createPassword(CreatePasswordRequest createPasswordRequest) async {
+    return await apiClient.fetch<CreatePasswordRequest,CreatePasswordResponse?>(
+      api: SignUpApi.createPassword,
+      body:  createPasswordRequest,
       mapper: (response) {
         return null;
       },

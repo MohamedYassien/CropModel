@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 
 class Helpers {
-
   static String validateItemNotNull(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'field_required'.tr();
@@ -67,13 +66,50 @@ class Helpers {
       '9': '٩',
     };
 
-    if (language == 'en'){
+    if (language == 'en') {
       return input;
     }
 
     return input.split('').map((e) => englishToArabicDigits[e] ?? e).join();
   }
 
+  static String? validateStrongPassword(String? password) {
+    if(password == null || password.trim().isEmpty) {
+      return "password_is_required".tr();
+    }
 
+    if (password.length < 8) {
+      return "password_must_be_at_least_6_characters".tr();
+    }
 
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return "Add_at_least_one_uppercase_letter".tr();
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      return "add_at_least_one_lowercase_letter".tr();
+    }
+
+    if (!RegExp(r'\d').hasMatch(password)) {
+      return "add_at_least_one_number".tr();
+    }
+
+    if (!RegExp(r'[@$!%*?&]').hasMatch(password)) {
+      return "Add_at_least_one_special_character".tr();
+    }
+
+    return null;
+  }
+
+  static String? validatePasswordConfirmation(String? password, String? confirmPassword) {
+    if (confirmPassword == null || confirmPassword.trim().isEmpty) {
+      return "confirm_password_is_required".tr();
+    }
+
+    if (password != confirmPassword) {
+      return "passwords_do_not_match".tr();
+    }
+
+    return null;
+  }
 }
