@@ -3,6 +3,7 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/features/ForgotPassword/presentation/UI/ResetPassword.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/create_password_presenter.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/widgets/otp_field.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_bloc.dart';
@@ -126,7 +127,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CreatePasswordPresenter(),
+                    builder: (context) => Resetpassword(email: widget.email),
                   ),
                 );
               }
