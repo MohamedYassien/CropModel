@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Service & Bloc Imports
+import '../../../../core/shared/app_message.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../data/service/forgotpass_services.dart';
 import '../bloc/forgotPass_bloc.dart';
@@ -31,39 +32,6 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
 
-  // Enhanced SnackBar with Icons and better styling
-  void _showSnackBar(BuildContext context,
-      String message,
-      Color color,
-      IconData icon,) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 20.sp),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(16.w),
-        duration: const Duration(seconds: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
-  }
 
   @override
   void dispose() {
@@ -92,48 +60,50 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
           return Scaffold(
             body: BlocListener<ForgotPassBloc, ForgotPassState>(
               listener: (context, state) {
-                if (!mounted) return;
+                // if (!mounted) return;
+                //
+                // if (state is OtpSentState) {
 
-                if (state is OtpSentState) {
-                  _showSnackBar(
-                    context,
-                    "otp_sent_success".tr(),
-                    const Color(0xFF71BC55),
-                    Icons.check_circle_outline,
-                  );
+                // AppMessage.showSnackBar(
+                //   context,
+                //   "otp_sent_success".tr(),
+                //   const Color(0xFF71BC55),
+                //   Icons.check_circle_outline,
+                // );
+                //
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          OTPVerificationScreen(
-                            email: emailController.text.trim(),
-                          ),
-                    ),
-                  );
-                }
-                if (state is ForgotPassError) {
-                  String displayMessage;
-
-                  if (state.message.contains('not found') ||
-                      state.message.contains('404')) {
-                    displayMessage = "no_account_found".tr();
-                  } else if (state.message.contains('network') ||
-                      state.message.contains('SocketException')) {
-                    displayMessage = "check_connection".tr();
-                  } else if (state.message.contains('too many') ||
-                      state.message.contains('429')) {
-                    displayMessage = "too_many_requests".tr();
-                  } else {
-                    displayMessage = "something_went_wrong".tr();
-                  }
-
-                  _showSnackBar(
-                    context,
-                    displayMessage,
-                    const Color(0xFFEA2020),
-                    Icons.error_outline,
-                  );
-                }
+                     context,
+                     MaterialPageRoute(
+                       builder: (_) =>
+                           OTPVerificationScreen(
+                             email: emailController.text.trim(),
+                           ),
+                     ),
+                   );
+               // }
+               //  if (state is ForgotPassError) {
+               //    String displayMessage;
+               //
+               //    if (state.message.contains('not found') ||
+               //        state.message.contains('404')) {
+               //      displayMessage = "no_account_found".tr();
+               //    } else if (state.message.contains('network') ||
+               //        state.message.contains('SocketException')) {
+               //      displayMessage = "check_connection".tr();
+               //    } else if (state.message.contains('too many') ||
+               //        state.message.contains('429')) {
+               //      displayMessage = "too_many_requests".tr();
+               //    } else {
+               //      displayMessage = "something_went_wrong".tr();
+               //    }
+               //
+               //    AppMessage.showSnackBar(
+               //      context,
+               //      displayMessage,
+               //      const Color(0xFFEA2020),
+               //      Icons.error_outline,
+               //    );
+               // }
               },
               child: SafeArea(
                 child: Padding(
@@ -147,7 +117,10 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: IconButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                Navigator.pop(context);
+
+                              } ,
                               icon: const Icon(Icons.arrow_back_ios),
                             ),
                           ),

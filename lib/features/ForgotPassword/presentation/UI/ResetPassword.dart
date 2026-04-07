@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Bloc & Service Imports
+import '../../../../core/shared/app_message.dart';
 import '../../../../core/shared/custom_button.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../bloc/forgotPass_bloc.dart';
@@ -11,12 +11,10 @@ import '../bloc/forgotPass_event.dart';
 import '../bloc/forgotPass_state.dart';
 import '../../data/service/forgotpass_services.dart';
 
-// UseCase Imports
 import '../../domain/usecases/send_otp_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 
-// UI Imports
 import 'PasswordChanged.dart';
 import '../../../../../core/constants/app_colors.dart';
 
@@ -92,39 +90,39 @@ class _ResetpasswordState extends State<Resetpassword> {
           return Scaffold(
             body: BlocListener<ForgotPassBloc, ForgotPassState>(
               listener: (context, state) {
-                if (!mounted) return;
+               // if (!mounted) return;
 
-                if (state is ForgotPassPasswordReset) {
+               // if (state is ForgotPassPasswordReset) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const Passwordchanged()),
                   );
-                }
+                //}
 
-                if (state is ForgotPassError) {
-                  String displayMessage;
-
-
-                  if (state.message.contains('not found') ||
-                      state.message.contains('404')) {
-                    displayMessage = "no_account_found".tr();
-                  } else if (state.message.contains('network') ||
-                      state.message.contains('SocketException')) {
-                    displayMessage = "check_connection".tr();
-                  } else if (state.message.contains('too many') ||
-                      state.message.contains('429')) {
-                    displayMessage = "too_many_requests".tr();
-                  } else {
-                    displayMessage = "something_went_wrong".tr();
-                  }
-
-                  _showSnackBar(
-                    context,
-                    displayMessage,
-                    const Color(0xFFEA2020),
-                    Icons.error_outline,
-                  );
-                }
+                // if (state is ForgotPassError) {
+                //   String displayMessage;
+                //
+                //
+                //   if (state.message.contains('not found') ||
+                //       state.message.contains('404')) {
+                //     displayMessage = "no_account_found".tr();
+                //   } else if (state.message.contains('network') ||
+                //       state.message.contains('SocketException')) {
+                //     displayMessage = "check_connection".tr();
+                //   } else if (state.message.contains('too many') ||
+                //       state.message.contains('429')) {
+                //     displayMessage = "too_many_requests".tr();
+                //   } else {
+                //     displayMessage = "something_went_wrong".tr();
+                //   }
+                //
+                //   AppMessage.showSnackBar(
+                //     context,
+                //     displayMessage,
+                //     const Color(0xFFEA2020),
+                //     Icons.error_outline,
+                //   );
+                // }
               },
               child: SafeArea(
                 child: SingleChildScrollView(
