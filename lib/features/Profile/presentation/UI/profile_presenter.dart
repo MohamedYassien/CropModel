@@ -7,7 +7,9 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/text_font_transformer.dart';
+import '../../../Change_password/presentaion/UI/Change_password_present.dart';
 import '../../../Login/data/service/SecureStorage.dart';
+import '../../../Login/presentation/UI/LoginDetails.dart';
 import '../bloc/profile_block.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -130,9 +132,9 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
               _initialPhone = _phoneNumberController.text;
               _initialBiometric = _biometricEnabled;
             });
-            ScaffoldMessenger.of(blocContext).showSnackBar(
-              const SnackBar(content: Text("Profile Updated!")),
-            );
+            ScaffoldMessenger.of(
+              blocContext,
+            ).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
           }
         },
         builder: (blocContext, state) {
@@ -143,13 +145,13 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
           }
 
           if (state is ProfileError) {
-            return Scaffold(
-              body: Center(child: Text(state.message)),
-            );
+            return Scaffold(body: Center(child: Text(state.message)));
           }
 
           final bool isLoading = state is ProfileLoading;
-          final Uint8List? tempImage = state is ProfileLoaded ? state.tempImage : null;
+          final Uint8List? tempImage = state is ProfileLoaded
+              ? state.tempImage
+              : null;
           final user = state is ProfileLoaded ? state.user : null;
 
           final bool hasChanges = _checkHasChanges(blocContext);
@@ -161,13 +163,20 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
               leading: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 22.w),
                 child: IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginDetails()),
+                  ),
                   icon: const Icon(Icons.arrow_back_ios),
                 ),
               ),
               title: Text(
                 "profile".tr(),
-                style: getDynamicStyle(context, size: 24, weight: FontWeight.bold),
+                style: getDynamicStyle(
+                  context,
+                  size: 24,
+                  weight: FontWeight.bold,
+                ),
               ),
             ),
             body: GestureDetector(
@@ -189,12 +198,15 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               blocContext,
                               MaterialPageRoute(
                                 builder: (context) => CropProfileScreen(
-                                  initialImageBytes: tempImage ?? user?.profileImage,
+                                  initialImageBytes:
+                                      tempImage ?? user?.profileImage,
                                 ),
                               ),
                             );
                             if (result != null && result is Uint8List) {
-                              blocContext.read<ProfileBloc>().add(ProfileImageChanged(result));
+                              blocContext.read<ProfileBloc>().add(
+                                ProfileImageChanged(result),
+                              );
                             }
                           },
                           child: Stack(
@@ -207,20 +219,30 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 backgroundImage: tempImage != null
                                     ? MemoryImage(tempImage)
                                     : (user?.profileImage != null
-                                    ? MemoryImage(user!.profileImage!)
-                                    : const AssetImage('assets/images/profilePlaceholder2.png')) as ImageProvider,
+                                              ? MemoryImage(user!.profileImage!)
+                                              : const AssetImage(
+                                                  'assets/images/profilePlaceholder2.png',
+                                                ))
+                                          as ImageProvider,
                               ),
                               Positioned(
                                 bottom: -22.h,
                                 child: Container(
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 3.w),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3.w,
+                                    ),
                                   ),
                                   child: CircleAvatar(
                                     radius: 20.r,
                                     backgroundColor: const Color(0xFFaca9a9),
-                                    child: Image.asset('assets/images/cameraIcons2.png', width: 24.w, height: 24.h),
+                                    child: Image.asset(
+                                      'assets/images/cameraIcons2.png',
+                                      width: 24.w,
+                                      height: 24.h,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -236,7 +258,11 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 controller: _nameController,
                                 focusNode: _nameFocusNode,
                                 hintText: "enter_your_name".tr(),
-                                textStyle: getDynamicStyle(context, size: 18, weight: FontWeight.bold),
+                                textStyle: getDynamicStyle(
+                                  context,
+                                  size: 18,
+                                  weight: FontWeight.bold,
+                                ),
                                 validator: (value) {
                                   if (!_showNameError) return null;
                                   return Helpers.validateFullName(value);
@@ -244,10 +270,14 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 suffixIcon: Padding(
                                   padding: EdgeInsets.all(15.w),
                                   child: Image.asset(
-                                    _nameFocusNode.hasFocus ? 'assets/images/editIconGray.png' : 'assets/images/editIconRed.png',
+                                    _nameFocusNode.hasFocus
+                                        ? 'assets/images/editIconGray.png'
+                                        : 'assets/images/editIconRed.png',
                                     width: 5.w,
                                     height: 5.h,
-                                    color: _nameFocusNode.hasFocus ? AppColors.primaryColor : const Color(0xFF8E8E8E),
+                                    color: _nameFocusNode.hasFocus
+                                        ? AppColors.primaryColor
+                                        : const Color(0xFF8E8E8E),
                                   ),
                                 ),
                               ),
@@ -263,7 +293,11 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 focusNode: _phoneFocusNode,
                                 keyboardType: TextInputType.phone,
                                 hintText: "enter_your_phone_number".tr(),
-                                textStyle: getDynamicStyle(blocContext, size: 18, weight: FontWeight.bold),
+                                textStyle: getDynamicStyle(
+                                  blocContext,
+                                  size: 18,
+                                  weight: FontWeight.bold,
+                                ),
                                 validator: (value) {
                                   if (!_showPhoneError) return null;
                                   return Helpers.validatePhone(value);
@@ -271,10 +305,14 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 suffixIcon: Padding(
                                   padding: EdgeInsets.all(15.w),
                                   child: Image.asset(
-                                    _phoneFocusNode.hasFocus ? 'assets/images/editIconGray.png' : 'assets/images/editIconRed.png',
+                                    _phoneFocusNode.hasFocus
+                                        ? 'assets/images/editIconGray.png'
+                                        : 'assets/images/editIconRed.png',
                                     width: 5.w,
                                     height: 5.h,
-                                    color: _phoneFocusNode.hasFocus ? const Color(0xFFCF2120) : const Color(0xFF8E8E8E),
+                                    color: _phoneFocusNode.hasFocus
+                                        ? const Color(0xFFCF2120)
+                                        : const Color(0xFF8E8E8E),
                                   ),
                                 ),
                               ),
@@ -283,7 +321,10 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                         ),
                         SizedBox(height: 38.h),
                         Container(
-                          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 10.h,
+                            horizontal: 20.w,
+                          ),
                           width: 400.w,
                           decoration: BoxDecoration(
                             color: const Color(0xFFf8f8f8),
@@ -295,7 +336,10 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 children: [
                                   Icon(Icons.fingerprint, size: 30.sp),
                                   SizedBox(width: 20.w),
-                                  Text("fingerprint_login".tr(), style: getDynamicStyle(blocContext)),
+                                  Text(
+                                    "fingerprint_login".tr(),
+                                    style: getDynamicStyle(blocContext),
+                                  ),
                                   const Spacer(),
                                   Switch(
                                     value: _biometricEnabled,
@@ -303,35 +347,63 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                       await _toggleBiometric(value);
                                     },
                                     thumbColor: WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(WidgetState.selected) ? Colors.white : Colors.grey,
+                                      (states) =>
+                                          states.contains(WidgetState.selected)
+                                          ? Colors.white
+                                          : Colors.grey,
                                     ),
                                     trackColor: WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(WidgetState.selected) ? AppColors.primaryColor : Colors.grey.shade400,
+                                      (states) =>
+                                          states.contains(WidgetState.selected)
+                                          ? AppColors.primaryColor
+                                          : Colors.grey.shade400,
                                     ),
-                                    trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                                    trackOutlineColor: WidgetStateProperty.all(
+                                      Colors.transparent,
+                                    ),
                                   ),
                                 ],
                               ),
                               Divider(color: Colors.grey.shade300),
                               Row(
                                 children: [
-                                  Icon(Icons.language_rounded, size: 30.sp, color: Colors.grey.shade600),
+                                  Icon(
+                                    Icons.language_rounded,
+                                    size: 30.sp,
+                                    color: Colors.grey.shade600,
+                                  ),
                                   SizedBox(width: 20.w),
-                                  Text("language_switch".tr(), style: getDynamicStyle(blocContext)),
+                                  Text(
+                                    "language_switch".tr(),
+                                    style: getDynamicStyle(blocContext),
+                                  ),
                                   const Spacer(),
                                   Switch(
-                                    value: blocContext.locale.languageCode == 'ar',
+                                    value:
+                                        blocContext.locale.languageCode == 'ar',
                                     onChanged: (value) {
-                                      blocContext.setLocale(value ? const Locale('ar') : const Locale('en'));
+                                      blocContext.setLocale(
+                                        value
+                                            ? const Locale('ar')
+                                            : const Locale('en'),
+                                      );
                                       setState(() {});
                                     },
                                     thumbColor: WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(WidgetState.selected) ? Colors.white : Colors.grey,
+                                      (states) =>
+                                          states.contains(WidgetState.selected)
+                                          ? Colors.white
+                                          : Colors.grey,
                                     ),
                                     trackColor: WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(WidgetState.selected) ? const Color(0xFFCF2120) : Colors.grey.shade400,
+                                      (states) =>
+                                          states.contains(WidgetState.selected)
+                                          ? const Color(0xFFCF2120)
+                                          : Colors.grey.shade400,
                                     ),
-                                    trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                                    trackOutlineColor: WidgetStateProperty.all(
+                                      Colors.transparent,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -339,7 +411,13 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               _buildListTile(
                                 iconPath: 'assets/images/lockIcon.png',
                                 title: "reset_password".tr(),
-                                onTap: () => print("Reset password pressed!"),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ChangePasswordScreen(),
+                                  ),
+                                ),
                                 blocContext: blocContext,
                               ),
                               Divider(color: Colors.grey.shade300),
@@ -360,27 +438,38 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                           child: ElevatedButton(
                             onPressed: (!isLoading && hasChanges)
                                 ? () => blocContext.read<ProfileBloc>().add(
-                              SaveProfilePressed(
-                                name: _nameController.text,
-                                phone: _phoneNumberController.text,
-                              ),
-                            )
+                                    SaveProfilePressed(
+                                      name: _nameController.text,
+                                      phone: _phoneNumberController.text,
+                                    ),
+                                  )
                                 : null,
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(95.w, 45.h),
-                              backgroundColor: (!isLoading && hasChanges) ? const Color(0xFFCF2120) : Colors.grey.shade400,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+                              backgroundColor: (!isLoading && hasChanges)
+                                  ? const Color(0xFFCF2120)
+                                  : Colors.grey.shade400,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.r),
+                              ),
                             ),
                             child: isLoading
                                 ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : Text(
-                              "save".tr(),
-                              style: getDynamicStyle(blocContext, color: Colors.white, size: 16),
-                            ),
+                                    "save".tr(),
+                                    style: getDynamicStyle(
+                                      blocContext,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -415,7 +504,10 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
             children: [
               Image.asset(iconPath, width: 25.w, height: 25.h),
               SizedBox(width: 24.w),
-              Text(title, style: getDynamicStyle(blocContext, color: titleColor)),
+              Text(
+                title,
+                style: getDynamicStyle(blocContext, color: titleColor),
+              ),
             ],
           ),
         ),
