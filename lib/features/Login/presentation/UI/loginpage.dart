@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
-import 'package:cropmodel/features/Login/presentation/UI/widgets/SnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -60,12 +60,15 @@ class _LoginPageState extends State<LoginPage> {
                 if (!mounted) return;
                 if (state is LoginSuccess) {
                   if (state is LoginSuccess) {
-                    AppSnackBar.show(
-                      context: context,
-                      message: "Login successful",
-                      backgroundColor: const Color(0xFF71BC55),
-                      icon: Icons.check_circle_rounded,
+                    AppMessage.showSnackBar(
+                      context,
+                      "Login successful",
+                       const Color(0xFF71BC55),
+                      Icons.check_circle_rounded,
                     );
+                    Future.delayed(const Duration(seconds: 3), () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    });
 
                     // Navigator.pushReplacement(
                     //   context,
@@ -79,40 +82,20 @@ class _LoginPageState extends State<LoginPage> {
                 }
 
                 if (state is LoginFailure) {
-                  AppSnackBar.show(
-                    context: context,
-                    message: state.message,
-                    backgroundColor: const Color(0xFFEA2020),
-                    icon: Icons.error_rounded,
+                  AppMessage.showSnackBar(
+                    context,
+                    state.message,
+                  const Color(0xFFEA2020),
+                  Icons.error_rounded,
                   );
                 }
 
                 if (state is BiometricNotAvailable) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Color(0xFFEA2020),
-                      margin: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Row(
-                        children: [
-                          Icon(Icons.error_rounded, color: Colors.white),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "Biometric not available",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Nunito',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      duration: Duration(seconds: 3),
-                    ),
+                  AppMessage.showSnackBar(
+                    context,
+                    "Biometric not available",
+                    const Color(0xFFEA2020),
+                    Icons.error_rounded,
                   );
                 }
               },
