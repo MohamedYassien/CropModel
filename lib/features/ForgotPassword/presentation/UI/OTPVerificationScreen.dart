@@ -3,6 +3,7 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/features/ForgotPassword/presentation/UI/ResetPassword.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/widgets/otp_field.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_bloc.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart';
@@ -25,7 +26,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   String? otp;
   late final List<TextEditingController> _controllers = List.generate(
     6,
-        (_) => TextEditingController(),
+    (_) => TextEditingController(),
   );
 
   late final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
@@ -126,6 +127,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 const Color(0xFF71BC55),
                 Icons.check_circle,
               );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Resetpassword(email: widget.email),
+                ),
+              );
             }
           },
           child: BlocBuilder<OTPBloc, OTPState>(
@@ -141,7 +148,10 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                           Row(
                             children: [
                               IconButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: ()  {
+
+                    Navigator.pop(context);
+                    },
                                 icon: const Icon(
                                   Icons.arrow_back_ios_new_rounded,
                                 ),
@@ -228,25 +238,25 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                               ),
                               TextButton(
                                 onPressed:
-                                (_canResend && state is! OTPResendLoading)
+                                    (_canResend && state is! OTPResendLoading)
                                     ? () {
-                                  otp = _controllers
-                                      .map((c) => c.text)
-                                      .join();
-                                  _clearOtpFields();
-                                  context.read<OTPBloc>().add(
-                                    OTPResendButtonPressed(
-                                      email: widget.email,
-                                    ),
-                                  );
-                                }
+                                        otp = _controllers
+                                            .map((c) => c.text)
+                                            .join();
+                                        _clearOtpFields();
+                                        context.read<OTPBloc>().add(
+                                          OTPResendButtonPressed(
+                                            email: widget.email,
+                                          ),
+                                        );
+                                      }
                                     : null,
                                 child: Text(
                                   'resend_the_otp'.tr(),
                                   style: TextStyle(
                                     color:
-                                    (_canResend &&
-                                        state is! OTPResendLoading)
+                                        (_canResend &&
+                                            state is! OTPResendLoading)
                                         ? AppColors.primaryColor
                                         : Colors.grey,
                                     fontSize: 12,
@@ -281,19 +291,19 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                           CustomButton(
                             onPressed: _canVerify
                                 ? () {
-                              FocusScope.of(context).unfocus();
-                              otp = _controllers
-                                  .map((c) => c.text)
-                                  .join();
-                              print('the otp: $otp');
+                                    FocusScope.of(context).unfocus();
+                                    otp = _controllers
+                                        .map((c) => c.text)
+                                        .join();
+                                    print('the otp: $otp');
 
-                              context.read<OTPBloc>().add(
-                                OTPButtonPressed(
-                                  otp: otp!,
-                                  email: widget.email,
-                                ),
-                              );
-                            }
+                                    context.read<OTPBloc>().add(
+                                      OTPButtonPressed(
+                                        otp: otp!,
+                                        email: widget.email,
+                                      ),
+                                    );
+                                  }
                                 : null,
                             buttonTextKey: 'continue',
                             isLoading: state is OTPVerifyLoading,
