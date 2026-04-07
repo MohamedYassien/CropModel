@@ -32,7 +32,6 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
 
-
   @override
   void dispose() {
     emailController.dispose();
@@ -52,9 +51,7 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
       },
       child: Builder(
         builder: (context) {
-          final state = context
-              .watch<ForgotPassBloc>()
-              .state;
+          final state = context.watch<ForgotPassBloc>().state;
           final bool isLoading = state is ForgotPassLoading;
 
           return Scaffold(
@@ -71,39 +68,31 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                 //   Icons.check_circle_outline,
                 // );
                 //
-                  Navigator.push(
-                     context,
-                     MaterialPageRoute(
-                       builder: (_) =>
-                           OTPVerificationScreen(
-                             email: emailController.text.trim(),
-                           ),
-                     ),
-                   );
-               // }
-               //  if (state is ForgotPassError) {
-               //    String displayMessage;
-               //
-               //    if (state.message.contains('not found') ||
-               //        state.message.contains('404')) {
-               //      displayMessage = "no_account_found".tr();
-               //    } else if (state.message.contains('network') ||
-               //        state.message.contains('SocketException')) {
-               //      displayMessage = "check_connection".tr();
-               //    } else if (state.message.contains('too many') ||
-               //        state.message.contains('429')) {
-               //      displayMessage = "too_many_requests".tr();
-               //    } else {
-               //      displayMessage = "something_went_wrong".tr();
-               //    }
-               //
-               //    AppMessage.showSnackBar(
-               //      context,
-               //      displayMessage,
-               //      const Color(0xFFEA2020),
-               //      Icons.error_outline,
-               //    );
-               // }
+
+                // }
+                //  if (state is ForgotPassError) {
+                //    String displayMessage;
+                //
+                //    if (state.message.contains('not found') ||
+                //        state.message.contains('404')) {
+                //      displayMessage = "no_account_found".tr();
+                //    } else if (state.message.contains('network') ||
+                //        state.message.contains('SocketException')) {
+                //      displayMessage = "check_connection".tr();
+                //    } else if (state.message.contains('too many') ||
+                //        state.message.contains('429')) {
+                //      displayMessage = "too_many_requests".tr();
+                //    } else {
+                //      displayMessage = "something_went_wrong".tr();
+                //    }
+                //
+                //    AppMessage.showSnackBar(
+                //      context,
+                //      displayMessage,
+                //      const Color(0xFFEA2020),
+                //      Icons.error_outline,
+                //    );
+                // }
               },
               child: SafeArea(
                 child: Padding(
@@ -119,8 +108,7 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                             child: IconButton(
                               onPressed: () {
                                 Navigator.pop(context);
-
-                              } ,
+                              },
                               icon: const Icon(Icons.arrow_back_ios),
                             ),
                           ),
@@ -151,9 +139,7 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                           CustomTextField(
                             controller: emailController,
                             validator: (value) {
-                              if (value == null || value
-                                  .trim()
-                                  .isEmpty) {
+                              if (value == null || value.trim().isEmpty) {
                                 return "Email is required";
                               }
                               final emailRegex = RegExp(
@@ -169,13 +155,21 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                           SizedBox(height: 20.h),
                           CustomButton(
                             buttonTextKey: "continue".tr(),
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  context.read<ForgotPassBloc>().add(
-                                    SendOtpEvent(emailController.text.trim()),
-                                  );
-                                }
-                              }
+                            onPressed: () {
+                              // if (_formKey.currentState!.validate()) {
+                              //   context.read<ForgotPassBloc>().add(
+                              //     SendOtpEvent(emailController.text.trim()),
+                              //   );
+                              // }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OTPVerificationScreen(
+                                    email: emailController.text,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
 
                           SizedBox(height: 20.h),
