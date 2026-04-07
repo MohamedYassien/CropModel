@@ -1,3 +1,4 @@
+import 'package:cropmodel/features/Login/presentation/UI/Splach.dart';
 import 'package:cropmodel/features/Change_password/presentaion/bloc/Change_password_bloc.dart';
 import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: const LoginPage(),
+          home:  Splach(),
         );
       },
     );
