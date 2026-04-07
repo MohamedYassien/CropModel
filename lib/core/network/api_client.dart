@@ -71,9 +71,14 @@ class APIClient {
     context,
   }) async {
     try {
+      final bool isAbsoluteUrl =
+          api.path.startsWith('http://') || api.path.startsWith('https://');
+      final String resolvedUrl = isAbsoluteUrl
+          ? "${api.path}${pathParam != null ? "/$pathParam" : ""}"
+          : "${AppStrings.baseUrl}/${api.path}${pathParam != null ? "/$pathParam" : ""}";
+
       final requestOptions = RequestOptions(
-        baseUrl:
-            "${AppStrings.baseUrl}/${api.path}${pathParam != null ? "/$pathParam" : ""}",
+        path: resolvedUrl,
         method: api.method.name,
         queryParameters: queryParameters,
         data: body,

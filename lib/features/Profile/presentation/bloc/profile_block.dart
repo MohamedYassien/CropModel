@@ -60,9 +60,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
         try {
           await _updateProfileUseCase.call(updatedUser);
+          emit(
+            ProfileLoaded(
+              user: updatedUser,
+              hasChanges: false,
+            ),
+          );
           emit(ProfileUpdateSuccess());
         } catch (e) {
-          emit(ProfileError("Save Failed"));
+          emit(
+            currentState.copyWith(
+              errorMessage: "save_failed",
+            ),
+          );
         }
       }
     });

@@ -46,5 +46,7 @@
   "too_many_requests": "محاولات كثيرة جداً. يرجى المحاولة بعد قليل.",
   "something_went_wrong": "حدث خطأ ما. يرجى المحاولة لاحقاً.",
   "server_error": "السيرفر غير متاح حالياً. يرجى المحاولة لاحقاً.",
-  "passwords_do_not_match": "كلمة المرور غير متطابقة"
+  "passwords_do_not_match": "كلمة المرور غير متطابقة",
+  "profile_saved_successfully": "تم الحفظ بنجاح",
+  "save_failed": "فشل الحفظ"
 }

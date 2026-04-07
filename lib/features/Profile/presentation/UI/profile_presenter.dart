@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/shared/app_message.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/text_font_transformer.dart';
@@ -132,9 +133,21 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
               _initialPhone = _phoneNumberController.text;
               _initialBiometric = _biometricEnabled;
             });
-            ScaffoldMessenger.of(
+            AppMessage.showSnackBar(
               blocContext,
-            ).showSnackBar(const SnackBar(content: Text("Profile Updated!")));
+              "profile_saved_successfully".tr(),
+              Colors.green,
+              Icons.check_circle,
+            );
+          }
+
+          if (state is ProfileLoaded && state.errorMessage != null) {
+            AppMessage.showSnackBar(
+              blocContext,
+              state.errorMessage!.tr(),
+              const Color(0xFFEA2020),
+              Icons.error_rounded,
+            );
           }
         },
         builder: (blocContext, state) {
@@ -156,16 +169,26 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
 
           final bool hasChanges = _checkHasChanges(blocContext);
 
-          return Scaffold(
+          return WillPopScope(
+            onWillPop: () async {
+              Navigator.pushAndRemoveUntil(
+                blocContext,
+                MaterialPageRoute(builder: (_) => const LoginDetails()),
+                (route) => false,
+              );
+              return false;
+            },
+            child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
               leading: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 22.w),
                 child: IconButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginDetails()),
+                  onPressed: () => Navigator.pushAndRemoveUntil(
+                    blocContext,
+                    MaterialPageRoute(builder: (_) => const LoginDetails()),
+                    (route) => false,
                   ),
                   icon: const Icon(Icons.arrow_back_ios),
                 ),
@@ -478,6 +501,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                 ),
               ),
             ),
+          ),
           );
         },
       ),

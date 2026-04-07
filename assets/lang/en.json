@@ -76,5 +76,7 @@
   "confirm_password": "Confirm Password",
   "enter_your_password": "Enter your password",
   "confirm_password_is_required": "Confirm password is required",
-  "Your_account_has_created_successfully": "Your account has created successfully"
+  "Your_account_has_created_successfully": "Your account has created successfully",
+  "profile_saved_successfully": "Saved successfully",
+  "save_failed": "Save failed"
 }
