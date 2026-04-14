@@ -2,6 +2,9 @@ import 'package:cropmodel/features/Login/domain/usecases/BiometricAuth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/service/BiometricService.dart';
 import '../../data/service/SecureStorage.dart';
+import '../../domain/usecases/GetCredentials.dart';
+import '../../domain/usecases/LoginWithEmail.dart';
+import '../../domain/usecases/SaveCredentials.dart';
 import '../../domain/usecases/checkBiometricAvailability.dart';
 import 'LoginEvent.dart';
 import 'LoginState.dart';
@@ -9,21 +12,40 @@ import 'LoginState.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final BiometricService biometricService;
   final SecureStorage secureStorage;
+  final LoginWithEmail loginWithEmail;
+  final Savecredentials saveCredentials;
+  final GetCredentials getCredentials;
 
   LoginBloc({
     required this.biometricService,
     required this.secureStorage,
+    required this.loginWithEmail,
+    required this.saveCredentials,
+    required this.getCredentials,
   }) : super(LoginInitial()) {
      on<LoginWithEmailEvent>(_onLogin);
     on<BiometricLoginEvent>(_onBiometricLogin);
     on<LogoutEvent>(_onLogout);
   }
 
+
+  Future <void> _loginWithEmail(String email, String password) async {
+    try {
+      await loginWithEmail.call(email, password);
+      await saveCredentials.call(email, password);
+    } catch (e) {
+      throw Exception('Login failed: ${e.toString()}');
+    }
+  }
+
+
   Future<void> _onLogin(
       LoginWithEmailEvent event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
     try {
       await Future.delayed(const Duration(seconds: 1));
+
+       await _loginWithEmail(event.email,event.password);
 
       await secureStorage.saveEmail(event.email);
       await secureStorage.savePassword(event.password);
