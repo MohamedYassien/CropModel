@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/features/Login/domain/usecases/GetCredentials.dart';
+import 'package:cropmodel/features/Login/domain/usecases/LoginWithEmail.dart';
+import 'package:cropmodel/features/Login/domain/usecases/SaveCredentials.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../ForgotPassword/presentation/UI/ForgetPasswordScreen.dart';
 import '../../../sign_up/presentation/UI/sign_up_presenter.dart';
+import '../../data/service/LoginService.dart';
 import '../../data/service/SecureStorage.dart';
 import '../bloc/LoginBloc.dart';
 import '../bloc/LoginEvent.dart';
@@ -46,6 +50,9 @@ class _LoginPageState extends State<LoginPage> {
 
     return BlocProvider(
       create: (_) => LoginBloc(
+        loginWithEmail: LoginWithEmail(LoginService()),
+        saveCredentials:Savecredentials(SecureStorage()),
+        getCredentials: GetCredentials(SecureStorage()),
         biometricService: BiometricService(),
         secureStorage: SecureStorage(),
       ),
