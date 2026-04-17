@@ -44,4 +44,12 @@ class SecureStorage {
     final value = await _storage.read(key: 'biometric_prompt_shown');
     return value == 'true';
   }
+
+  Future<void> saveToken(String token) async{
+    await _storage.write(key:'token',value:token);
+  }
+
+  Future<String>getToken()async{
+    return await _storage.read(key: 'token') ?? '';
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:cropmodel/features/Login/domain/usecases/BiometricAuth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/network/API_error.dart';
+import '../../data/model/LoginRequest.dart';
 import '../../data/service/BiometricService.dart';
 import '../../data/service/SecureStorage.dart';
 import '../../domain/usecases/GetCredentials.dart';
@@ -28,14 +30,33 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LogoutEvent>(_onLogout);
   }
 
+  Future<void> _loginWithEmail(String email, String password) async {
 
-  Future <void> _loginWithEmail(String email, String password) async {
     try {
-      await loginWithEmail.call(email, password);
+      final request = LoginRequest(
+        email: email,
+        password: password,
+      );
+
+      final response = await loginWithEmail.call(request);
+
+      if (response == null || response.token.isEmpty) {
+        throw APIError(
+          message: "Invalid email or password",
+          code: "401",
+        );
+      }
+
+      print("token: ${response?.token}");
+
       await saveCredentials.call(email, password);
     } catch (e) {
-      throw Exception('Login failed: ${e.toString()}');
+      if (e is APIError) {
+        throw e;
+      }
+      throw APIError(message: e.toString());
     }
+
   }
 
 
@@ -45,14 +66,26 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       await Future.delayed(const Duration(seconds: 1));
 
-       await _loginWithEmail(event.email,event.password);
+      await _loginWithEmail(event.email, event.password);
 
-      await secureStorage.saveEmail(event.email);
-      await secureStorage.savePassword(event.password);
+      // await secureStorage.saveEmail(event.email);
+      // await secureStorage.savePassword(event.password);
 
       emit(LoginSuccess());
     } catch (e) {
-      emit(LoginFailure(e.toString()));
+      String message;
+
+      if (e is APIError) {
+        message = e.message;
+
+        if (e.code == "401") {
+          message = "Invalid email or password";
+        }
+      } else {
+        message = "Unexpected error occurred";
+      }
+
+      emit(LoginFailure(message));
     }
   }
 

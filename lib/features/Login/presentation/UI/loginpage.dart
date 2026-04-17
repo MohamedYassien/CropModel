@@ -28,6 +28,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _obscurePassword = true;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -65,7 +66,6 @@ class _LoginPageState extends State<LoginPage> {
             body: BlocListener<LoginBloc, LoginState>(
               listener: (context, state) {
                 if (!mounted) return;
-                if (state is LoginSuccess) {
                   if (state is LoginSuccess) {
                     AppMessage.showSnackBar(
                       context,
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                     //   context,
                     //   MaterialPageRoute(builder: (_) => const LoginDetails()),
                     // );
-                  }
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const LoginDetails()),
@@ -140,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                                 hintText: "email_address".tr(),
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
+                                enabled: !isLoading,
                                 validator: (value) =>
                                     Helpers.validateEmail(value),
                               ),
@@ -147,6 +148,19 @@ class _LoginPageState extends State<LoginPage> {
                               CustomTextField(
                                 hintText: "password_required".tr(),
                                 controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                enabled: !isLoading,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return "password_required".tr();
@@ -197,12 +211,12 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               SizedBox(height: 20.h),
                               Row(
-                                children: [
+                                 children: [
                                   Expanded(
                                     child: SizedBox(
                                       height: 55.h,
                                       child: ElevatedButton(
-                                        onPressed: () => _login(context),
+                                        onPressed:isLoading ? null: () =>_login(context),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
                                               AppColors.buttonColor,
@@ -286,7 +300,8 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                               SizedBox(height: 20.h),
-                            ],
+
+                                ],
                           ),
                           Padding(
                             padding: EdgeInsets.only(bottom: 40.h),
@@ -312,7 +327,7 @@ class _LoginPageState extends State<LoginPage> {
                                     );
                                   },
                                   child: Text(
-                                    "register",
+                                    "Register",
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontWeight: FontWeight.bold,
