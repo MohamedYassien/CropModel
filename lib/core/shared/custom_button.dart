@@ -1,3 +1,4 @@
+import 'package:cropmodel/core/utils/text_font_transformer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -60,12 +61,7 @@ class CustomButton extends StatelessWidget {
                         child ??
                         Text(
                           '$buttonTextKey'.tr(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17.sp,
-                            fontFamily: 'Nunito',
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: getDynamicStyle(context, color: Colors.white, size: 17.sp, weight: FontWeight.bold )
                         ),
                   ),
                 ),

@@ -126,7 +126,7 @@ class _OTPPresenterState extends State<OTPPresenter> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CreatePasswordPresenter(),
+                    builder: (context) => CreatePasswordPresenter(email: widget.email, otp: otp!,),
                   ),
                 );
               }

@@ -78,5 +78,8 @@
   "confirm_password_is_required": "Confirm password is required",
   "Your_account_has_created_successfully": "Your account has created successfully",
   "profile_saved_successfully": "Saved successfully",
-  "save_failed": "Save failed"
+  "save_failed": "Save failed",
+  "email_already_exists": "Email already exists",
+  "invalid_email_or_password": "Invalid email or password",
+  "no_internet_connection": "No internet connection",
 }
