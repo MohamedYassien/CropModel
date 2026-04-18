@@ -1,3 +1,3 @@
 class AppStrings{
-  static final String baseUrl = 'https://api.spaceflightnewsapi.net/v4';
+  static final String baseUrl = 'http://72.61.154.19:8080/api/v1';
 }

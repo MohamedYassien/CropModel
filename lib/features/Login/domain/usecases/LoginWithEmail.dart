@@ -1,3 +1,6 @@
+import 'package:cropmodel/features/Login/data/model/LoginRequest.dart';
+import 'package:cropmodel/features/Login/data/model/LoginResponse.dart';
+
 import '../../data/service/LoginService.dart';
 
 class LoginWithEmail {
@@ -5,7 +8,7 @@ class LoginWithEmail {
 
   LoginWithEmail(this._loginService);
 
-  Future<void> call(String email, String password) async {
-    return await _loginService.login(email, password);
+  Future<LoginResponse?> call(LoginRequest request) async {
+    return await _loginService.login(request);
   }
 }

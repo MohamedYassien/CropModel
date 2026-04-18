@@ -13,6 +13,8 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool enabled;
   final TextStyle? textStyle;
+  final bool obscureText;
+
 
   const CustomTextField({
     super.key,
@@ -24,6 +26,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.enabled = true,
     this.textStyle,
+    this.obscureText = false,
   });
 
   @override
@@ -37,6 +40,7 @@ class CustomTextField extends StatelessWidget {
         validator: validator,
         keyboardType: keyboardType,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        obscureText: obscureText,
 
         style: textStyle ?? getDynamicStyle(context),
 
