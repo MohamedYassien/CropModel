@@ -1,11 +1,11 @@
-import '../../data/service/forgotpass_services.dart';
+
+import '../../data/service/forgotPass_services.dart';
 
 class ResetPasswordUseCase {
-  final ForgotpassServices services;
+   ForgotpassServices services = ForgotpassServices();
 
-  ResetPasswordUseCase(this.services);
 
-  Future<void> call(String email, String password) {
-    return services.resetPassword(email, password);
+  Future<void> call(String email, String otp, String password) {
+    return services.resetPassword(email, otp, password);
   }
 }
