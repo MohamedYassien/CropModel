@@ -41,8 +41,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileFieldsChanged>((event, emit) {
       if (state is ProfileLoaded) {
         final currentState = state as ProfileLoaded;
-        final bool changed = event.name != currentState.user.name ||
-            event.phone != currentState.user.phoneNumber;
+        final bool changed = event.name != currentState.user.fullName ||
+            event.phone != currentState.user.phone;
         emit(currentState.copyWith(hasChanges: changed));
       }
     });
@@ -55,7 +55,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final updatedUser = currentState.user.copyWith(
           name: event.name,
           phoneNumber: event.phone,
-          profileImage: currentState.tempImage ?? currentState.user.profileImage,
+          profilePicture: currentState.tempImage ?? currentState.user.profilePicture,
         );
 
         try {
@@ -81,9 +81,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
 UserModel _createDefaultUser() {
   return UserModel(
-    name: "New User",
+    fullName: "New User",
     email: "example@mail.com",
-    phoneNumber: "0000000000",
+    phone: "0000000000",
     isFingerprintEnabled: false,
   );
 }

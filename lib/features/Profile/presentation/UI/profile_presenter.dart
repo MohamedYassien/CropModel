@@ -118,12 +118,12 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
       child: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (blocContext, state) {
           if (state is ProfileLoaded && !_isInitialized) {
-            _nameController.text = state.user.name;
-            _phoneNumberController.text = state.user.phoneNumber;
-            _emailController.text = state.user.email;
+            _nameController.text = state.user.fullName!;
+            _phoneNumberController.text = state.user.phone!;
+            _emailController.text = state.user.email!;
 
-            _initialName = state.user.name;
-            _initialPhone = state.user.phoneNumber;
+            _initialName = state.user.fullName!;
+            _initialPhone = state.user.phone!;
             _isInitialized = true;
           }
 
@@ -222,7 +222,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                               MaterialPageRoute(
                                 builder: (context) => CropProfileScreen(
                                   initialImageBytes:
-                                      tempImage ?? user?.profileImage,
+                                      tempImage ?? user?.profilePicture,
                                 ),
                               ),
                             );
@@ -241,8 +241,8 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
                                 backgroundColor: Colors.grey[200],
                                 backgroundImage: tempImage != null
                                     ? MemoryImage(tempImage)
-                                    : (user?.profileImage != null
-                                              ? MemoryImage(user!.profileImage!)
+                                    : (user?.profilePicture != null
+                                              ? MemoryImage(user!.profilePicture!)
                                               : const AssetImage(
                                                   'assets/images/profilePlaceholder2.png',
                                                 ))
