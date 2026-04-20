@@ -15,3 +15,10 @@ class VerifyOtpSubmitted extends SignUpEvent {
 
   VerifyOtpSubmitted({required this.email, required this.otp});
 }
+
+class OTPResendButtonPressed extends SignUpEvent {
+
+  final String email;
+
+  OTPResendButtonPressed({required this.email});
+}
