@@ -81,5 +81,8 @@
   "save_failed": "Save failed",
   "email_already_exists": "Email already exists",
   "invalid_email_or_password": "Invalid email or password",
-  "no_internet_connection": "No internet connection"
+  "no_internet_connection": "No internet connection",
+  "password_must": "Password must contain at least one special character: _ & $",
+  "invalid_otp": "Invalid OTP code",
+  "email_anot_found": "Email not found"
 }
