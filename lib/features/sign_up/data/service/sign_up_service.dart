@@ -25,7 +25,7 @@ class SignUpService {
       api: SignUpApi.verifyOtp,
       body: otpRequest,
       mapper: (response) {
-        return null;
+        return OTPResponse.fromJson(response);
       },
     );
   }

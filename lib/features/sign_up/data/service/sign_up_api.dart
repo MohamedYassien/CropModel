@@ -8,9 +8,9 @@ enum SignUpApi implements API {
 
   @override
   final String path;
-
   @override
   final Method method;
 
-  const SignUpApi(this.method,this.path);
+  const SignUpApi(this.method, this.path);
 }
+
