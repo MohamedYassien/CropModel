@@ -12,4 +12,14 @@ class SignUpError extends SignUpState {
   SignUpError(this.message);
 }
 
+class OTPResendLoading extends SignUpState {}
+
+class OTPResendSuccess extends SignUpState {}
+
+class OTPResendError extends SignUpState {
+  final String message;
+
+  OTPResendError(this.message);
+}
+
 

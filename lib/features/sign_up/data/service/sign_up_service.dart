@@ -31,9 +31,11 @@ class SignUpService {
   }
 
   Future<OTPResponse?> resendOTP(String email) async {
-    return await apiClient.fetch<String, OTPResponse?>(
+    return await apiClient.fetch<Map<String, String>, OTPResponse?>(
       api: SignUpApi.resendOTP,
-      body: email,
+      body: {
+        'email': email
+      },
       mapper: (response) {
         return null;
       },
