@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../Login/presentation/UI/LoginDetails.dart';
+import '../../../Login/presentation/UI/loginpage.dart';
 
 class ConfirmResetPasswordScreen extends StatelessWidget {
   const ConfirmResetPasswordScreen({super.key});
@@ -26,21 +26,18 @@ class ConfirmResetPasswordScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              Image.asset(
-                'assets/images/success.png',
-                height: 300.h,
-              ),
+              Image.asset('assets/images/success.png', height: 300.h),
               SizedBox(height: 20.h),
-             CustomButton(
-               buttonTextKey: "continue".tr(),
-               onPressed: () {
-                 Navigator.pushAndRemoveUntil(
-                   context,
-                   MaterialPageRoute(builder: (context) => const LoginDetails()),
-                   (route) => false,
-                 );
-                 }
-             )
+              CustomButton(
+                buttonTextKey: "continue".tr(),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                },
+              ),
             ],
           ),
         ),
