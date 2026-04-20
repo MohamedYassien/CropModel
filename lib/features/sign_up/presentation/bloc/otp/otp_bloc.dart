@@ -1,10 +1,10 @@
 import 'package:cropmodel/features/ForgotPassword/data/service/forgotpass_services.dart';
+import 'package:cropmodel/features/sign_up/data/model/otp/otp_request.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../ForgotPassword/domain/usecases/verify_otp_usecase.dart';
-import '../../../data/model/otp/otp_request.dart';
+import '../../../../sign_up//domain/usecases/verify_otp_usecase.dart';
 import '../../../domain/usecases/resend_otp_usecase.dart';
 
 class OTPBloc extends Bloc<OTPEvent, OTPState> {
@@ -22,7 +22,7 @@ class OTPBloc extends Bloc<OTPEvent, OTPState> {
         } else{
           emit(OTPVerifyError("OTP Wrong"));
         }
-        await VerifyOtpUseCase(ForgotpassServices()).call(event.email, event.otp);
+        await VerifyOtpUseCase().call(OTPRequest(otp: event.otp, email: event.email));
 
       } catch (e) {
         emit(OTPVerifyError(e.toString()));
