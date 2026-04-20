@@ -64,6 +64,8 @@ class APIClient {
     context,
   }) async {
     try {
+      final bool isFormData = body is FormData;
+
       final bool isAbsoluteUrl =
           api.path.startsWith('http://') || api.path.startsWith('https://');
 
@@ -77,7 +79,7 @@ class APIClient {
         data: body,
         headers: {
           if (headers != null) ...headers,
-          HttpHeaders.contentTypeHeader: 'application/json',
+          if (!isFormData) HttpHeaders.contentTypeHeader: 'application/json',
         },
       );
 

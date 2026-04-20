@@ -1,4 +1,5 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:cropmodel/features/sign_up/data/model/sign-up/sign_up_request.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/shared/custom_text_field.dart';
+import '../../../../core/utils/text_font_transformer.dart';
 import '../bloc/sign-up/sign_up_bloc.dart';
 import '../bloc/sign-up/sign_up_event.dart';
 import '../bloc/sign-up/sign_up_state.dart';
@@ -42,9 +44,12 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
       child: BlocListener<SignUpBloc, SignUpState>(
         listener: (context, state) {
           if (state is SignUpError) {
-            ScaffoldMessenger.of(
+            AppMessage.showSnackBar(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+              state.message,
+              const Color(0xFFEA2020),
+              Icons.error_outline,
+            );
           }
 
           if (state is SignUpSuccess) {
@@ -73,11 +78,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                           SizedBox(height: 30.h),
                           Text(
                             'sign_up'.tr(),
-                            style: TextStyle(
-                              fontSize: 35.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                            style: getDynamicStyle(context, size: 35, weight: FontWeight.bold)),
                           SizedBox(height: 40.h),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 35.r),
@@ -122,7 +123,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                                       context.read<SignUpBloc>().add(
                                         SignUpButtonPressed(
                                           signUpRequest: SignUpRequest(
-                                            name: _fullNameController.text,
+                                            fullName: _fullNameController.text,
                                             email: _emailController.text,
                                             phone: _phoneController.text,
                                           ),
@@ -139,11 +140,9 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                             children: [
                               Text(
                                 "have_an_account_already".tr(),
-                                style: TextStyle(
-                                  color: Color(0xff62707D),
-                                  fontSize: 16.sp,
-                                ),
+                                style: getDynamicStyle( context, color: Color(0xff62707D))
                               ),
+                              SizedBox(width: 12.w,),
                               TextButton(
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
@@ -153,12 +152,7 @@ class _SignUpPresenterState extends State<SignUpPresenter> {
                                 },
                                 child: Text(
                                   "login".tr(),
-                                  style: TextStyle(
-                                    color: AppColors.primaryColor,
-                                    fontFamily: 'Nunito',
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: getDynamicStyle(context, color: AppColors.primaryColor, weight: FontWeight.bold)
                                 ),
                               ),
                             ],

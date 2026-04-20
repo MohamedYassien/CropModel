@@ -2,7 +2,10 @@ import 'package:cropmodel/features/sign_up/data/model/otp/otp_request.dart';
 import 'package:cropmodel/features/sign_up/domain/usecases/verify_otp_usecase.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/sign-up/sign_up_event.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/sign-up/sign_up_state.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../domain/usecases/sign_up_usecase.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
