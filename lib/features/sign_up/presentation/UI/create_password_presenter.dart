@@ -2,6 +2,7 @@ import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/shared/custom_text_field.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
+import 'package:cropmodel/core/utils/text_font_transformer.dart';
 import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/create-password/create_password_bloc.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/create-password/create_password_event.dart';
@@ -14,6 +15,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../bloc/create-password/create_password_state.dart';
 
 class CreatePasswordPresenter extends StatefulWidget {
+
+  final String email;
+
+  final String otp;
+
+  const CreatePasswordPresenter({super.key, required this.email, required this.otp});
+
   @override
   State<StatefulWidget> createState() => _CreatePasswordPresenterState();
 }
@@ -37,7 +45,7 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
               AppMessage.showSnackBar(
                 context,
                 state.message,
-                Colors.red,
+                const Color(0xFFEA2020),
                 Icons.error_outline,
               );
             }
@@ -82,15 +90,13 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                           SizedBox(height: 40.h),
                           Text(
                             'create_password'.tr(),
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              fontFamily: 'Nunito',
-                            ),
+                            style: getDynamicStyle(context, size: 22)
                           ),
                           SizedBox(height: 40.h),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 35.r),
                             child: CustomTextField(
+                              enabled: state is! CreatePasswordLoading,
                               hintText: 'enter_your_password'.tr(),
                               controller: enterPasswordController,
                               validator: (value) =>
@@ -116,6 +122,8 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                               if (_formKey.currentState!.validate()) {
                                 context.read<CreatePasswordBloc>().add(
                                   CreatePasswordButtonPressed(
+                                    email: widget.email,
+                                    otp: widget.otp,
                                     password: enterPasswordController.text,
                                   ),
                                 );

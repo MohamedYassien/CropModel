@@ -4,8 +4,8 @@ import 'package:cropmodel/features/sign_up/data/service/sign_up_service.dart';
 class CreatePasswordUseCase {
   SignUpService signUpService = SignUpService();
 
-  Future<void> call(String password) async {
+  Future<void> call(CreatePasswordRequest createPasswordRequest) async {
 
-      signUpService.createPassword(CreatePasswordRequest(password: password));
+      await signUpService.createPassword(createPasswordRequest);
   }
 }
