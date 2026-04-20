@@ -62,24 +62,10 @@ class _ResetpasswordState extends State<Resetpassword> {
                 }
 
                 if (state is ForgotPassError) {
-                  String displayMessage;
-
-                  if (state.message.contains('not found') ||
-                      state.message.contains('404')) {
-                    displayMessage = "no_account_found".tr();
-                  } else if (state.message.contains('network') ||
-                      state.message.contains('SocketException')) {
-                    displayMessage = "check_connection".tr();
-                  } else if (state.message.contains('too many') ||
-                      state.message.contains('429')) {
-                    displayMessage = "too_many_requests".tr();
-                  } else {
-                    displayMessage = "something_went_wrong".tr();
-                  }
 
                   AppMessage.showSnackBar(
                     context,
-                    displayMessage,
+                    state.message,
                     const Color(0xFFEA2020),
                     Icons.error_outline,
                   );
@@ -181,7 +167,7 @@ class _ResetpasswordState extends State<Resetpassword> {
                                 ),
                               );
                             },
-                            isLoading: state is PasswordResetLoading,
+                            isLoading: state is ForgotPassLoading,
                           ),
                           SizedBox(height: 20.h),
                         ],

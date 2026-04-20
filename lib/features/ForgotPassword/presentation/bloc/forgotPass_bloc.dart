@@ -1,4 +1,5 @@
 import 'package:cropmodel/features/ForgotPassword/domain/usecases/resend_otp_usecase.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/usecases/reset_password_usecase.dart';
@@ -21,7 +22,13 @@ class ForgotPassBloc extends Bloc<ForgotPassEvent, ForgotPassState> {
       } on APIError catch (e) {
         emit(ForgotPassError(e.message));
       } catch (e) {
-        emit(ForgotPassError(e.toString()));
+        String errorMessage = e.toString();
+        if(e.toString().contains('Email not found')){
+          errorMessage = 'email_anot_found'.tr();
+        } else if (e.toString().contains('No internet connection')){
+          errorMessage = "no_internet_connection".tr();
+        }
+        emit(ForgotPassError(errorMessage));
       }
     });
 
@@ -31,9 +38,15 @@ class ForgotPassBloc extends Bloc<ForgotPassEvent, ForgotPassState> {
         await VerifyOtpUseCase().call(event.email, event.otp);
         emit(OTPVerifySuccess());
       } on APIError catch (e) {
-        emit(ForgotPassError(e.message));
+        emit(OTPVerifyError(e.message));
       } catch (e) {
-        emit(ForgotPassError(e.toString()));
+        String errorMessage = e.toString();
+        if(e.toString().contains('Invalid OTP')){
+          errorMessage = 'invalid_otp'.tr();
+        } else if (e.toString().contains('No internet connection')){
+          errorMessage = "no_internet_connection".tr();
+        }
+        emit(OTPVerifyError(errorMessage));
       }
     });
 
@@ -49,7 +62,13 @@ class ForgotPassBloc extends Bloc<ForgotPassEvent, ForgotPassState> {
       } on APIError catch (e) {
         emit(ForgotPassError(e.message));
       } catch (e) {
-        emit(ForgotPassError(e.toString()));
+        String errorMessage = e.toString();
+      if(e.toString().contains('Password must contain at least one special character: _ & \$')){
+        errorMessage = 'password_must'.tr();
+      } else if (e.toString().contains('No internet connection')){
+        errorMessage = "no_internet_connection".tr();
+      }
+        emit(ForgotPassError(errorMessage));
       }
     });
 
