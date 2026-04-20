@@ -8,3 +8,17 @@ class SignUpButtonPressed extends SignUpEvent {
 
   SignUpButtonPressed({required this.signUpRequest});
 }
+
+class VerifyOtpSubmitted extends SignUpEvent {
+  final String email;
+  final String otp;
+
+  VerifyOtpSubmitted({required this.email, required this.otp});
+}
+
+class OTPResendButtonPressed extends SignUpEvent {
+
+  final String email;
+
+  OTPResendButtonPressed({required this.email});
+}

@@ -6,8 +6,8 @@ import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/create_password_presenter.dart';
 import 'package:cropmodel/features/sign_up/presentation/UI/widgets/otp_field.dart';
 import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_bloc.dart';
-import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart';
-import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_state.dart';
+import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart' hide OTPResendButtonPressed;
+import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_state.dart' hide OTPResendLoading;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,7 +108,7 @@ class _OTPPresenterState extends State<OTPPresenter> {
           if (state is SignUpSuccess) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  CreatePasswordPresenter()),
+              MaterialPageRoute(builder: (context) =>  CreatePasswordPresenter(email: widget.email, otp: otp!,)),
             );
           } else if (state is SignUpError) {
             AppMessage.showSnackBar(
@@ -209,7 +209,7 @@ class _OTPPresenterState extends State<OTPPresenter> {
                                 ? () {
                               otp = _controllers.map((c) => c.text).join();
                               _clearOtpFields();
-                              context.read<OTPBloc>().add(
+                              context.read<SignUpBloc>().add(
                                 OTPResendButtonPressed(email: widget.email),
                               );
                             }
