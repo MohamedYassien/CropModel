@@ -63,26 +63,31 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<void> _onLogin(
       LoginWithEmailEvent event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
+
     try {
       await Future.delayed(const Duration(seconds: 1));
 
-      await _loginWithEmail(event.email, event.password);
+      final response = await loginWithEmail.call(
+        LoginRequest(
+          email: event.email,
+          password: event.password,
+        ),
+      );
 
-      // await secureStorage.saveEmail(event.email);
-      // await secureStorage.savePassword(event.password);
+      if (response == null || response.token.isEmpty) {
+        throw APIError(message: "Invalid email or password", code: "401");
+      }
 
+      await saveCredentials.call(event.email, event.password);
+      await secureStorage.saveToken(response.token);
       emit(LoginSuccess());
     } catch (e) {
-      String message;
+      String message = "Unexpected error occurred";
 
       if (e is APIError) {
-        message = e.message;
-
-        if (e.code == "401") {
-          message = "Invalid email or password";
-        }
-      } else {
-        message = "Unexpected error occurred";
+        message = e.code == "401"
+            ? "Invalid email or password"
+            : e.message;
       }
 
       emit(LoginFailure(message));
@@ -105,7 +110,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       return;
     }
 
-    final authenticated = await Biometricauth(BiometricService()).call();
+    final authenticated = await Biometricauth(biometricService).call();
     if (!authenticated) {
       emit(LoginFailure('Biometric authentication failed'));
       return;
@@ -113,14 +118,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     final email = await secureStorage.getEmail();
     final password = await secureStorage.getPassword();
+    final token = await secureStorage.getToken();
 
     print("Saved email: '$email'");
     print("Saved password: '$password'");
 
-    if (email.isNotEmpty && password.isNotEmpty) {
+    if (email.isNotEmpty && password.isNotEmpty ) {
       emit(LoginSuccess());
     } else {
-      emit(LoginFailure('No saved credentials found'));
+      emit(LoginFailure('No saved credentials found '));
     }
   }
 
@@ -128,7 +134,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final biometricEnabled = await secureStorage.isBiometricEnabled();
 
     if (!biometricEnabled) {
-      await secureStorage..clearData();
+      await secureStorage.clearData();
     }
 
     emit(LoginInitial());
