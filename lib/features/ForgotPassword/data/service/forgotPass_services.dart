@@ -1,4 +1,4 @@
-import '../../../../core/network/api_client.dart';
+import 'package:cropmodel/core/network/api_client.dart';
 import 'forgotPass_api.dart';
 
 class ForgotpassServices {
@@ -25,12 +25,23 @@ class ForgotpassServices {
     );
   }
 
-  Future<void> resetPassword(String email, String password) async {
+  Future<void> resendOTP(String email) async {
+    await apiClient.fetch<Map<String, dynamic>, void>(
+      api: ForgotpassApi.resendOTP,
+      body: {
+        "email": email,
+      },
+      mapper: (_) {},
+    );
+  }
+
+  Future<void> resetPassword(String email, String otp, String password) async {
     await apiClient.fetch<Map<String, dynamic>, void>(
       api: ForgotpassApi.resetPassword,
       body: {
         "email": email,
-        "new_password": password,
+        "otp": otp,
+        "newPassword": password,
       },
       mapper: (_) {},
     );

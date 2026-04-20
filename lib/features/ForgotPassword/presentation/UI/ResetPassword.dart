@@ -19,8 +19,10 @@ import 'PasswordChanged.dart';
 import '../../../../../core/constants/app_colors.dart';
 
 class Resetpassword extends StatefulWidget {
-  final String email; // Added email to identify the user for reset
-  const Resetpassword({super.key, required this.email});
+  final String email;
+  final String otp;
+
+  const Resetpassword({super.key, required this.email, required this.otp});
 
   @override
   State<Resetpassword> createState() => _ResetpasswordState();
@@ -30,39 +32,6 @@ class _ResetpasswordState extends State<Resetpassword> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmController = TextEditingController();
-  bool _isObscure = true;
-  bool _isConfirmObscure = true;
-
-  void _onConfirm(BuildContext context) {
-    if (_formKey.currentState?.validate() ?? false) {
-      context.read<ForgotPassBloc>().add(
-        ResetPasswordEvent(widget.email, passwordController.text.trim()),
-      );
-    }
-  }
-
-  void _showSnackBar(BuildContext context, String message, Color color, IconData icon) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 20.sp),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(fontFamily: 'Nunito', color: Colors.white, fontSize: 14.sp),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(16.w),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ),
-    );
-  }
 
   @override
   void dispose() {
@@ -75,12 +44,7 @@ class _ResetpasswordState extends State<Resetpassword> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-        final service = ForgotpassServices();
-        return ForgotPassBloc(
-          sendOtpUseCase: SendOtpUseCase(service),
-          verifyOtpUseCase: VerifyOtpUseCase(service),
-          resetPasswordUseCase: ResetPasswordUseCase(service),
-        );
+        return ForgotPassBloc();
       },
       child: Builder(
         builder: (context) {
@@ -90,39 +54,36 @@ class _ResetpasswordState extends State<Resetpassword> {
           return Scaffold(
             body: BlocListener<ForgotPassBloc, ForgotPassState>(
               listener: (context, state) {
-               // if (!mounted) return;
-
-               // if (state is ForgotPassPasswordReset) {
+                if (state is PasswordResetState) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const Passwordchanged()),
                   );
-                //}
+                }
 
-                // if (state is ForgotPassError) {
-                //   String displayMessage;
-                //
-                //
-                //   if (state.message.contains('not found') ||
-                //       state.message.contains('404')) {
-                //     displayMessage = "no_account_found".tr();
-                //   } else if (state.message.contains('network') ||
-                //       state.message.contains('SocketException')) {
-                //     displayMessage = "check_connection".tr();
-                //   } else if (state.message.contains('too many') ||
-                //       state.message.contains('429')) {
-                //     displayMessage = "too_many_requests".tr();
-                //   } else {
-                //     displayMessage = "something_went_wrong".tr();
-                //   }
-                //
-                //   AppMessage.showSnackBar(
-                //     context,
-                //     displayMessage,
-                //     const Color(0xFFEA2020),
-                //     Icons.error_outline,
-                //   );
-                // }
+                if (state is ForgotPassError) {
+                  String displayMessage;
+
+                  if (state.message.contains('not found') ||
+                      state.message.contains('404')) {
+                    displayMessage = "no_account_found".tr();
+                  } else if (state.message.contains('network') ||
+                      state.message.contains('SocketException')) {
+                    displayMessage = "check_connection".tr();
+                  } else if (state.message.contains('too many') ||
+                      state.message.contains('429')) {
+                    displayMessage = "too_many_requests".tr();
+                  } else {
+                    displayMessage = "something_went_wrong".tr();
+                  }
+
+                  AppMessage.showSnackBar(
+                    context,
+                    displayMessage,
+                    const Color(0xFFEA2020),
+                    Icons.error_outline,
+                  );
+                }
               },
               child: SafeArea(
                 child: SingleChildScrollView(
@@ -160,10 +121,40 @@ class _ResetpasswordState extends State<Resetpassword> {
                           CustomTextField(
                             controller: passwordController,
                             validator: (value) {
-                              if (value == null || value.isEmpty) return "password_required".tr();
-                              if (value.length < 8) return "password_min_length".tr();
+                              if (value == null || value.isEmpty) {
+                                return "password_required".tr();
+                              }
+
+                              if (value.length < 8) {
+                                return "password_min_length".tr();
+                              }
+
+                              final hasUpper = RegExp(r'[A-Z]').hasMatch(value);
+                              if (!hasUpper) {
+                                return "password_uppercase_required".tr();
+                              }
+
+                              final hasLower = RegExp(r'[a-z]').hasMatch(value);
+                              if (!hasLower) {
+                                return "password_lowercase_required".tr();
+                              }
+
+                              final hasNumber = RegExp(r'[0-9]').hasMatch(value);
+                              if (!hasNumber) {
+                                return "password_number_required".tr();
+                              }
+
+                              final hasSpecial = RegExp(
+                                r'[!@#$%^&*(),.?":{}|<>_\-\\/\[\]]',
+                              ).hasMatch(value);
+
+                              if (!hasSpecial) {
+                                return "password_special_char_required".tr();
+                              }
+
                               return null;
-                            }, hintText: 'Password',
+                            },
+                            hintText: 'Password',
                           ),
 
                           SizedBox(height: 20.h),
@@ -172,7 +163,8 @@ class _ResetpasswordState extends State<Resetpassword> {
                             controller: confirmController,
                             hintText: 'Confirm Password',
                             validator: (value) {
-                              if (value != passwordController.text) return "passwords_do_not_match".tr();
+                              if (value != passwordController.text)
+                                return "passwords_do_not_match".tr();
                               return null;
                             },
                           ),
@@ -180,11 +172,20 @@ class _ResetpasswordState extends State<Resetpassword> {
                           SizedBox(height: 40.h),
                           CustomButton(
                             buttonTextKey: "confirm".tr(),
-                            onPressed: () => _onConfirm(context),
-                            isLoading: state is ForgotPassLoading,
+                            onPressed: () {
+                              context.read<ForgotPassBloc>().add(
+                                ResetPasswordEvent(
+                                  widget.email,
+                                  widget.otp,
+                                  passwordController.text.trim(),
+                                ),
+                              );
+                            },
+                            isLoading: state is PasswordResetLoading,
                           ),
                           SizedBox(height: 20.h),
                         ],
+
                       ),
                     ),
                   ),

@@ -42,57 +42,59 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-        final service = ForgotpassServices();
-        return ForgotPassBloc(
-          sendOtpUseCase: SendOtpUseCase(service),
-          verifyOtpUseCase: VerifyOtpUseCase(service),
-          resetPasswordUseCase: ResetPasswordUseCase(service),
-        );
+        return ForgotPassBloc();
       },
       child: Builder(
         builder: (context) {
           final state = context.watch<ForgotPassBloc>().state;
-          final bool isLoading = state is ForgotPassLoading;
-
           return Scaffold(
             body: BlocListener<ForgotPassBloc, ForgotPassState>(
               listener: (context, state) {
-                // if (!mounted) return;
-                //
-                // if (state is OtpSentState) {
+                if (!mounted) return;
 
-                // AppMessage.showSnackBar(
-                //   context,
-                //   "otp_sent_success".tr(),
-                //   const Color(0xFF71BC55),
-                //   Icons.check_circle_outline,
-                // );
-                //
+                if (state is OtpSentState) {
 
-                // }
-                //  if (state is ForgotPassError) {
-                //    String displayMessage;
-                //
-                //    if (state.message.contains('not found') ||
-                //        state.message.contains('404')) {
-                //      displayMessage = "no_account_found".tr();
-                //    } else if (state.message.contains('network') ||
-                //        state.message.contains('SocketException')) {
-                //      displayMessage = "check_connection".tr();
-                //    } else if (state.message.contains('too many') ||
-                //        state.message.contains('429')) {
-                //      displayMessage = "too_many_requests".tr();
-                //    } else {
-                //      displayMessage = "something_went_wrong".tr();
-                //    }
-                //
-                //    AppMessage.showSnackBar(
-                //      context,
-                //      displayMessage,
-                //      const Color(0xFFEA2020),
-                //      Icons.error_outline,
-                //    );
-                // }
+                AppMessage.showSnackBar(
+                  context,
+                  "otp_sent_success".tr(),
+                  const Color(0xFF71BC55),
+                  Icons.check_circle_outline,
+                );
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        OTPVerificationScreen(
+                          email: emailController.text.trim(),
+                        ),
+                  ),
+                );
+
+                }
+                 if (state is ForgotPassError) {
+                   String displayMessage;
+
+                   if (state.message.contains('not found') ||
+                       state.message.contains('404')) {
+                     displayMessage = "no_account_found".tr();
+                   } else if (state.message.contains('network') ||
+                       state.message.contains('SocketException')) {
+                     displayMessage = "check_connection".tr();
+                   } else if (state.message.contains('too many') ||
+                       state.message.contains('429')) {
+                     displayMessage = "too_many_requests".tr();
+                   } else {
+                     displayMessage = "something_went_wrong".tr();
+                   }
+
+                   AppMessage.showSnackBar(
+                     context,
+                     displayMessage,
+                     const Color(0xFFEA2020),
+                     Icons.error_outline,
+                   );
+                }
               },
               child: SafeArea(
                 child: Padding(
@@ -156,20 +158,13 @@ class _ForgetpasswordscreenState extends State<Forgetpasswordscreen> {
                           CustomButton(
                             buttonTextKey: "continue".tr(),
                             onPressed: () {
-                              // if (_formKey.currentState!.validate()) {
-                              //   context.read<ForgotPassBloc>().add(
-                              //     SendOtpEvent(emailController.text.trim()),
-                              //   );
-                              // }
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OTPVerificationScreen(
-                                    email: emailController.text,
-                                  ),
-                                ),
-                              );
+                              if (_formKey.currentState!.validate()) {
+                                context.read<ForgotPassBloc>().add(
+                                  SendOtpEvent(emailController.text.trim()),
+                                );
+                              }
                             },
+                            isLoading: state is ForgotPassLoading,
                           ),
 
                           SizedBox(height: 20.h),

@@ -4,15 +4,19 @@ import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/shared/custom_button.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:cropmodel/features/ForgotPassword/presentation/UI/ResetPassword.dart';
-import 'package:cropmodel/features/sign_up/presentation/UI/create_password_presenter.dart';
-import 'package:cropmodel/features/sign_up/presentation/UI/widgets/otp_field.dart';
-import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_bloc.dart';
-import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_event.dart';
-import 'package:cropmodel/features/sign_up/presentation/bloc/otp/otp_state.dart';
+import 'package:cropmodel/features/ForgotPassword/presentation/UI/widgets/otpFields.dart';
+import 'package:cropmodel/features/ForgotPassword/presentation/bloc/forgotPass_bloc.dart';
+import 'package:cropmodel/features/ForgotPassword/presentation/bloc/forgotPass_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../data/service/forgotPass_services.dart';
+import '../../domain/usecases/verify_otp_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
+import '../../domain/usecases/send_otp_usecase.dart';
+import '../bloc/forgotPass_event.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
   final String email;
@@ -99,9 +103,11 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OTPBloc(),
+      create: (_) {
+        return ForgotPassBloc();
+      },
       child: Scaffold(
-        body: BlocListener<OTPBloc, OTPState>(
+        body: BlocListener<ForgotPassBloc, ForgotPassState>(
           listener: (context, state) {
             if (state is OTPResendSuccess) {
               setState(() {
@@ -109,7 +115,15 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   _attemptsLeft--;
                 }
               });
+
               _startTimer();
+
+              AppMessage.showSnackBar(
+                context,
+                "otp_resent_successfully".tr(),
+                Colors.green,
+                Icons.check_circle,
+              );
             }
 
             if (state is OTPVerifyError) {
@@ -124,16 +138,23 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
             if (state is OTPVerifySuccess) {
               if (mounted) {
+                AppMessage.showSnackBar(
+                  context,
+                  "OTP verified successfully",
+                  Colors.green,
+                  Icons.check_circle,
+                );
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Resetpassword(email: widget.email),
+                    builder: (context) => Resetpassword(email: widget.email, otp: otp!),
                   ),
                 );
               }
             }
           },
-          child: BlocBuilder<OTPBloc, OTPState>(
+          child: BlocBuilder<ForgotPassBloc, ForgotPassState>(
             builder: (context, state) {
               return SafeArea(
                 child: Scaffold(
@@ -187,7 +208,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                           children: List.generate(6, (index) {
                             return Padding(
                               padding: EdgeInsets.symmetric(horizontal: 6.w),
-                              child: OTPField(
+                              child: OTPFields(
                                 controller: _controllers[index],
                                 focusNode: _focusNodes[index],
                                 index: index,
@@ -241,7 +262,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                                     .map((c) => c.text)
                                     .join();
                                 _clearOtpFields();
-                                context.read<OTPBloc>().add(
+                                context.read<ForgotPassBloc>().add(
                                   OTPResendButtonPressed(
                                     email: widget.email,
                                   ),
@@ -295,10 +316,10 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                                 .join();
                             print('the otp: $otp');
 
-                            context.read<OTPBloc>().add(
-                              OTPButtonPressed(
-                                otp: otp!,
+                            context.read<ForgotPassBloc>().add(
+                              VerifyOtpEvent(
                                 email: widget.email,
+                                otp: otp!,
                               ),
                             );
                           }
