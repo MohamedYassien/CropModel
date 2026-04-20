@@ -1,4 +1,5 @@
 import '../../domain/repositories/change_password_repository.dart';
+import '../model/change_password_model.dart';
 import '../service/change_password_service.dart';
 
 class ChangePasswordRepositoryImpl implements ChangePasswordRepository {
@@ -7,17 +8,17 @@ class ChangePasswordRepositoryImpl implements ChangePasswordRepository {
   ChangePasswordRepositoryImpl(this._remote);
 
   @override
-  Future<void> changePassword({
+  Future<ChangePasswordResponseModel> changePassword({
+    required String email,
     required String currentPassword,
     required String newPassword,
   }) async {
-    try {
-      await _remote.changePassword(
+    return _remote.changePassword(
+      request: ChangePasswordRequestModel(
+        email: email,
         currentPassword: currentPassword,
         newPassword: newPassword,
-      );
-    } catch (e) {
-      throw Exception("Failed to change password");
-    }
+      ),
+    );
   }
 }

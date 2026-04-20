@@ -5,21 +5,22 @@ import '../../domain/usecases/change_password_usecase.dart';
 import 'Change_password_event.dart';
 import 'Change_password_state.dart';
 
-class ChangePasswordBloc extends Bloc<ChangePasswordEvent, ChangePasswordState> {
+class ChangePasswordBloc
+    extends Bloc<ChangePasswordEvent, ChangePasswordState> {
   final ChangePasswordUseCase changePasswordUseCase;
 
-  ChangePasswordBloc({
-    required this.changePasswordUseCase,
-  }) : super(ChangePasswordInitial()) {
+  ChangePasswordBloc({required this.changePasswordUseCase})
+    : super(ChangePasswordInitial()) {
     on<ChangePasswordSubmitted>((event, emit) async {
       emit(ChangePasswordLoading());
 
       try {
-        await changePasswordUseCase.call(
+        final response = await changePasswordUseCase.call(
+          email: event.email,
           currentPassword: event.currentPassword,
           newPassword: event.newPassword,
         );
-        emit(ChangePasswordSuccess());
+        emit(ChangePasswordSuccess(message: response.message));
       } on APIError catch (e) {
         emit(ChangePasswordError(message: e.message));
       } catch (e) {

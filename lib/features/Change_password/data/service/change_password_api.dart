@@ -1,7 +1,7 @@
 import 'package:cropmodel/core/network/API.dart';
 
 enum ChangePasswordApi implements API {
-  changePassword(Method.post, 'auth/change-password');
+  changePassword(Method.post, '/auth/change-password');
 
   @override
   final String path;
