@@ -1,6 +1,7 @@
 import 'package:cropmodel/features/Login/presentation/UI/Splach.dart';
 import 'package:cropmodel/features/Change_password/presentaion/bloc/Change_password_bloc.dart';
 import 'package:cropmodel/features/Login/presentation/UI/loginpage.dart';
+import 'package:cropmodel/features/RestaurantDetails/presentaion/UI/map_test_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/di/service_locator.dart';
+import 'features/RestaurantDetails/presentaion/UI/restaurant_details_screen.dart';
 
 
 void main() async {
@@ -54,7 +56,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home:  Splach(),
+          home: RestaurantDetailsScreen(restaurantId: '1'),
         );
       },
     );
