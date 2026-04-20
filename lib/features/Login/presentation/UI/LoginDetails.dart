@@ -26,11 +26,13 @@ class _LoginDetailsState extends State<LoginDetails> {
 
   Future<void> _loadBiometricStatus() async {
     final enabled = await _storage.isBiometricEnabled();
+    final promptShown = await _storage.isBiometricPromptShown();
 
     if (!mounted) return;
     setState(() => _biometricEnabled = enabled);
 
-    if (!enabled) {
+    if (!enabled && !promptShown) {
+      await _storage.setBiometricPromptShown(true);
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!mounted) return;
 

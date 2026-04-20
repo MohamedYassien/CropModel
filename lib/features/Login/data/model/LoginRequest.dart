@@ -1,19 +1,15 @@
-class CreatePasswordRequest {
-
+class LoginRequest {
   final String email;
-  final String otp;
   final String password;
 
-  CreatePasswordRequest({
+  LoginRequest({
     required this.email,
-    required this.otp,
     required this.password,
   });
 
-  Map<String, String> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'email': email,
-      "otp": otp,
       'password': password,
     };
   }
