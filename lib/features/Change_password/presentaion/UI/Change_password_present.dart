@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../Login/data/service/SecureStorage.dart';
 import '../bloc/Change_password_bloc.dart';
+import '../bloc/Change_password_event.dart';
 import '../bloc/Change_password_state.dart';
 import 'Change_Password_Success.dart';
 
@@ -18,9 +20,10 @@ class ChangePasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-
+  final SecureStorage _secureStorage = SecureStorage();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -28,6 +31,7 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
   void dispose() {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _newPasswordController.dispose();
     super.dispose();
   }
 
@@ -37,13 +41,24 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
       body: BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
         listener: (context, state) {
           if (state is ChangePasswordSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ConfirmResetPasswordScreen()),
+              MaterialPageRoute(
+                builder: (context) => const ConfirmResetPasswordScreen(),
+              ),
             );
           } else if (state is ChangePasswordError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         },
@@ -86,14 +101,20 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
                         hintText: "Enter current password".tr(),
                         controller: _passwordController,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return "Password Required".tr();
-                          if (value.trim().length < 6) return "Password Min Length".tr();
+                          if (value == null || value.isEmpty)
+                            return "Password Required".tr();
+                          if (value.trim().length < 6)
+                            return "Password Min Length".tr();
 
                           final uppercaseRegex = RegExp(r'[A-Z]');
-                          if (!uppercaseRegex.hasMatch(value)) return "Password Uppercase".tr();
+                          if (!uppercaseRegex.hasMatch(value))
+                            return "Password Uppercase".tr();
 
-                          final specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
-                          if (!specialCharRegex.hasMatch(value)) return "Password Special Char".tr();
+                          final specialCharRegex = RegExp(
+                            r'[!@#$%^&*(),.?":{}|<>]',
+                          );
+                          if (!specialCharRegex.hasMatch(value))
+                            return "Password Special Char".tr();
 
                           return null;
                         },
@@ -103,8 +124,10 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
                         hintText: "New password".tr(),
                         controller: _newPasswordController,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return "Password Required".tr();
-                          if (value.length < 8) return "password_min_length".tr();
+                          if (value == null || value.isEmpty)
+                            return "Password Required".tr();
+                          if (value.length < 8)
+                            return "password_min_length".tr();
                           return null;
                         },
                       ),
@@ -127,16 +150,32 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
                         buttonTextKey: "continue".tr(),
                         onPressed: state is ChangePasswordLoading
                             ? null
-                            : () {
-                          if (_formKey.currentState!.validate()) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ConfirmResetPasswordScreen(),
-                              ),
-                            );
-                          }
-                        },
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final email = await _secureStorage.getEmail();
+                                  if (!context.mounted) return;
+                                  if (email.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Please login again".tr(),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  context.read<ChangePasswordBloc>().add(
+                                    ChangePasswordSubmitted(
+                                      email: email,
+                                      currentPassword: _passwordController.text
+                                          .trim(),
+                                      newPassword: _newPasswordController.text
+                                          .trim(),
+                                    ),
+                                  );
+                                }
+                              },
                       ),
                     ],
                   ),
