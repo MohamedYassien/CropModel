@@ -106,10 +106,10 @@ class _OTPPresenterState extends State<OTPPresenter> {
       child: BlocListener<SignUpBloc, SignUpState>(
         listener: (context, state) {
           if (state is SignUpSuccess) {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) =>  CreatePasswordPresenter()),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  CreatePasswordPresenter()),
+            );
           } else if (state is SignUpError) {
             AppMessage.showSnackBar(
               context,
