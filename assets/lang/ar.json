@@ -71,5 +71,8 @@
   "Add_at_least_one_special_character": "يجب أن تحتوي كلمة المرور على حرف خاص",
   "password_is_required": "كلمة المرور مطلوبة",
   "confirm_password_is_required": "تأكيد كلمة المرور مطلوب",
-  "Your_account_has_created_successfully": "تم إنشاء حسابك بنجاح"
+  "Your_account_has_created_successfully": "تم إنشاء حسابك بنجاح",
+  "password_must": "يجب أن تحتوي كلمة المرور على حرف خاص واحد على الأقل: _ & $",
+  "invalid_otp": "رمز غير صالح",
+  "email_anot_found": "لم يتم العثور على البريد الإلكتروني"
 }

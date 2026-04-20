@@ -35,6 +35,12 @@ class PasswordResetState extends ForgotPassState {}
 
 class PasswordResetLoading extends ForgotPassState {}
 
+class PasswordResetError extends ForgotPassState {
+  final String message;
+
+  PasswordResetError(this.message);
+}
+
 class ForgotPassError extends ForgotPassState {
   final String message;
 
