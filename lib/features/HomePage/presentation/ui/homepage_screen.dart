@@ -6,6 +6,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cropmodel/features/room/presentation/UI/room_presenter.dart';
+import 'package:cropmodel/core/shared/data.dart';
+import 'package:cropmodel/features/room/presentation/UI/room_details_presenter.dart';
+import 'package:cropmodel/features/room/presentation/UI/my_rooms_presenter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../Login/presentation/UI/LoginDetails.dart';
 import '../../../Login/presentation/UI/widgets/showLogoutDialog.dart';
@@ -22,7 +26,17 @@ class homepage extends StatefulWidget {
 
 class _homepageState extends State<homepage> {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh when coming back from room flows.
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final rooms = AppData.instance.myRooms;
+    final latestRooms = rooms.reversed.take(3).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -31,7 +45,10 @@ class _homepageState extends State<homepage> {
           padding: EdgeInsetsDirectional.only(start: 15.w),
           child: InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePresenter()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePresenter()),
+              );
             },
             child: Image.asset(
               "assets/images/profilePlaceholder2.png",
@@ -47,7 +64,6 @@ class _homepageState extends State<homepage> {
             color: Color(0xffCF2120),
             fontSize: 32.sp,
             fontWeight: FontWeight.w900,
-
           ),
         ),
         actions: [
@@ -88,7 +104,12 @@ class _homepageState extends State<homepage> {
           ),
           //SizedBox(height: 13),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RoomPresenter()),
+              );
+            },
             child: Padding(
               padding: EdgeInsets.all(20.w),
               child: Container(
@@ -248,6 +269,29 @@ class _homepageState extends State<homepage> {
                   ),
                 ),
               ),
+              const Spacer(),
+              Padding(
+                padding: EdgeInsets.only(top: 30.w, right: 20.w),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MyRoomsPresenter(),
+                      ),
+                    ).then((_) => setState(() {}));
+                  },
+                  child: Text(
+                    'My rooms',
+                    style: TextStyle(
+                      color: Color(0xffCF2120),
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Nunito',
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
 
@@ -255,7 +299,6 @@ class _homepageState extends State<homepage> {
             padding: const EdgeInsets.all(20),
             child: Container(
               width: double.infinity.w,
-              height: 192.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
@@ -263,28 +306,157 @@ class _homepageState extends State<homepage> {
                 ),
                 color: Color(0xffFAFAFA),
               ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 15.w),
-                    child: Image.asset(
-                      "assets/images/No Food.png",
-                      width: 90.w,
-                      height: 90.h,
+              child: rooms.isEmpty
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 15.w),
+                          child: Image.asset(
+                            "assets/images/No Food.png",
+                            width: 90.w,
+                            height: 90.h,
+                          ),
+                        ),
+                        SizedBox(height: 7.h),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 18.h),
+                          child: Text(
+                            "No previous  orders yet.\nStart Your frist order!",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xff000000),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Nunito",
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        SizedBox(height: 10.h),
+                        ...latestRooms.map((room) {
+                          final totalItems = room.orders.fold<int>(
+                            0,
+                            (sum, o) => sum + o.items.length,
+                          );
+
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      RoomDetailsPresenter(room: room),
+                                ),
+                              ).then((_) => setState(() {}));
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 14.w,
+                                vertical: 8.h,
+                              ),
+                              child: Container(
+                                padding: EdgeInsets.all(12.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      228,
+                                      228,
+                                      228,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 44.w,
+                                      height: 44.w,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: const Color(0xffF0C8C8),
+                                      ),
+                                      child: Icon(
+                                        Icons.meeting_room,
+                                        color: const Color(0xffCF2120),
+                                        size: 22.sp,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            room.name,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w700,
+                                              fontFamily: 'Nunito',
+                                            ),
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Text(
+                                            room.restaurantModel.name,
+                                            style: TextStyle(
+                                              color: const Color.fromARGB(
+                                                255,
+                                                96,
+                                                96,
+                                                96,
+                                              ),
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w200,
+                                              fontFamily: 'Nunito',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '${room.orders.length} orders',
+                                          style: TextStyle(
+                                            color: const Color.fromARGB(
+                                              255,
+                                              96,
+                                              96,
+                                              96,
+                                            ),
+                                            fontSize: 11.sp,
+                                            fontFamily: 'Nunito',
+                                          ),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          '$totalItems items',
+                                          style: TextStyle(
+                                            color: const Color(0xffCF2120),
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w800,
+                                            fontFamily: 'Nunito',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                        SizedBox(height: 10.h),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 7.h),
-                  Text(
-                    "No_previous_orders_yet_Start_Your_frist_order".tr(),
-                    style: TextStyle(
-                      color: Color(0xff000000),
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Nunito",
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -374,7 +546,7 @@ class _homepageState extends State<homepage> {
               ),
               SizedBox(height: 20.h,),
               InkWell(
-                onTap: (){},
+                onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomsPresenter()));},
                 child: SizedBox(
                   height: 40.h,
                   child: Row(
