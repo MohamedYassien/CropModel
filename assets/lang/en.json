@@ -84,5 +84,12 @@
   "no_internet_connection": "No internet connection",
   "password_must": "Password must contain at least one special character: _ & $",
   "invalid_otp": "Invalid OTP code",
-  "email_anot_found": "Email not found"
+  "email_anot_found": "Email not found",
+  "Create_Order":"Create Order",
+  "Create_New_Order_Group":"Create New\nOrder Group",
+  "Restaurants":"Restaurants",
+  "Browse_Restaurants":"Browse Restaurants",
+  "find_your_favourite_meals": "find your favourite meals",
+  "Latest_Orders":"Latest Orders",
+  "No_previous_orders_yet_Start_Your_frist_order":"No previous  orders yet.\nStart Your frist order!"
 }
