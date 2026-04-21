@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 
 class UserModel {
-  int? userId;
+  String? userId;
   String? fullName;
   String? email;
   String? phone;
@@ -29,7 +29,7 @@ class UserModel {
   });
 
   UserModel copyWith({
-    int? userId,
+    String? userId,
     String? name,
     String? email,
     String? phoneNumber,

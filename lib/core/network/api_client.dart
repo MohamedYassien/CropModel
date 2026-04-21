@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import '../../features/Login/data/service/SecureStorage.dart';
 import 'API.dart';
 
 class APIClient {
@@ -64,6 +65,9 @@ class APIClient {
     context,
   }) async {
     try {
+      final storage = SecureStorage();
+      final String token = await storage.getToken();
+
       final bool isFormData = body is FormData;
 
       final bool isAbsoluteUrl =
@@ -79,6 +83,7 @@ class APIClient {
         data: body,
         headers: {
           if (headers != null) ...headers,
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
           if (!isFormData) HttpHeaders.contentTypeHeader: 'application/json',
         },
       );

@@ -17,9 +17,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final user = await _getProfileUseCase.call();
         if (user != null) {
           emit(ProfileLoaded(user: user));
+        }else {
+          emit(ProfileError("User not found"));
         }
       } catch (e) {
-        emit(ProfileLoaded(user: _createDefaultUser()));
+        emit(ProfileError(e.toString()));
       }
     });
 
@@ -50,6 +52,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<SaveProfilePressed>((event, emit) async {
       if (state is ProfileLoaded) {
         final currentState = state as ProfileLoaded;
+        final newImage = currentState.tempImage ?? currentState.user.profilePicture;
         emit(ProfileLoading());
 
         final updatedUser = currentState.user.copyWith(
@@ -59,32 +62,24 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         );
 
         try {
+
           await _updateProfileUseCase.call(updatedUser);
-          emit(
-            ProfileLoaded(
-              user: updatedUser,
-              hasChanges: false,
-            ),
-          );
           emit(ProfileUpdateSuccess());
+
+          final freshUser = await _getProfileUseCase.call();
+
+          if (freshUser != null) {
+            emit(ProfileLoaded(user: freshUser, hasChanges: false));
+          }
         } catch (e) {
-          emit(
-            currentState.copyWith(
-              errorMessage: "save_failed",
-            ),
-          );
+          emit(currentState.copyWith(
+            errorMessage: "save_failed",
+            hasChanges: true,
+          ));
         }
       }
     });
   }
 }
 
-UserModel _createDefaultUser() {
-  return UserModel(
-    fullName: "New User",
-    email: "example@mail.com",
-    phone: "0000000000",
-    isFingerprintEnabled: false,
-  );
-}
 
