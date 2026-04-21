@@ -1,42 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../../data/model/menu_model.dart';
 
 class MenuItemCard extends StatelessWidget {
-  const MenuItemCard({super.key});
+  final MenuItemModel item;
+
+  const MenuItemCard({
+    super.key,
+    required this.item,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Image.asset(
-            "assets/images/download.png",
-            height: 140,
-            width: double.infinity,
-            fit: BoxFit.cover,
+        // Food Image — Square with rounded corners
+        AspectRatio(
+          aspectRatio: 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: item.imageUrl.isNotEmpty
+                ? CachedNetworkImage(
+              imageUrl: item.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              placeholder: (context, url) => Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(color: Colors.white),
+              ),
+              errorWidget: (context, url, error) => _buildPlaceholder(),
+            )
+                : _buildPlaceholder(),
           ),
         ),
-        const SizedBox(height: 8),
-        const Text(
-          "Mozzarella Sticks",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          maxLines: 1,
+        SizedBox(height: 8.h),
+        // Name
+        Text(
+          item.name,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+            height: 1.2,
+          ),
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
-        const Text(
-          "Crispy breaded mozzarella served with a side of warm marinara sauce.",
-          style: TextStyle(color: Colors.grey, fontSize: 11),
+        SizedBox(height: 4.h),
+        // Description
+        Text(
+          item.description,
+          style: TextStyle(
+            fontSize: 10.sp,
+            color: Colors.grey[600],
+            height: 1.3,
+          ),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
-        const Text(
-          "EGP 9.00",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        SizedBox(height: 6.h),
+        // Price
+        Text(
+          'EGP ${item.price.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFFD32F2F),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.grey[200],
+      child: Center(
+        child: Icon(
+          Icons.fastfood,
+          size: 40.w,
+          color: Colors.grey[400],
+        ),
+      ),
     );
   }
 }

@@ -1,3 +1,10 @@
-abstract class RestaurantEvent {}
+import 'package:equatable/equatable.dart';
 
-class LoadRestaurants extends RestaurantEvent {}
+abstract class RestaurantEvent extends Equatable {
+  const RestaurantEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class LoadRestaurantsEvent extends RestaurantEvent {}
