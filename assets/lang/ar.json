@@ -74,5 +74,17 @@
   "Your_account_has_created_successfully": "تم إنشاء حسابك بنجاح",
   "password_must": "يجب أن تحتوي كلمة المرور على حرف خاص واحد على الأقل: _ & $",
   "invalid_otp": "رمز غير صالح",
-  "email_anot_found": "لم يتم العثور على البريد الإلكتروني"
+  "email_anot_found": "لم يتم العثور على البريد الإلكتروني",
+  "Create_Order":"إنشاء طلب",
+  "Create_New_Order_Group":"إنشاء مجموعة\nطلبات جديدة",
+  "Restaurants":"المطاعم",
+  "Browse_Restaurants":"تصفح المطاعم",
+  "find_your_favourite_meals": "اعثر على وجباتك المفضلة",
+  "Latest_Orders":"أحدث الطلبات",
+  "No_previous_orders_yet_Start_Your_frist_order":"لا توجد طلبات سابقة حتى الآن. \nابدأ طلبك الأول!"
+
+
+
+
+  
 }
