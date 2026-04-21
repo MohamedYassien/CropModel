@@ -96,53 +96,6 @@ class _LoginDetailsState extends State<LoginDetails> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(20.w),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(20.r),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.black.withOpacity(0.06),
-            //         blurRadius: 14,
-            //         offset: const Offset(0, 5),
-            //       ),
-            //     ],
-            //   ),
-            //   child: Column(
-            //     children: [
-            //       Icon(
-            //         Icons.check_circle_rounded,
-            //         color: const Color(0xFFCF2120),
-            //         size: 60.sp,
-            //       ),
-            //       SizedBox(height: 12.h),
-            //       Text(
-            //         "You are logged in",
-            //         style: TextStyle(
-            //           fontSize: 22.sp,
-            //           fontWeight: FontWeight.bold,
-            //           color: Colors.black87,
-            //         ),
-            //       ),
-            //       SizedBox(height: 20.h),
-            //       SwitchListTile(
-            //         contentPadding: EdgeInsets.zero,
-            //         activeColor: const Color(0xFFCF2120),
-            //         title: Text(
-            //           "Enable Biometric Login",
-            //           style: TextStyle(
-            //             fontSize: 16.sp,
-            //             fontWeight: FontWeight.w500,
-            //           ),
-            //         ),
-            //         value: _biometricEnabled,
-            //         onChanged: _toggleBiometric,
-            //       ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
