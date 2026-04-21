@@ -1,20 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../domain/usecases/get_menu_usecase.dart';
-import 'menuEvent.dart';
-import 'menuState.dart';
+import 'menu_event.dart';
+import 'menu_state.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  final GetMenuUseCase getMenuUseCase;
-
-  MenuBloc(this.getMenuUseCase) : super(MenuInitial()) {
-    on<LoadMenu>((event, emit) async {
+  MenuBloc() : super(MenuInitial()) {
+    on<LoadMenuEvent>((event, emit) async {
       emit(MenuLoading());
       try {
-        final data = await getMenuUseCase.call(event.restaurantId);
-        emit(MenuLoaded(data));
+        final categories = await GetMenuUseCase().call(event.restaurantId);
+        emit(MenuLoaded(categories));
       } catch (e) {
-        emit(MenuError("Failed to fetch menu"));
+        emit(MenuError(e.toString()));
       }
     });
   }

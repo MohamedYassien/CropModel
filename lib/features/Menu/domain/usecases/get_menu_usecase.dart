@@ -1,12 +1,11 @@
-import '../../data/model/menu_model.dart';
-import '../../data/service/menu_services.dart';
+import '../../../Menu/data/model/menu_model.dart';
+import '../../../Restaurant/data/service/restaurant_services.dart';
 
 class GetMenuUseCase {
-  final MenuServices repository;
-
-  GetMenuUseCase(this.repository);
+  RestaurantService restaurantService = RestaurantService();
 
   Future<List<MenuCategoryModel>> call(String restaurantId) async {
-    return await repository.getRestaurantMenu(restaurantId);
+    final restaurant = await restaurantService.getRestaurantById(restaurantId);
+    return restaurant.menuCategories;
   }
 }

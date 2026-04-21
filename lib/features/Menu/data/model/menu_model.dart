@@ -24,14 +24,21 @@ class MenuItemModel {
   final String name;
   final String description;
   final double price;
+  final String imageUrl;  // ✅ Added
 
-  MenuItemModel({required this.name, required this.description, required this.price});
+  MenuItemModel({
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.imageUrl,  // ✅ Added
+  });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
     return MenuItemModel(
-      name: json['name'],
-      description: json['description'],
-      price: json['price'].toDouble(),
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      imageUrl: json['imageUrl'] ?? '',  // ✅ Added
     );
   }
 }

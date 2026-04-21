@@ -1,10 +1,10 @@
 import '../../data/model/restaurant_model.dart';
 import '../../data/service/restaurant_services.dart';
 
-class GetRestaurantsUseCase {
+class GetRestaurantDetailsUseCase {
   RestaurantService restaurantService = RestaurantService();
 
-  Future<List<RestaurantModel>> call() async {
-    return await restaurantService.getRestaurants();
+  Future<RestaurantModel> call(String restaurantId) async {
+    return await restaurantService.getRestaurantById(restaurantId);
   }
 }

@@ -1,0 +1,112 @@
+{
+  "restaurants": [
+    {
+      "id": "1",
+      "name": "KFC",
+      "imageUrl": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=800",
+      "rating": 4.8,
+      "description": "KFC is a popular fast-food chain known for its crispy fried chicken and a variety of meals like sandwiches and buckets.",
+      "location": "123 Main Street, San Francisco, CA",
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "menuCategories": [
+        {
+          "id": "cat1",
+          "name": "Appetizers",
+          "items": [
+            {
+              "name": "Mozzarella Sticks",
+              "description": "Crispy breaded mozzarella served with a side of warm marinara sauce.",
+              "price": 9.00,
+              "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk5YLOMZ1bzkG6uzxSaYfCcy2ojUeJi8Na9g&s"
+            },
+            {
+              "name": "Spinach Artichoke Dip",
+              "description": "A creamy blend of spinach, artichokes, and melted cheese, served with warm tortilla chips.",
+              "price": 9.00,
+              "imageUrl": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400"
+            }
+          ]
+        },
+        {
+          "id": "cat2",
+          "name": "Burgers & Sandwiches",
+          "items": [
+            {
+              "name": "Zinger Burger",
+              "description": "Crispy chicken fillet with lettuce, mayo, and spicy sauce in a toasted bun.",
+              "price": 14.00,
+              "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400"
+            },
+            {
+              "name": "Twister Wrap",
+              "description": "Strips of crispy chicken with fresh lettuce and pepper mayo wrapped in a tortilla.",
+              "price": 12.00,
+              "imageUrl": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Buffalo Burger",
+      "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
+      "rating": 4.5,
+      "description": "Premium burger joint serving juicy, handcrafted burgers with fresh ingredients and signature sauces.",
+      "location": "456 Market Street, San Francisco, CA",
+      "latitude": 37.7849,
+      "longitude": -122.4094,
+      "menuCategories": [
+        {
+          "id": "cat1",
+          "name": "Classic Burgers",
+          "items": [
+            {
+              "name": "Classic Cheeseburger",
+              "description": "Beef patty with cheddar cheese, lettuce, tomato, and house sauce.",
+              "price": 13.00,
+              "imageUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400"
+            },
+            {
+              "name": "Buffalo Special",
+              "description": "Double patty with caramelized onions, BBQ sauce, and crispy bacon.",
+              "price": 18.00,
+              "imageUrl": "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Pizza Hut",
+      "imageUrl": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800",
+      "rating": 4.6,
+      "description": "Famous pizza restaurant offering a wide variety of pizzas, pasta, and wings with Italian flavors.",
+      "location": "789 Mission Street, San Francisco, CA",
+      "latitude": 37.7649,
+      "longitude": -122.4294,
+      "menuCategories": [
+        {
+          "id": "cat1",
+          "name": "Pizzas",
+          "items": [
+            {
+              "name": "Pepperoni Feast",
+              "description": "Classic pizza loaded with double pepperoni and mozzarella cheese.",
+              "price": 16.00,
+              "imageUrl": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400"
+            },
+            {
+              "name": "Veggie Supreme",
+              "description": "Loaded with mushrooms, peppers, onions, olives, and tomatoes.",
+              "price": 15.00,
+              "imageUrl": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

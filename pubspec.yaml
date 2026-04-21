@@ -52,6 +52,7 @@ flutter:
     - assets/lang/
     - assets/images/
     - assets/fonts/
+    - assets/data/restaurants.json
 
   fonts:
     - family: Nunito
