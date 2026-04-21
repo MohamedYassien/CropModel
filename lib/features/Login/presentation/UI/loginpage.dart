@@ -1,10 +1,11 @@
 import 'dart:io';
+import 'package:cropmodel/bottom_navigation_bar.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/utils/helpers.dart';
 import 'package:cropmodel/features/Login/domain/usecases/GetCredentials.dart';
 import 'package:cropmodel/features/Login/domain/usecases/LoginWithEmail.dart';
 import 'package:cropmodel/features/Login/domain/usecases/SaveCredentials.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -84,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const LoginDetails()),
+                    MaterialPageRoute(builder: (_) => const BottomNavigationBar()),
                   );
                 }
 

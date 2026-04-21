@@ -1,6 +1,7 @@
 import 'dart:typed_data';
+import 'package:cropmodel/bottom_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -182,16 +183,9 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
-              leading: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 22.w),
-                child: IconButton(
-                  onPressed: () => Navigator.pushAndRemoveUntil(
-                    blocContext,
-                    MaterialPageRoute(builder: (_) => const LoginDetails()),
-                    (route) => false,
-                  ),
-                  icon: const Icon(Icons.arrow_back_ios),
-                ),
+              leading: IconButton(
+                onPressed: () {Navigator.pop(context);},
+                icon: const Icon(Icons.arrow_back_ios),
               ),
               title: Text(
                 "profile".tr(),

@@ -1,9 +1,16 @@
 import 'dart:ui';
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/utils/text_font_transformer.dart';
+import 'package:cropmodel/features/Profile/presentation/UI/profile_presenter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'features/HomePage/presentation/ui/homepage_screen.dart';
+import 'features/Restaurant/presentation/UI/restaurantScreen.dart';
+
 class BottomNavigationBar extends StatefulWidget {
+
   const BottomNavigationBar({super.key});
 
   @override
@@ -11,25 +18,24 @@ class BottomNavigationBar extends StatefulWidget {
 }
 
 class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
+
   int currentIndex = 0;
+
+  void changePage(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
+
+
+  List<Widget> get pages => [
+    homepage(onNavigate: changePage,),
+    RestaurantListScreen(onNavigate: changePage,),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            },
-          ),
-        ],
-      ),
       extendBody: true,
       body: Stack(
         children: [
@@ -37,7 +43,7 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: EdgeInsets.only(bottom: 24.h, left: 15.w, right: 15.w),
+              padding: EdgeInsets.only(bottom: 15.h, left: 15.w, right: 15.w),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(174.r),
                 child: BackdropFilter(
@@ -70,9 +76,9 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildNavItem('Home', Icons.home_outlined, 0),
-                            _buildNavItem('Restaurants', Icons.restaurant, 1),
-                            _buildNavItem('Profile', Icons.person_2_outlined, 2),
+                            _buildNavItem('home'.tr(), Icons.home_outlined, 0),
+                            _buildNavItem('restaurants'.tr(), Icons.restaurant, 1),
+                            _buildNavItem('profile'.tr(), Icons.person_2_outlined, 2),
                           ],
                         ),
                       ],
@@ -84,142 +90,6 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
           ),
         ],
       ),
-      endDrawer: Container(
-        margin: EdgeInsets.only(top: 60.h, right: 2.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50.r),
-          color: Colors.white.withOpacity(0.9),
-        ),
-        height: 800.h,
-        width: 214.w,
-        child: Drawer(
-          child: Column(
-            children: [
-              SizedBox(height: 50.h,),
-              Container(
-                height: 68.h,
-                width: 68.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xffEEEEEE)
-                ),
-                child: Icon(Icons.person, size: 40.sp, color: Color(0xff8E8E8E),),
-              ),
-              SizedBox(height: 15.h),
-              Text(
-                'John Doe',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xff000000),
-                ),
-              ),
-              SizedBox(height: 15.h),
-              Text('johnDoe@gmail.com', style: TextStyle(fontSize: 14.sp, color: Color(0xff8E8E8E)),),
-              SizedBox(height: 20.h,),
-              Divider(
-                thickness: 1,
-                color: Colors.grey.withOpacity(0.3),
-                indent: 10.w,
-                endIndent: 10.w,
-              ),
-            SizedBox(height: 15.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.home_outlined, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Dashboard', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.list_alt_sharp, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Restaurants List', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.history, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Latest Orders', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.group, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Orders Groups', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.settings, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Settings', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h,),
-              Divider(
-                thickness: 2,
-                color: Colors.grey.withOpacity(0.3),
-                indent: 10.w,
-                endIndent: 10.w,
-              ),
-              SizedBox(height: 20.h,),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 40.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.power_settings_new, color: AppColors.primaryColor, size: 30.sp,),
-                      Text('Logout', style: TextStyle(fontSize: 14.sp,),),
-                    ],
-                  ),
-                ),
-              ),
-
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -228,9 +98,14 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          currentIndex = index;
-        });
+        if(index == 2){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfilePresenter()));
+        }
+        else {
+          setState(() {
+            currentIndex = index;
+          });
+        }
       },
       child: Center(
         child: Container(
@@ -255,13 +130,7 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
               SizedBox(height: 6.h),
               Text(
                 text,
-                style: TextStyle(
-                  fontSize: isSelected ? 13.sp : 12.sp,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected
-                      ? AppColors.primaryColor
-                      : AppColors.primaryColor.withOpacity(0.7),
-                ),
+                style: getDynamicStyle(context,size: isSelected ? 13.sp : 12.sp, weight: FontWeight.bold, color: AppColors.primaryColor )
               ),
             ],
           ),
@@ -270,10 +139,4 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
     );
   }
 
-  List<Widget> get pages => [
-    Center(child: Text('Home')),
-    Center(child: Text('Restaurants')),
-
-    Center(child: Text('Profile')),
-  ];
 }
