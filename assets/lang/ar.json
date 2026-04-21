@@ -81,7 +81,16 @@
   "Browse_Restaurants":"تصفح المطاعم",
   "find_your_favourite_meals": "اعثر على وجباتك المفضلة",
   "Latest_Orders":"أحدث الطلبات",
-  "No_previous_orders_yet_Start_Your_frist_order":"لا توجد طلبات سابقة حتى الآن. \nابدأ طلبك الأول!"
+  "No_previous_orders_yet_Start_Your_frist_order":"لا توجد طلبات سابقة حتى الآن. \nابدأ طلبك الأول!",
+  "home": "الرئيسية",
+  "restaurants": "المطاعم",
+  "profile": "الملف",
+  "dashboard": "لوحة التحكم",
+  "restaurants_list": "قائمة المطاعم",
+  "latest_orders": "الطلبات الأخيرة",
+  "orders_groups": "مجموعة الطلبات",
+  "settings": "الأعدادات",
+  "are_you_want_logout": "هل تريد تسجيل الخروج ؟"
 
 
 

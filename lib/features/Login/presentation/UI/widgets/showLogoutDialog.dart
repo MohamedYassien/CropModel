@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -44,7 +45,7 @@ void showLogoutDialog(BuildContext context, VoidCallback onConfirm) {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  "Are you sure you want to\nlogout?",
+                  "are_you_want_logout".tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.sp,
@@ -71,7 +72,7 @@ void showLogoutDialog(BuildContext context, VoidCallback onConfirm) {
                           backgroundColor: Colors.white,
                         ),
                         child: Text(
-                          "Cancel",
+                          "cancel".tr(),
                           style: TextStyle(
                             color: const Color(0xFFCF2120),
                             fontSize: 16.sp,
@@ -96,7 +97,7 @@ void showLogoutDialog(BuildContext context, VoidCallback onConfirm) {
                           ),
                         ),
                         child: Text(
-                          "Confirm",
+                          "confirm".tr(),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16.sp,
