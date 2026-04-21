@@ -1,8 +1,8 @@
 import 'package:cropmodel/core/network/API.dart';
 
 enum UserApi implements API {
-  getProfile(Method.get, 'https://jsonplaceholder.typicode.com/users/1'),
-  updateProfile(Method.put, 'https://jsonplaceholder.typicode.com/users/1');
+  getProfile(Method.get, '/users/get-profile'),
+  updateProfile(Method.put, '/users/update-profile');
 
   @override
   final String path;
