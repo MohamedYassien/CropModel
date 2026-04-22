@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/shared/app_message.dart';
 import '../../../../core/shared/custom_text_field.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../Login/data/service/SecureStorage.dart';
@@ -41,12 +42,11 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
       body: BlocConsumer<ChangePasswordBloc, ChangePasswordState>(
         listener: (context, state) {
           if (state is ChangePasswordSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                duration: const Duration(seconds: 2),
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
+            AppMessage.showSnackBar(
+              context,
+              state.message,
+              const Color(0xFF71BC55),
+              Icons.check_circle_outline,
             );
             Navigator.pushReplacement(
               context,
@@ -55,12 +55,11 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
               ),
             );
           } else if (state is ChangePasswordError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                duration: const Duration(seconds: 2),
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
+            AppMessage.showSnackBar(
+              context,
+              state.message,
+              const Color(0xFFEA2020),
+              Icons.error_outline,
             );
           }
         },
@@ -157,14 +156,11 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
                                   final email = await _secureStorage.getEmail();
                                   if (!context.mounted) return;
                                   if (email.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        duration: const Duration(seconds: 2),
-                                        content: Text(
-                                          "Please login again".tr(),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
+                                    AppMessage.showSnackBar(
+                                      context,
+                                      "Please login again".tr(),
+                                      const Color(0xFFEA2020),
+                                      Icons.error_outline,
                                     );
                                     return;
                                   }
