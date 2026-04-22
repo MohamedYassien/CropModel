@@ -200,7 +200,7 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                         color: Colors.white,
                       ),
                       child: Text(
-                        u.name,
+                        u.fullName!,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14.sp,
@@ -251,7 +251,7 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  o.user.name,
+                                  o.user.fullName!,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 14.sp,

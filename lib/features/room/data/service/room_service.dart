@@ -11,9 +11,9 @@ class RoomService {
   RoomService({AppData? appData}) : _appData = appData ?? AppData.instance;
 
   static final UserModel guestUser = UserModel(
-    name: 'Guest',
+    fullName: 'Guest',
     email: 'guest@corpmeal.local',
-    phoneNumber: '0000000000',
+    phone: '0000000000',
   );
 
   List<Room> getOpenRooms() {
