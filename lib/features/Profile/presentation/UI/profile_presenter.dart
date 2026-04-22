@@ -174,7 +174,7 @@ class _ProfilePresenterState extends State<ProfilePresenter> {
             onWillPop: () async {
               Navigator.pushAndRemoveUntil(
                 blocContext,
-                MaterialPageRoute(builder: (_) => const LoginDetails()),
+                MaterialPageRoute(builder: (_) => BottomNavigationBar()),
                 (route) => false,
               );
               return false;

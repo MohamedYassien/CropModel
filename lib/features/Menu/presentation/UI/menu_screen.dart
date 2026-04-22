@@ -3,11 +3,17 @@ import 'package:cropmodel/features/Menu/presentation/UI/widgets/MenuItemCard.dar
 import 'package:cropmodel/features/room/data/model/room.dart';
 import 'package:cropmodel/features/room/domain/usecases/add_menu_item_to_room_usecase.dart';
 import 'package:cropmodel/features/room/domain/usecases/get_open_rooms_usecase.dart';
-import 'package:flutter/material.dart';
+import 'package:cropmodel/features/room/presentation/UI/my_rooms_presenter.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../bottom_navigation_bar.dart';
+import '../../../../core/utils/text_font_transformer.dart';
+import '../../../Login/presentation/UI/loginpage.dart';
+import '../../../Login/presentation/UI/widgets/showLogoutDialog.dart';
 import '../../data/model/menu_model.dart';
 import '../bloc/menuBloc.dart';
 import '../bloc/menu_event.dart';
@@ -52,9 +58,18 @@ class _MenuScreenState extends State<MenuScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           actions: [
-            IconButton(
-              icon: Icon(Icons.menu, size: 24.w, color: Colors.black),
-              onPressed: () {},
+            Builder(
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.only(right: 5.w),
+                    child: IconButton(
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                      icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
+                    ),
+                  );
+                }
             ),
           ],
         ),
@@ -80,6 +95,149 @@ class _MenuScreenState extends State<MenuScreen> {
             }
             return const SizedBox.shrink();
           },
+        ),
+        endDrawer: Container(
+          margin: EdgeInsets.only(top: 60.h, right: 2.w),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50.r),
+            color: Colors.white.withOpacity(0.9),
+          ),
+          height: 800.h,
+          width: 214.w,
+          child: Drawer(
+            child: Column(
+              children: [
+                SizedBox(height: 50.h,),
+                Container(
+                  height: 68.h,
+                  width: 68.w,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xffEEEEEE)
+                  ),
+                  child: Icon(Icons.person, size: 40.sp, color: Color(0xff8E8E8E),),
+                ),
+                SizedBox(height: 15.h),
+                Text(
+                  'John Doe',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff000000),
+                  ),
+                ),
+                SizedBox(height: 15.h),
+                Text('johnDoe@gmail.com', style: TextStyle(fontSize: 14.sp, color: Color(0xff8E8E8E)),),
+                SizedBox(height: 20.h,),
+                Divider(
+                  thickness: 1,
+                  color: Colors.grey.withOpacity(0.3),
+                  indent: 10.w,
+                  endIndent: 10.w,
+                ),
+                SizedBox(height: 15.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.home_outlined, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('dashboard'.tr(),
+                            style: getDynamicStyle(context, size: 14.sp)),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationBar(index: 1)));},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.list_alt_sharp, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('restaurants_list'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.history, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('latest_orders'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomsPresenter()));},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.group, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('orders_groups'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.settings, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('settings'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                Divider(
+                  thickness: 2,
+                  color: Colors.grey.withOpacity(0.3),
+                  indent: 10.w,
+                  endIndent: 10.w,
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: () {
+                    showLogoutDialog(context, () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                      );
+                    });
+                  },
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.power_settings_new, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('logout'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

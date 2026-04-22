@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'features/HomePage/presentation/ui/homepage_screen.dart';
-import 'features/Restaurant/presentation/UI/restaurantScreen.dart';
+import 'features/Restaurant/presentation/UI/restaurant_screen.dart';
 
 class BottomNavigationBar extends StatefulWidget {
-
-  const BottomNavigationBar({super.key});
+  int index;
+  BottomNavigationBar({super.key, this.index = 0});
 
   @override
   State<BottomNavigationBar> createState() => _CustomBottomNavigationBarState();
@@ -19,7 +19,7 @@ class BottomNavigationBar extends StatefulWidget {
 
 class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
 
-  int currentIndex = 0;
+  late int currentIndex = widget.index;
 
   void changePage(int index) {
     setState(() {

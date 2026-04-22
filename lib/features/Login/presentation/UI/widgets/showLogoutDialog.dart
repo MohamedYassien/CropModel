@@ -6,7 +6,7 @@ void showLogoutDialog(BuildContext context, VoidCallback onConfirm) {
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
-    barrierLabel: "Logout",
+    barrierLabel: "logout".tr(),
     barrierColor: Colors.black.withOpacity(0.45),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (context, animation, secondaryAnimation) {

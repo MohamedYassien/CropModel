@@ -2,8 +2,10 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/features/HomePage/presentation/ui/homepage_screen.dart';
 import 'package:cropmodel/features/Menu/presentation/UI/menu_screen.dart';
 import 'package:cropmodel/features/room/data/model/room.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../bottom_navigation_bar.dart';
 
 class RoomDetailsPresenter extends StatefulWidget {
   final Room room;
@@ -28,7 +30,7 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
           icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
           onPressed: () => Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => homepage()),
+            MaterialPageRoute(builder: (context) => BottomNavigationBar()),
           ),
         ),
         title: Text(

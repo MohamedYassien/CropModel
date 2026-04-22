@@ -11,7 +11,9 @@ import 'package:cropmodel/core/shared/data.dart';
 import 'package:cropmodel/features/room/presentation/UI/room_details_presenter.dart';
 import 'package:cropmodel/features/room/presentation/UI/my_rooms_presenter.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../Login/data/service/SecureStorage.dart';
 import '../../../Login/presentation/UI/LoginDetails.dart';
+import '../../../Login/presentation/UI/widgets/ShowBiometricDialog.dart';
 import '../../../Login/presentation/UI/widgets/showLogoutDialog.dart';
 import '../bloc/homepage_block.dart';
 import '../bloc/homepage_state.dart';
@@ -32,6 +34,47 @@ class _homepageState extends State<homepage> {
     setState(() {});
   }
 
+  final SecureStorage _storage = SecureStorage();
+  bool _biometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricStatus();
+  }
+
+  Future<void> _loadBiometricStatus() async {
+    final enabled = await _storage.isBiometricEnabled();
+    final promptShown = await _storage.isBiometricPromptShown();
+
+    if (!mounted) return;
+    setState(() => _biometricEnabled = enabled);
+
+    if (!enabled && !promptShown) {
+      await _storage.setBiometricPromptShown(true);
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+
+        showBiometricDialog(
+          context: context,
+          onEnable: () async {
+            await _toggleBiometric(true);
+          },
+          onSkip: () async {
+            await _toggleBiometric(false);
+          },
+        );
+      });
+    }
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    await _storage.setBiometricEnabled(value);
+
+    if (!mounted) return;
+    setState(() => _biometricEnabled = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final rooms = AppData.instance.myRooms;
@@ -40,6 +83,8 @@ class _homepageState extends State<homepage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        foregroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         leading: Padding(
           padding: EdgeInsetsDirectional.only(start: 15.w),
@@ -82,7 +127,7 @@ class _homepageState extends State<homepage> {
           ),
         ],
       ),
-      body: Column(
+      body: ListView(
         children: [
           Padding(
             padding: EdgeInsetsDirectional.only(start: 20.w, top: 30.h),
@@ -170,9 +215,9 @@ class _homepageState extends State<homepage> {
           ),
           //SizedBox(height: 13),
           GestureDetector(
-    onTap: (){
-    widget.onNavigate?.call(1);
-    },
+          onTap: (){
+          widget.onNavigate?.call(1);
+          },
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Container(
@@ -237,7 +282,7 @@ class _homepageState extends State<homepage> {
                     Padding(
                       padding: EdgeInsetsDirectional.only(end: 10.h),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {widget.onNavigate?.call(1);},
                         icon: Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 20.sp,
@@ -459,6 +504,7 @@ class _homepageState extends State<homepage> {
                     ),
             ),
           ),
+          SizedBox(height: 100.h,),
         ],
       ),
       endDrawer: Container(
