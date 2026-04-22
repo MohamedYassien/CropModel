@@ -6,11 +6,9 @@ import '../../../data/model/menu_model.dart';
 
 class MenuItemCard extends StatelessWidget {
   final MenuItemModel item;
+  final VoidCallback? onAdd;
 
-  const MenuItemCard({
-    super.key,
-    required this.item,
-  });
+  const MenuItemCard({super.key, required this.item, this.onAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -18,25 +16,57 @@ class MenuItemCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Food Image — Square with rounded corners
-        AspectRatio(
-          aspectRatio: 1,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: item.imageUrl.isNotEmpty
-                ? CachedNetworkImage(
-              imageUrl: item.imageUrl,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              placeholder: (context, url) => Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(color: Colors.white),
+        Stack(
+          children: [
+            AspectRatio(
+              aspectRatio: 1,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.r),
+                child: item.imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: item.imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(color: Colors.white),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            _buildPlaceholder(),
+                      )
+                    : _buildPlaceholder(),
               ),
-              errorWidget: (context, url, error) => _buildPlaceholder(),
-            )
-                : _buildPlaceholder(),
-          ),
+            ),
+            if (onAdd != null)
+              Positioned(
+                top: 8.h,
+                right: 8.w,
+                child: InkWell(
+                  onTap: onAdd,
+                  child: Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 18.sp,
+                      color: const Color(0xFFD32F2F),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         SizedBox(height: 8.h),
         // Name
@@ -83,11 +113,7 @@ class MenuItemCard extends StatelessWidget {
       height: double.infinity,
       color: Colors.grey[200],
       child: Center(
-        child: Icon(
-          Icons.fastfood,
-          size: 40.w,
-          color: Colors.grey[400],
-        ),
+        child: Icon(Icons.fastfood, size: 40.w, color: Colors.grey[400]),
       ),
     );
   }
