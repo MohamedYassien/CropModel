@@ -90,7 +90,8 @@
   "latest_orders": "الطلبات الأخيرة",
   "orders_groups": "مجموعة الطلبات",
   "settings": "الأعدادات",
-  "are_you_want_logout": "هل تريد تسجيل الخروج ؟"
+  "are_you_want_logout": "هل تريد تسجيل الخروج ؟",
+  "added_to": "تمت أضافته الي {roomName}"
 
 
 

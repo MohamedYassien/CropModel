@@ -100,5 +100,6 @@
   "latest_orders": "Latest Orders",
   "orders_groups": "Orders Groups",
   "settings": "Settings",
-  "are_you_want_logout": "Are you sure you want to\\nlogout?"
+  "are_you_want_logout": "Are you sure you want to\nlogout?",
+  "added_to": "Added to {roomName}"
 }

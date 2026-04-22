@@ -1,4 +1,5 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/features/Menu/presentation/UI/widgets/MenuItemCard.dart';
 import 'package:cropmodel/features/room/data/model/room.dart';
 import 'package:cropmodel/features/room/domain/usecases/add_menu_item_to_room_usecase.dart';
@@ -58,19 +59,18 @@ class _MenuScreenState extends State<MenuScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           actions: [
-            Builder(
-                builder: (context) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: 5.w),
-                    child: IconButton(
-                      onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                      icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
-                    ),
-                  );
-                }
-            ),
+            Builder(builder: (context) {
+              return Padding(
+                padding: EdgeInsets.only(right: 5.w),
+                child: IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                  icon: Icon(Icons.menu_rounded,
+                      size: 40.sp, color: Colors.black),
+                ),
+              );
+            }),
           ],
         ),
         body: BlocBuilder<MenuBloc, MenuState>(
@@ -107,15 +107,19 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Drawer(
             child: Column(
               children: [
-                SizedBox(height: 50.h,),
+                SizedBox(
+                  height: 50.h,
+                ),
                 Container(
                   height: 68.h,
                   width: 68.w,
                   decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xffEEEEEE)
+                      shape: BoxShape.circle, color: Color(0xffEEEEEE)),
+                  child: Icon(
+                    Icons.person,
+                    size: 40.sp,
+                    color: Color(0xff8E8E8E),
                   ),
-                  child: Icon(Icons.person, size: 40.sp, color: Color(0xff8E8E8E),),
                 ),
                 SizedBox(height: 15.h),
                 Text(
@@ -127,94 +131,155 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
                 SizedBox(height: 15.h),
-                Text('johnDoe@gmail.com', style: TextStyle(fontSize: 14.sp, color: Color(0xff8E8E8E)),),
-                SizedBox(height: 20.h,),
+                Text(
+                  'johnDoe@gmail.com',
+                  style: TextStyle(fontSize: 14.sp, color: Color(0xff8E8E8E)),
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
                 Divider(
                   thickness: 1,
                   color: Colors.grey.withOpacity(0.3),
                   indent: 10.w,
                   endIndent: 10.w,
                 ),
-                SizedBox(height: 15.h,),
+                SizedBox(
+                  height: 15.h,
+                ),
                 InkWell(
-                  onTap: (){},
+                  onTap: () {},
                   child: SizedBox(
                     height: 40.h,
                     child: Row(
-
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.home_outlined, color: AppColors.primaryColor, size: 30.sp,),
+                        Icon(
+                          Icons.home_outlined,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
                         Text('dashboard'.tr(),
                             style: getDynamicStyle(context, size: 14.sp)),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 InkWell(
-                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationBar(index: 1)));},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                BottomNavigationBar(index: 1)));
+                  },
                   child: SizedBox(
                     height: 40.h,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.list_alt_sharp, color: AppColors.primaryColor, size: 30.sp,),
-                        Text('restaurants_list'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                        Icon(
+                          Icons.list_alt_sharp,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
+                        Text(
+                          'restaurants_list'.tr(),
+                          style: getDynamicStyle(context, size: 14.sp),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 InkWell(
-                  onTap: (){},
+                  onTap: () {},
                   child: SizedBox(
                     height: 40.h,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.history, color: AppColors.primaryColor, size: 30.sp,),
-                        Text('latest_orders'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                        Icon(
+                          Icons.history,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
+                        Text(
+                          'latest_orders'.tr(),
+                          style: getDynamicStyle(context, size: 14.sp),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 InkWell(
-                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomsPresenter()));},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyRoomsPresenter()));
+                  },
                   child: SizedBox(
                     height: 40.h,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.group, color: AppColors.primaryColor, size: 30.sp,),
-                        Text('orders_groups'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                        Icon(
+                          Icons.group,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
+                        Text(
+                          'orders_groups'.tr(),
+                          style: getDynamicStyle(context, size: 14.sp),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 InkWell(
-                  onTap: (){},
+                  onTap: () {},
                   child: SizedBox(
                     height: 40.h,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.settings, color: AppColors.primaryColor, size: 30.sp,),
-                        Text('settings'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                        Icon(
+                          Icons.settings,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
+                        Text(
+                          'settings'.tr(),
+                          style: getDynamicStyle(context, size: 14.sp),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 Divider(
                   thickness: 2,
                   color: Colors.grey.withOpacity(0.3),
                   indent: 10.w,
                   endIndent: 10.w,
                 ),
-                SizedBox(height: 20.h,),
+                SizedBox(
+                  height: 20.h,
+                ),
                 InkWell(
                   onTap: () {
                     showLogoutDialog(context, () {
@@ -229,8 +294,15 @@ class _MenuScreenState extends State<MenuScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.power_settings_new, color: AppColors.primaryColor, size: 30.sp,),
-                        Text('logout'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                        Icon(
+                          Icons.power_settings_new,
+                          color: AppColors.primaryColor,
+                          size: 30.sp,
+                        ),
+                        Text(
+                          'logout'.tr(),
+                          style: getDynamicStyle(context, size: 14.sp),
+                        ),
                       ],
                     ),
                   ),
@@ -310,16 +382,11 @@ class _MenuScreenState extends State<MenuScreen> {
             final room = widget.room;
             if (room != null) {
               _addMenuItemToRoomUseCase.call(room: room, item: items[index]);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Added to ${room.name}',
-                    style: const TextStyle(fontFamily: 'Nunito'),
-                  ),
-                  backgroundColor: AppColors.primaryColor,
-                  duration: const Duration(seconds: 1),
-                ),
-              );
+              AppMessage.showSnackBar(
+                  context,
+                  "added_to".tr(namedArgs: {'roomName': room.name}),
+                  const Color(0xFF71BC55),
+                  Icons.check_circle);
               return;
             }
             _showPickRoomBottomSheet(context, items[index]);
