@@ -43,6 +43,7 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
           if (state is ChangePasswordSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: const Duration(seconds: 2),
                 content: Text(state.message),
                 backgroundColor: Colors.green,
               ),
@@ -56,6 +57,7 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
           } else if (state is ChangePasswordError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: const Duration(seconds: 2),
                 content: Text(state.message),
                 backgroundColor: Colors.red,
               ),
@@ -157,6 +159,7 @@ class _ResetPasswordScreenState extends State<ChangePasswordScreen> {
                                   if (email.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
+                                        duration: const Duration(seconds: 2),
                                         content: Text(
                                           "Please login again".tr(),
                                         ),

@@ -14,7 +14,7 @@ class AppMessage {
 
     messenger.showSnackBar(
       SnackBar(
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(10.w),
         backgroundColor: color,
@@ -38,13 +38,8 @@ class AppMessage {
             ),
           ],
         ),
-        action: SnackBarAction(
-          label: '✕',
-          textColor: Colors.white,
-          onPressed: () {
-            messenger.hideCurrentSnackBar();
-          },
-        ),
+        showCloseIcon: false,
+        closeIconColor: Colors.white,
       ),
     );
   }

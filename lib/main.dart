@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core/di/service_locator.dart';
+import 'features/Login/presentation/UI/loginpage.dart';
 import 'features/Restaurant/presentation/UI/restaurant_screen.dart';
 
 
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
           locale: context.locale,
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
-          home: RestaurantListScreen(),
+          home: LoginPage(),
         );
       },
     );
