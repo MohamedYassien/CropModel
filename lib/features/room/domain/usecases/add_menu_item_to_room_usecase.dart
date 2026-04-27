@@ -11,7 +11,8 @@ class AddMenuItemToRoomUseCase {
   void call({
     required Room room,
     required MenuItemModel item,
+    String? notes,
   }) {
-    _roomService.addMenuItemToRoom(room: room, item: item);
+    _roomService.addMenuItemToRoom(room: room, item: item, notes: notes);
   }
 }

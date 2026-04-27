@@ -8,7 +8,7 @@ class RemoveItemFromCartUseCase {
   RemoveItemFromCartUseCase({CartService? cartService})
       : _cartService = cartService ?? CartService();
 
-  void call(MenuItemModel item) {
-    _cartService.removeItem(item);
+  void call(MenuItemModel item,{String? notes}) {
+    _cartService.removeItem(item,notes: notes);
   }
 }

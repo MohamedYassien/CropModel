@@ -2,6 +2,8 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/features/HomePage/presentation/ui/homepage_screen.dart';
 import 'package:cropmodel/features/Menu/presentation/UI/menu_screen.dart';
 import 'package:cropmodel/features/room/data/model/room.dart';
+import 'package:cropmodel/features/room/data/service/room_service.dart';
+import 'package:cropmodel/core/shared/data.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -17,9 +19,26 @@ class RoomDetailsPresenter extends StatefulWidget {
 }
 
 class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
+  final RoomService _roomService = RoomService();
+  
+  void _refreshRoomData() {
+    final updatedRoom = _roomService.getOpenRooms().firstWhere(
+      (room) => room.name == widget.room.name && 
+                room.restaurantModel.id == widget.room.restaurantModel.id,
+      orElse: () => widget.room,
+    );
+    setState(() {
+      // This will trigger a rebuild with the updated room data
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
-    final room = widget.room;
+    final room = _roomService.getOpenRooms().firstWhere(
+      (r) => r.name == widget.room.name && 
+             r.restaurantModel.id == widget.room.restaurantModel.id,
+      orElse: () => widget.room,
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -104,7 +123,7 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                       ),
                     ),
                   ).then((_) {
-                    setState(() {});
+                    _refreshRoomData();
                   });
                 },
                 child: Container(
@@ -301,7 +320,18 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    SizedBox(width: 10.w),
+                                    SizedBox(width: 5.w),
+                                    if (item.notes != null && item.notes!.isNotEmpty)
+                                      Text(
+                                        'note: ${item.notes}',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: 'Nunito',
+                                        ),
+                                      ),
+                                    SizedBox(width: 5.w),
                                     Text(
                                       'EGP ${item.price.toStringAsFixed(2)}',
                                       style: TextStyle(

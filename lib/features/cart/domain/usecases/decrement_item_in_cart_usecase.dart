@@ -8,7 +8,7 @@ class DecrementItemInCartUseCase {
   DecrementItemInCartUseCase({CartService? cartService})
       : _cartService = cartService ?? CartService();
 
-  void call(MenuItemModel item) {
-    _cartService.decrementItem(item);
+  void call(MenuItemModel item,{String? notes}) {
+    _cartService.decrementItem(item,notes: notes);
   }
 }

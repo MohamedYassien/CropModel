@@ -46,10 +46,9 @@ class CustomTextField extends StatelessWidget {
 
         decoration: InputDecoration(
           hintText: hintText,
-          suffixIcon: suffixIcon,
-
+          suffixIcon: suffixIcon != null ? suffixIcon : null,
           errorStyle: TextStyle(
-            height: 1.2, // control spacing
+            height: 1.2,
           ),
 
           helperText: ' ',
