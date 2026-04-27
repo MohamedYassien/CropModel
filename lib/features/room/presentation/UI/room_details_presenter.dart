@@ -1,7 +1,9 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/services/navigation_history_service.dart';
 import 'package:cropmodel/features/HomePage/presentation/ui/homepage_screen.dart';
 import 'package:cropmodel/features/Menu/presentation/UI/menu_screen.dart';
 import 'package:cropmodel/features/room/data/model/room.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:cropmodel/features/room/data/service/room_service.dart';
 import 'package:cropmodel/core/shared/data.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
@@ -19,11 +21,21 @@ class RoomDetailsPresenter extends StatefulWidget {
 }
 
 class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
+  @override
+  void initState() {
+    super.initState();
+    NavigationHistoryService().saveLastPosition(
+      'room_details',
+      routeName: 'room_details',
+      routeData: widget.room.name,
+    );
+  }
+
   final RoomService _roomService = RoomService();
-  
+
   void _refreshRoomData() {
     final updatedRoom = _roomService.getOpenRooms().firstWhere(
-      (room) => room.name == widget.room.name && 
+      (room) => room.name == widget.room.name &&
                 room.restaurantModel.id == widget.room.restaurantModel.id,
       orElse: () => widget.room,
     );
@@ -31,11 +43,11 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
       // This will trigger a rebuild with the updated room data
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final room = _roomService.getOpenRooms().firstWhere(
-      (r) => r.name == widget.room.name && 
+      (r) => r.name == widget.room.name &&
              r.restaurantModel.id == widget.room.restaurantModel.id,
       orElse: () => widget.room,
     );
@@ -98,7 +110,8 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            '${room.orders.length} orders',
+                            'orders_count'.tr(
+                                namedArgs: {'count': '${room.orders.length}'}),
                             style: TextStyle(
                               color: Colors.white.withAlpha(220),
                               fontSize: 12.sp,
@@ -303,44 +316,94 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                             )
                           else
                             ...o.items.map(
-                              (item) => Padding(
-                                padding: EdgeInsets.only(bottom: 6.h),
+                                  (item) => Container(
+                                margin: EdgeInsets.only(bottom: 10.h),
+                                padding: EdgeInsets.all(10.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
                                 child: Row(
                                   children: [
+
+                                    /// IMAGE
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      child: Image.network(
+                                        item.imageUrl ?? '',
+                                        width: 60.w,
+                                        height: 60.w,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          width: 60.w,
+                                          height: 60.w,
+                                          color: Colors.grey[200],
+                                          child: Icon(Icons.restaurant,
+                                              color: Colors.grey[400], size: 24.sp),
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 10.w),
+
+                                    /// DETAILS
                                     Expanded(
-                                      child: Text(
-                                        item.name,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w600,
-                                          fontFamily: 'Nunito',
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+
+                                          Text(
+                                            item.name,
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w700,
+                                              fontFamily: 'Nunito',
+                                              color: Colors.black,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+
+                                          SizedBox(height: 4.h),
+
+                                          Text(
+                                            'EGP ${item.price.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.primaryColor,
+                                            ),
+                                          ),
+
+                                          if (item.notes != null && item.notes!.isNotEmpty) ...[
+                                            SizedBox(height: 4.h),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 6.w, vertical: 3.h),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFFFF8E1),
+                                                borderRadius: BorderRadius.circular(6.r),
+                                              ),
+                                              child: Text(
+                                                item.notes!,
+                                                style: TextStyle(
+                                                  fontSize: 10.sp,
+                                                  color: const Color(0xFFF57F17),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(width: 5.w),
-                                    if (item.notes != null && item.notes!.isNotEmpty)
-                                      Text(
-                                        'note: ${item.notes}',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w400,
-                                          fontFamily: 'Nunito',
-                                        ),
-                                      ),
-                                    SizedBox(width: 5.w),
-                                    Text(
-                                      'EGP ${item.price.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: AppColors.primaryColor,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Nunito',
-                                      ),
-                                    ),
+
                                   ],
                                 ),
                               ),

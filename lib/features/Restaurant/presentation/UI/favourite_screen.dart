@@ -1,4 +1,5 @@
 import 'package:cropmodel/core/shared/end_drawer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,7 +10,6 @@ import '../../data/model/restaurant_model.dart';
 import '../bloc/favouriteBloc/favorites_bloc.dart';
 import '../bloc/favouriteBloc/favorites_event.dart';
 import '../bloc/favouriteBloc/favorites_state.dart';
-
 
 class FavoriteScreen extends StatelessWidget {
   final Function(int)? onNavigate;
@@ -26,7 +26,7 @@ class FavoriteScreen extends StatelessWidget {
           elevation: 0,
           centerTitle: true,
           title: Text(
-            'Favorites',
+            'favorites'.tr(),
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -40,19 +40,18 @@ class FavoriteScreen extends StatelessWidget {
             },
           ),
           actions: [
-            Builder(
-              builder: (context) {
-                return Padding(
-                  padding: EdgeInsets.only(right: 5.w),
-                  child: IconButton(
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                    icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
-                  ),
-                );
-              }
-            ),
+            Builder(builder: (context) {
+              return Padding(
+                padding: EdgeInsets.only(right: 5.w),
+                child: IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                  icon: Icon(Icons.menu_rounded,
+                      size: 40.sp, color: Colors.black),
+                ),
+              );
+            }),
           ],
         ),
         body: BlocBuilder<FavoritesBloc, FavoritesState>(
@@ -92,7 +91,7 @@ class FavoriteScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           Text(
-            'No favorites yet',
+            'no_favorites_yet'.tr(),
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -101,7 +100,7 @@ class FavoriteScreen extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Tap the heart icon to add restaurants to favorites',
+            'tap_heart_to_add_favorites'.tr(),
             style: TextStyle(
               fontSize: 14.sp,
               color: Colors.grey[500],
@@ -134,7 +133,8 @@ class FavoriteScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFavoriteList(BuildContext context, List<RestaurantModel> restaurants) {
+  Widget _buildFavoriteList(
+      BuildContext context, List<RestaurantModel> restaurants) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       itemCount: restaurants.length,
@@ -288,7 +288,9 @@ class FavoriteScreen extends StatelessWidget {
                     SizedBox(height: 6.h),
                     IconButton(
                       onPressed: () {
-                        context.read<FavoritesBloc>().add(RemoveFavoriteEvent(restaurant.id));
+                        context
+                            .read<FavoritesBloc>()
+                            .add(RemoveFavoriteEvent(restaurant.id));
                       },
                       icon: Icon(
                         Icons.favorite,

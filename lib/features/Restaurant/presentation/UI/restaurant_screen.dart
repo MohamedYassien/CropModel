@@ -1,4 +1,6 @@
+import 'package:cropmodel/core/services/navigation_history_service.dart';
 import 'package:cropmodel/core/shared/end_drawer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,6 +30,13 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
   String _searchQuery = '';
 
   @override
+  void initState() {
+    super.initState();
+    NavigationHistoryService()
+        .saveLastPosition('restaurant_list', routeName: 'restaurant_list');
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -37,106 +46,117 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => RestaurantBloc()..add(LoadRestaurantsEvent())),
-        BlocProvider(create: (context) => FavoritesBloc()..add(LoadFavoritesEvent())),
+        BlocProvider(
+            create: (context) => RestaurantBloc()..add(LoadRestaurantsEvent())),
+        BlocProvider(
+            create: (context) => FavoritesBloc()..add(LoadFavoritesEvent())),
       ],
       child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            centerTitle: true,
-            title: Text(
-              'Restaurants',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            'Restaurants'.tr(),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
             ),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
-              onPressed: () => widget.onNavigate?.call(0),
-            ),
-            actions: [
-              Builder(builder: (context) {
-                return Padding(
-                  padding: EdgeInsets.only(right: 5.w),
-                  child: Row(
-                    children: [
-                    IconButton(onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const FavoriteScreen())).then((_) {
-                        context.read<FavoritesBloc>().add(LoadFavoritesEvent());
-                      });
-                    }, icon: Icon(Icons.favorite)),
-                      IconButton(
-                        onPressed: () {
-                          Scaffold.of(context).openEndDrawer();
-                        },
-                        icon: Icon(Icons.menu_rounded,
-                            size: 40.sp, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
           ),
-          body: BlocBuilder<RestaurantBloc, RestaurantState>(
-            builder: (context, state) {
-              if (state is RestaurantLoading) {
-                return _buildShimmerLoading();
-              } else if (state is RestaurantLoaded) {
-                final filtered = state.restaurants.where((r) {
-                  if (_searchQuery.trim().isEmpty) return true;
-                  final q = _searchQuery.toLowerCase();
-                  return r.name.toLowerCase().contains(q) ||
-                      r.location.toLowerCase().contains(q) ||
-                      r.description.toLowerCase().contains(q);
-                }).toList();
-
-                return Column(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
+            onPressed: () => widget.onNavigate?.call(0),
+          ),
+          actions: [
+            Builder(builder: (context) {
+              return Padding(
+                padding: EdgeInsets.only(right: 5.w),
+                child: Row(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.w, vertical: 10.h),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
+                    IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const FavoriteScreen())).then((_) {
+                            context
+                                .read<FavoritesBloc>()
+                                .add(LoadFavoritesEvent());
                           });
                         },
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          prefixIcon: Icon(Icons.search,
-                              color: Colors.grey[600], size: 22.sp),
-                          filled: true,
-                          fillColor: const Color(0xffF7F7F7),
-                          contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                            borderSide: BorderSide.none,
-                          ),
+                        icon: Icon(Icons.favorite)),
+                    IconButton(
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                      icon: Icon(Icons.menu_rounded,
+                          size: 40.sp, color: Colors.black),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+        body: BlocBuilder<RestaurantBloc, RestaurantState>(
+          builder: (context, state) {
+            if (state is RestaurantLoading) {
+              return _buildShimmerLoading();
+            } else if (state is RestaurantLoaded) {
+              final filtered = state.restaurants.where((r) {
+                if (_searchQuery.trim().isEmpty) return true;
+                final q = _searchQuery.toLowerCase();
+                return r.name.toLowerCase().contains(q) ||
+                    r.location.toLowerCase().contains(q) ||
+                    r.description.toLowerCase().contains(q);
+              }).toList();
+
+              return Column(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'search'.tr(),
+                        prefixIcon: Icon(Icons.search,
+                            color: Colors.grey[600], size: 22.sp),
+                        filled: true,
+                        fillColor: const Color(0xffF7F7F7),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                          borderSide: BorderSide.none,
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: _buildRestaurantList(context, filtered),
-                    ),
-                  ],
-                );
-              } else if (state is RestaurantError) {
-                return Center(
-                  child: Text(
-                    state.message,
-                    style: TextStyle(fontSize: 14.sp),
                   ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
+                  Expanded(
+                    child: _buildRestaurantList(context, filtered),
+                  ),
+                ],
+              );
+            } else if (state is RestaurantError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      endDrawer: EndDrawer(onNavigate: widget.onNavigate ,),
       ),
     );
   }

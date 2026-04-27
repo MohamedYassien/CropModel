@@ -74,7 +74,7 @@ class Helpers {
   }
 
   static String? validateStrongPassword(String? password) {
-    if(password == null || password.trim().isEmpty) {
+    if (password == null || password.trim().isEmpty) {
       return "password_is_required".tr();
     }
 
@@ -94,14 +94,15 @@ class Helpers {
       return "add_at_least_one_number".tr();
     }
 
-    if (!RegExp(r'[@$!%*?&]').hasMatch(password)) {
+    if (!RegExp(r'[&$\-]').hasMatch(password)) {
       return "Add_at_least_one_special_character".tr();
     }
 
     return null;
   }
 
-  static String? validatePasswordConfirmation(String? password, String? confirmPassword) {
+  static String? validatePasswordConfirmation(
+      String? password, String? confirmPassword) {
     if (confirmPassword == null || confirmPassword.trim().isEmpty) {
       return "confirm_password_is_required".tr();
     }

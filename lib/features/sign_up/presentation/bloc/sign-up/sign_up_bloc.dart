@@ -17,7 +17,6 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     on<SignUpButtonPressed>((event, emit) async {
       emit(SignUpLoading());
       try {
-        await Future.delayed(const Duration(seconds: 2));
         await SignUpUseCase().call(event.signUpRequest);
         emit(SignUpSuccess());
       } catch (e) {

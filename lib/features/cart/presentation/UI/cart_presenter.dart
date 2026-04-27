@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/services/navigation_history_service.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/utils/text_font_transformer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:cropmodel/core/utils/real_delivery_time_utils.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +28,7 @@ class _CartPresenterState extends State<CartPresenter> {
   @override
   void initState() {
     super.initState();
+    NavigationHistoryService().saveLastPosition('cart', routeName: 'cart');
     _calculateDeliveryTime();
   }
 
@@ -36,7 +39,7 @@ class _CartPresenterState extends State<CartPresenter> {
       30.0444, // Default Cairo coordinates (you should replace with actual restaurant coords)
       31.2357,
     );
-    
+
     if (mounted) {
       setState(() {
         _deliveryTime = deliveryTime;
@@ -59,7 +62,7 @@ class _CartPresenterState extends State<CartPresenter> {
           ),
           centerTitle: true,
           title: Text(
-            'Cart',
+            'cart'.tr(),
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -83,13 +86,17 @@ class _CartPresenterState extends State<CartPresenter> {
                         size: 64.sp, color: Colors.grey[300]),
                     SizedBox(height: 16.h),
                     Text(
-                      'Your cart is empty',
-                      style: getDynamicStyle(
-                        context,
-                        size: 16.sp,
-                        weight: FontWeight.w600,
-                        color: Colors.grey[500],
-                      ),
+                      'your_cart_is_empty'.tr(),
+                      style: getDynamicStyle(context,
+                          size: 16.sp,
+                          weight: FontWeight.w600,
+                          color: Colors.grey[500]),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'add_items_from_menu'.tr(),
+                      style: getDynamicStyle(context,
+                          size: 12.sp, color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -163,8 +170,11 @@ class _CartPresenterState extends State<CartPresenter> {
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w700,
+                                      fontFamily: 'Nunito',
                                       color: Colors.black,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
 
                                   SizedBox(height: 4.h),
@@ -173,6 +183,7 @@ class _CartPresenterState extends State<CartPresenter> {
                                     '${cartItem.item.price.toStringAsFixed(2)} EGP',
                                     style: TextStyle(
                                       fontSize: 13.sp,
+                                      fontFamily: 'Nunito',
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primaryColor,
                                     ),
@@ -184,6 +195,7 @@ class _CartPresenterState extends State<CartPresenter> {
                                     '${cartItem.totalPrice.toStringAsFixed(2)} EGP total',
                                     style: TextStyle(
                                       fontSize: 11.sp,
+                                      fontFamily: 'Nunito',
                                       color: Colors.grey[500],
                                     ),
                                   ),
@@ -276,7 +288,9 @@ class _CartPresenterState extends State<CartPresenter> {
                                       '${cartItem.quantity}',
                                       style: TextStyle(
                                         fontSize: 14.sp,
+                                        fontFamily: 'Nunito',
                                         fontWeight: FontWeight.w700,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -334,13 +348,11 @@ class _CartPresenterState extends State<CartPresenter> {
                               children: [
 
                                 Text(
-                                  'Total',
-                                  style: getDynamicStyle(
-                                    context,
-                                    size: 12.sp,
-                                    weight: FontWeight.w500,
-                                    color: Colors.grey[600],
-                                  ),
+                                  'total'.tr(),
+                                  style: getDynamicStyle(context,
+                                      size: 12.sp,
+                                      weight: FontWeight.w500,
+                                      color: Colors.grey[600]),
                                 ),
 
                                 SizedBox(height: 2.h),
@@ -398,12 +410,11 @@ class _CartPresenterState extends State<CartPresenter> {
                             ),
 
                             Text(
-                              '${state.items.length} items',
-                              style: getDynamicStyle(
-                                context,
-                                size: 12.sp,
-                                color: Colors.grey[500],
-                              ),
+                              'items_count'.tr(namedArgs: {
+                                'count': '${state.items.length}'
+                              }),
+                              style: getDynamicStyle(context,
+                                  size: 12.sp, color: Colors.grey[500]),
                             ),
                           ],
                         ),
@@ -418,7 +429,7 @@ class _CartPresenterState extends State<CartPresenter> {
                             onPressed: () {
                               AppMessage.showSnackBar(
                                 context,
-                                'Order placed successfully!',
+                                'checkout_success'.tr(),
                                 const Color(0xFF71BC55),
                                 Icons.check_circle,
                               );
@@ -435,7 +446,7 @@ class _CartPresenterState extends State<CartPresenter> {
                               ),
                             ),
                             child: Text(
-                              'Checkout',
+                              'checkout'.tr(),
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w700,

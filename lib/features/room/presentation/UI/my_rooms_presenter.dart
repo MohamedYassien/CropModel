@@ -1,6 +1,8 @@
 import 'package:cropmodel/core/constants/app_colors.dart';
+import 'package:cropmodel/core/services/navigation_history_service.dart';
 import 'package:cropmodel/core/shared/data.dart';
 import 'package:cropmodel/features/room/presentation/UI/room_details_presenter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,6 +14,13 @@ class MyRoomsPresenter extends StatefulWidget {
 }
 
 class _MyRoomsPresenterState extends State<MyRoomsPresenter> {
+  @override
+  void initState() {
+    super.initState();
+    NavigationHistoryService()
+        .saveLastPosition('my_rooms', routeName: 'my_rooms');
+  }
+
   @override
   Widget build(BuildContext context) {
     final rooms = AppData.instance.myRooms;
@@ -26,7 +35,7 @@ class _MyRoomsPresenterState extends State<MyRoomsPresenter> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'My Rooms',
+          'my_rooms_title'.tr(),
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.w700,
@@ -40,7 +49,7 @@ class _MyRoomsPresenterState extends State<MyRoomsPresenter> {
         child: rooms.isEmpty
             ? Center(
                 child: Text(
-                  'No rooms yet',
+                  'no_rooms_yet'.tr(),
                   style: TextStyle(
                     color: const Color.fromARGB(255, 96, 96, 96),
                     fontSize: 13.sp,
@@ -110,7 +119,8 @@ class _MyRoomsPresenterState extends State<MyRoomsPresenter> {
                                   room.restaurantModel.name,
                                   style: TextStyle(
                                     fontSize: 12.sp,
-                                    color: const Color.fromARGB(255, 96, 96, 96),
+                                    color:
+                                        const Color.fromARGB(255, 96, 96, 96),
                                     fontFamily: 'Nunito',
                                   ),
                                 ),

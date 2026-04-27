@@ -15,12 +15,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../bloc/create-password/create_password_state.dart';
 
 class CreatePasswordPresenter extends StatefulWidget {
-
   final String email;
 
   final String otp;
 
-  const CreatePasswordPresenter({super.key, required this.email, required this.otp});
+  const CreatePasswordPresenter(
+      {super.key, required this.email, required this.otp});
 
   @override
   State<StatefulWidget> createState() => _CreatePasswordPresenterState();
@@ -33,6 +33,9 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
       TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +75,9 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(height: 20.h,),
+                          SizedBox(
+                            height: 20.h,
+                          ),
                           Row(
                             children: [
                               SizedBox(width: 5.w),
@@ -88,10 +93,8 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                           SizedBox(height: 15.h),
                           Image.asset('assets/images/create-password.png'),
                           SizedBox(height: 40.h),
-                          Text(
-                            'create_password'.tr(),
-                            style: getDynamicStyle(context, size: 22)
-                          ),
+                          Text('create_password'.tr(),
+                              style: getDynamicStyle(context, size: 22)),
                           SizedBox(height: 40.h),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 35.r),
@@ -99,6 +102,20 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                               enabled: state is! CreatePasswordLoading,
                               hintText: 'enter_your_password'.tr(),
                               controller: enterPasswordController,
+                              obscureText: _obscurePassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                               validator: (value) =>
                                   Helpers.validateStrongPassword(value),
                             ),
@@ -109,11 +126,26 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                             child: CustomTextField(
                               hintText: 'confirm_password'.tr(),
                               controller: confirmPasswordController,
+                              obscureText: _obscureConfirmPassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
                               validator: (value) =>
                                   Helpers.validatePasswordConfirmation(
-                                    enterPasswordController.text,
-                                    confirmPasswordController.text,
-                                  ),
+                                enterPasswordController.text,
+                                confirmPasswordController.text,
+                              ),
                             ),
                           ),
                           SizedBox(height: 40.h),
@@ -121,12 +153,12 @@ class _CreatePasswordPresenterState extends State<CreatePasswordPresenter> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<CreatePasswordBloc>().add(
-                                  CreatePasswordButtonPressed(
-                                    email: widget.email,
-                                    otp: widget.otp,
-                                    password: enterPasswordController.text,
-                                  ),
-                                );
+                                      CreatePasswordButtonPressed(
+                                        email: widget.email,
+                                        otp: widget.otp,
+                                        password: enterPasswordController.text,
+                                      ),
+                                    );
                               }
                             },
                             buttonTextKey: 'save',

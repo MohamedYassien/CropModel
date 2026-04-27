@@ -33,7 +33,6 @@ class APIClient {
         );
       }
     }
-
     await _setupCacheInterceptor();
   }
 
@@ -83,7 +82,7 @@ class APIClient {
         data: body,
         headers: {
           if (headers != null) ...headers,
-          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+         if (token.isNotEmpty) 'Authorization': 'Bearer $token',
           if (!isFormData) HttpHeaders.contentTypeHeader: 'application/json',
         },
       );
@@ -125,8 +124,8 @@ class APIClient {
 
         default:
           throw APIError(
-            message: "Unexpected error occurred",
-            code: "1",
+            message: data?['message'] ?? "Something went wrong",
+            code: data?['code']?.toString(),
           );
       }
     }

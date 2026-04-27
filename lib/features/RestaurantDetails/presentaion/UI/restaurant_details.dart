@@ -1,4 +1,5 @@
 import 'package:cropmodel/core/shared/end_drawer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter/gestures.dart';
@@ -10,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cropmodel/core/shared/data.dart';
 import 'package:cropmodel/core/utils/real_delivery_time_utils.dart';
+import '../../../../core/services/navigation_history_service.dart';
 import '../../../Menu/presentation/UI/menu_screen.dart';
 import '../bloc/restaurant_details_bloc.dart';
 import '../bloc/restaurant_details_event.dart';
@@ -29,6 +31,16 @@ class RestaurantDetailsScreen extends StatefulWidget {
 }
 
 class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    NavigationHistoryService().saveLastPosition(
+      'restaurant_details',
+      routeName: 'restaurant_details',
+      routeData: widget.restaurantId,
+    );
+  }
+
   String _deliveryTime = 'Calculating...';
   String _distance = 'Calculating...';
 
@@ -41,7 +53,7 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
       restaurantLat,
       restaurantLng,
     );
-    
+
     if (mounted) {
       setState(() {
         _deliveryTime = deliveryTime;
@@ -82,7 +94,7 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
                 return _buildShimmerLoading();
               } else if (state is RestaurantDetailsLoaded) {
                 final restaurant = state.restaurant;
-                
+
                 // Calculate delivery details when restaurant is loaded
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _calculateDeliveryDetails(restaurant.latitude, restaurant.longitude);
@@ -251,7 +263,7 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
                           _buildMenuButton(context, restaurant.id),
                           SizedBox(height: 24.h),
                           Text(
-                            'Location',
+                            'location'.tr(),
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
@@ -345,7 +357,7 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
                 ),
                 SizedBox(width: 12.w),
                 Text(
-                  'Menu',
+                  'menu'.tr(),
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,

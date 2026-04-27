@@ -1,3 +1,5 @@
+import 'package:cropmodel/core/services/navigation_history_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +18,12 @@ class RoomPresenter extends StatefulWidget {
 
 class _RoomPresenterState extends State<RoomPresenter> {
   final TextEditingController _roomNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    NavigationHistoryService().saveLastPosition('room', routeName: 'room');
+  }
 
   @override
   void dispose() {
@@ -37,7 +45,7 @@ class _RoomPresenterState extends State<RoomPresenter> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Create Order',
+            'create_order'.tr(),
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
@@ -69,7 +77,7 @@ class _RoomPresenterState extends State<RoomPresenter> {
                         ),
                       ),
                     Text(
-                      'Restaurant',
+                      'restaurant'.tr(),
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16.sp,
@@ -109,8 +117,8 @@ class _RoomPresenterState extends State<RoomPresenter> {
                           onChanged: (value) {
                             if (value != null) {
                               context.read<RoomBloc>().add(
-                                RestaurantSelected(value),
-                              );
+                                    RestaurantSelected(value),
+                                  );
                             }
                           },
                         ),
@@ -169,12 +177,11 @@ class _RoomPresenterState extends State<RoomPresenter> {
                           final selected = state.selectedRestaurant;
                           if (selected == null) return;
 
-                          final createdRoom = context
-                              .read<RoomBloc>()
-                              .createRoomSync(
-                                roomName: name,
-                                restaurant: selected,
-                              );
+                          final createdRoom =
+                              context.read<RoomBloc>().createRoomSync(
+                                    roomName: name,
+                                    restaurant: selected,
+                                  );
 
                           Navigator.push(
                             context,

@@ -43,50 +43,52 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
       body: Stack(
         children: [
           Center(child: pages[currentIndex]),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 15.h, left: 5.w, right: 5.w),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(174.r),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                  child: Container(
-                    height: 80.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(174.r),
-                      color: Colors.transparent,
-                    ),
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.black.withOpacity(0.1),
-                                Colors.transparent,
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.1),
-                              ],
-                              stops: const [0.0, 0.25, 0.75, 1.0],
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 15.h, left: 5.w, right: 5.w),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(174.r),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                    child: Container(
+                      height: 80.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(174.r),
+                        color: Colors.transparent,
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.black.withOpacity(0.1),
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.1),
+                                ],
+                                stops: const [0.0, 0.25, 0.75, 1.0],
+                              ),
                             ),
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildNavItem('home'.tr(), Icons.home_outlined, 0),
-                            _buildNavItem(
-                                'restaurants'.tr(), Icons.restaurant, 1),
-                            _buildNavItem(
-                                'cart'.tr(), Icons.shopping_cart_outlined, 2),
-                            _buildNavItem(
-                                'profile'.tr(), Icons.person_2_outlined, 3),
-                          ],
-                        ),
-                      ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildNavItem('home'.tr(), Icons.home_outlined, 0),
+                              _buildNavItem(
+                                  'restaurants'.tr(), Icons.restaurant, 1),
+                              _buildNavItem(
+                                  'cart'.tr(), Icons.shopping_cart_outlined, 2),
+                              _buildNavItem(
+                                  'profile'.tr(), Icons.person_2_outlined, 3),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
