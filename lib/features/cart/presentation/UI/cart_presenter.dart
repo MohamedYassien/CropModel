@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/core/utils/text_font_transformer.dart';
+import 'package:cropmodel/core/utils/real_delivery_time_utils.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,8 +12,36 @@ import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
 import '../bloc/cart_state.dart';
 
-class CartPresenter extends StatelessWidget {
+class CartPresenter extends StatefulWidget {
   const CartPresenter({super.key});
+
+  @override
+  State<CartPresenter> createState() => _CartPresenterState();
+}
+
+class _CartPresenterState extends State<CartPresenter> {
+  String _deliveryTime = 'Calculating...';
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateDeliveryTime();
+  }
+
+  Future<void> _calculateDeliveryTime() async {
+    // For cart, we'll use a default location or get user's current location
+    // You might want to store the restaurant location when items are added to cart
+    final deliveryTime = await RealDeliveryTimeUtils.calculateRealDeliveryTime(
+      30.0444, // Default Cairo coordinates (you should replace with actual restaurant coords)
+      31.2357,
+    );
+    
+    if (mounted) {
+      setState(() {
+        _deliveryTime = deliveryTime;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +281,24 @@ class CartPresenter extends StatelessWidget {
                                       size: 18.sp,
                                       weight: FontWeight.bold,
                                       color: AppColors.primaryColor),
+                                ),
+                                SizedBox(height: 4.h),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 14.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      _deliveryTime,
+                                      style: getDynamicStyle(context,
+                                          size: 11.sp,
+                                          weight: FontWeight.w500,
+                                          color: Colors.grey[600]),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
