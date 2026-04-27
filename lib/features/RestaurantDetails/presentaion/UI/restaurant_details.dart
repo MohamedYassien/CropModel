@@ -1,4 +1,5 @@
-import 'package:cropmodel/core/shared/end_drawer.dart';
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide BottomNavigationBar;
@@ -6,7 +7,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../bottom_navigation_bar.dart';
@@ -29,23 +32,153 @@ class RestaurantDetailsScreen extends StatelessWidget {
     required this.restaurantId,
   });
 
-  Future<void> openInGoogleMaps(double lat, double lng) async {
-    final Uri googleMapsUri = Uri.parse("google.navigation:q=$lat,$lng&mode=d");
-    final Uri appleMapsUri = Uri.parse("https://maps.apple.com/?q=$lat,$lng");
-    final Uri fallbackUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
+  Future<bool> _showMapPermissionDialog(BuildContext context, String restaurantName) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'Open Maps?',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Do you want to navigate to $restaurantName using Google Maps?',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[700],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD32F2F),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Open Maps',
+                style: TextStyle(fontSize: 14.sp),
+              ),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+
+
+
+  Future<Position?> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return null;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return null;
+    }
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
+
+  Future<void> openInGoogleMaps(
+      BuildContext context,
+      double destLat,
+      double destLng,
+      String restaurantName,
+      String address,
+      ) async {
+    final bool hasPermission = await _showMapPermissionDialog(context, restaurantName);
+    if (!hasPermission) return;
+
+    final Position? userPosition = await _getCurrentLocation();
+
+    final String origin = userPosition != null
+        ? '${userPosition.latitude},${userPosition.longitude}'
+        : '';
+
+    final String destCoords = '$destLat,$destLng';
+
+    final Uri androidNavUri = Uri.parse(
+      'google.navigation:q=$destCoords&mode=d',
+    );
+
+    final Uri appleUri = Uri.parse(
+      'http://maps.apple.com/?saddr=$origin&daddr=$destCoords&dirflg=d',
+    );
+
+    final Uri webUri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&origin=$origin&destination=$destCoords&travelmode=driving',
+    );
 
     try {
-      if (await canLaunchUrl(googleMapsUri)) {
-        await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication);
-      } else if (await canLaunchUrl(appleMapsUri)) {
-        await launchUrl(appleMapsUri, mode: LaunchMode.externalApplication);
-      } else {
-        await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
+      if (Platform.isAndroid && await canLaunchUrl(androidNavUri)) {
+        await launchUrl(androidNavUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      if (Platform.isIOS && await canLaunchUrl(appleUri)) {
+        await launchUrl(appleUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      if (await canLaunchUrl(webUri)) {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No maps app available'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      debugPrint("Could not launch maps: $e");
+      debugPrint('Map error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error opening maps'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,18 +222,12 @@ class RestaurantDetailsScreen extends StatelessWidget {
                     pinned: true,
                     backgroundColor: Colors.white,
                     leading: IconButton(
-                      icon: Container(
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          size: 18.w,
-                          color: Colors.black,
-                        ),
+                      icon:Icon(
+                        Icons.arrow_back_ios,
+                        size: 18.w,
+                        color: Colors.white,
                       ),
+
                       onPressed: () => Navigator.pop(context),
                     ),
                     actions: [
@@ -112,7 +239,7 @@ class RestaurantDetailsScreen extends StatelessWidget {
                                 onPressed: () {
                                   Scaffold.of(context).openEndDrawer();
                                 },
-                                icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
+                                icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.white),
                               ),
                             );
                           }
@@ -213,8 +340,11 @@ class RestaurantDetailsScreen extends StatelessWidget {
 
                               onTap: (LatLng position) {
                                 openInGoogleMaps(
+                                  context,
                                   restaurant.latitude,
                                   restaurant.longitude,
+                                  restaurant.name,
+                                  restaurant.location,
                                 );
                               },
 
@@ -250,7 +380,138 @@ class RestaurantDetailsScreen extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-        endDrawer: EndDrawer()
+        endDrawer: Container(
+          margin: EdgeInsets.only(top: 60.h, right: 2.w),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50.r),
+            color: Colors.white.withOpacity(0.9),
+          ),
+          height: 800.h,
+          width: 214.w,
+          child: Drawer(
+            child: Column(
+              children: [
+                SizedBox(height: 50.h,),
+                Container(
+                  height: 68.h,
+                  width: 68.w,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xffEEEEEE)
+                  ),
+                  child: Icon(Icons.person, size: 40.sp, color: Color(0xff8E8E8E),),
+                ),
+
+                Divider(
+                  thickness: 1,
+                  color: Colors.grey.withOpacity(0.3),
+                  indent: 10.w,
+                  endIndent: 10.w,
+                ),
+                SizedBox(height: 15.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.home_outlined, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('dashboard'.tr(),
+                            style: getDynamicStyle(context, size: 14.sp)),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationBar(index: 1)));},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.list_alt_sharp, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('restaurants_list'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.history, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('latest_orders'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => MyRoomsPresenter()));},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.group, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('orders_groups'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: (){},
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.settings, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('settings'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h,),
+                Divider(
+                  thickness: 2,
+                  color: Colors.grey.withOpacity(0.3),
+                  indent: 10.w,
+                  endIndent: 10.w,
+                ),
+                SizedBox(height: 20.h,),
+                InkWell(
+                  onTap: () {
+                    showLogoutDialog(context, () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                      );
+                    });
+                  },
+                  child: SizedBox(
+                    height: 40.h,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(Icons.power_settings_new, color: AppColors.primaryColor, size: 30.sp,),
+                        Text('logout'.tr(), style: getDynamicStyle(context, size: 14.sp),),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

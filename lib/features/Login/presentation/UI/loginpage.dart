@@ -18,7 +18,6 @@ import '../bloc/LoginBloc.dart';
 import '../bloc/LoginEvent.dart';
 import '../bloc/LoginState.dart';
 import '../../data/service/BiometricService.dart';
-import 'LoginDetails.dart';
 import '../../../../../core/constants/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -35,15 +34,14 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   void _login(BuildContext context) {
-    final formState = _formKey.currentState;
-    if (formState == null || !formState.validate()) return;
-
-    context.read<LoginBloc>().add(
-      LoginWithEmailEvent(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      ),
-    );
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<LoginBloc>().add(
+        LoginWithEmailEvent(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        ),
+      );
+    }
   }
 
   @override
@@ -53,302 +51,227 @@ class _LoginPageState extends State<LoginPage> {
     return BlocProvider(
       create: (_) => LoginBloc(
         loginWithEmail: LoginWithEmail(LoginService()),
-        saveCredentials:Savecredentials(SecureStorage()),
+        saveCredentials: Savecredentials(SecureStorage()),
         getCredentials: GetCredentials(SecureStorage()),
         biometricService: BiometricService(),
         secureStorage: SecureStorage(),
       ),
-      child: Builder(
-        builder: (context) {
-          final state = context.watch<LoginBloc>().state;
-          final bool isLoading = state is LoginLoading;
+      child: Scaffold(
+        body: BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state is LoginSuccess) {
+              AppMessage.showSnackBar(
+                context,
+                "Login successful",
+                const Color(0xFF71BC55),
+                Icons.check_circle_rounded,
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => BottomNavigationBar()),
+              );
+            } else if (state is LoginFailure) {
+              AppMessage.showSnackBar(
+                context,
+                state.message,
+                const Color(0xFFEA2020),
+                Icons.error_rounded,
+              );
+            } else if (state is BiometricNotAvailable) {
+              AppMessage.showSnackBar(
+                context,
+                "Biometric not available",
+                const Color(0xFFEA2020),
+                Icons.error_rounded,
+              );
+            }
+          },
+          builder: (context, state) {
+            final bool isLoading = state is LoginLoading;
 
-          return Scaffold(
-            body: BlocListener<LoginBloc, LoginState>(
-              listener: (context, state) {
-                if (!mounted) return;
-                  if (state is LoginSuccess) {
-                    AppMessage.showSnackBar(
-                      context,
-                      "Login successful",
-                       const Color(0xFF71BC55),
-                      Icons.check_circle_rounded,
-                    );
-                    Future.delayed(const Duration(seconds: 3), () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    });
-
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(builder: (_) => const LoginDetails()),
-                    // );
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) =>  BottomNavigationBar()),
-                  );
-                }
-
-                if (state is LoginFailure) {
-                  AppMessage.showSnackBar(
-                    context,
-                    state.message,
-                  const Color(0xFFEA2020),
-                  Icons.error_rounded,
-                  );
-                }
-
-                if (state is BiometricNotAvailable) {
-                  AppMessage.showSnackBar(
-                    context,
-                    "Biometric not available",
-                    const Color(0xFFEA2020),
-                    Icons.error_rounded,
-                  );
-                }
-              },
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 52.w),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(height: 121.h),
-                              Image.asset(
-                                "assets/images/logo.png",
-                                height: 130.h,
-                                width: 130.w,
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 52.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            SizedBox(height: 120.h),
+                            Image.asset(
+                              "assets/images/logo.png",
+                              height: 130.h,
+                              width: 130.w,
+                            ),
+                            SizedBox(height: 25.h),
+                            Text(
+                              "login".tr(),
+                              style: TextStyle(
+                                fontSize: 35.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.labelTextColor,
                               ),
-                              SizedBox(height: 25.h),
-                              Text(
-                                "login".tr(),
-                                style: TextStyle(
-                                  fontSize: 35.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.labelTextColor,
+                            ),
+                            SizedBox(height: 40.h),
+                            CustomTextField(
+                              hintText: "email_address".tr(),
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              enabled: !isLoading,
+                              validator: (value) => Helpers.validateEmail(value),
+                            ),
+                            SizedBox(height: 16.h),
+                            CustomTextField(
+                              hintText: "password_required".tr(),
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              enabled: !isLoading,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                  size: 22.sp,
                                 ),
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                               ),
-                              SizedBox(height: 40.h),
-                              CustomTextField(
-                                hintText: "email_address".tr(),
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                enabled: !isLoading,
-                                validator: (value) =>
-                                    Helpers.validateEmail(value),
-                              ),
-                              SizedBox(height: 23.h),
-                              CustomTextField(
-                                hintText: "password_required".tr(),
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                enabled: !isLoading,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
+                            ),
+                            SizedBox(height: 12.h),
+                            Align(
+                              alignment: isArabic ? Alignment.centerLeft : Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const Forgetpasswordscreen()),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "password_required".tr();
-                                  }
-
-                                  if (value.trim().length < 6) {
-                                    return "password_min_length".tr();
-                                  }
-
-                                  final uppercaseRegex = RegExp(r'[A-Z]');
-                                  if (!uppercaseRegex.hasMatch(value)) {
-                                    return "password_uppercase".tr();
-                                  }
-
-                                  final specialCharRegex = RegExp(
-                                    r'[!@#$%^&*(),.?":{}|<>]',
-                                  );
-                                  if (!specialCharRegex.hasMatch(value)) {
-                                    return "password_special_char".tr();
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                              SizedBox(height: 20.h),
-                              Align(
-                                alignment: isArabic
-                                    ? Alignment.centerLeft
-                                    : Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Forgetpasswordscreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "forgot_password".tr(),
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontFamily: 'Nunito',
-                                    ),
+                                child: Text(
+                                  "forgot_password".tr(),
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontFamily: 'Nunito',
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 20.h),
-                              Row(
-                                 children: [
+                            ),
+                            SizedBox(height: 20.h),
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
                                   Expanded(
-                                    child: SizedBox(
-                                      height: 55.h,
-                                      child: ElevatedButton(
-                                        onPressed:isLoading ? null: () =>_login(context),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              AppColors.buttonColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              18.r,
-                                            ),
-                                          ),
-                                          elevation: 3,
+                                    child: ElevatedButton(
+                                      onPressed: isLoading ? null : () => _login(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.buttonColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18.r),
                                         ),
-                                        child: isLoading
-                                            ? SizedBox(
-                                                height: 22.h,
-                                                width: 22.w,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2.5,
-                                                      color: Colors.white,
-                                                    ),
-                                              )
-                                            : Text(
-                                                "login_button".tr(),
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.sp,
-                                                  fontFamily: 'Nunito',
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                        elevation: 2,
+                                      ),
+                                      child: isLoading
+                                          ? SizedBox(
+                                        height: 20.h,
+                                        width: 20.w,
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                          : Text(
+                                        "login_button".tr(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18.sp,
+                                          fontFamily: 'Nunito',
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 10.w),
                                   FutureBuilder<bool>(
                                     future: BiometricService().checkBiometricAvailability(),
                                     builder: (context, snapshot) {
-                                      final available = snapshot.data ?? false;
-                                      if (!available) return const SizedBox.shrink();
+                                      if (!(snapshot.data ?? false)) return const SizedBox.shrink();
 
-                                      IconData icon = Platform.isIOS
-                                          ? Icons.face_retouching_natural
-                                          : Icons.fingerprint;
-
-                                      return GestureDetector(
-                                        onTap: isLoading
-                                            ? null
-                                            : () {
-                                          context.read<LoginBloc>().add(
-                                            BiometricLoginEvent(),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: 55.w,
-                                          height: 55.h,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
+                                      return Row(
+                                        children: [
+                                          SizedBox(width: 12.w),
+                                          InkWell(
+                                            onTap: isLoading ? null : () => context.read<LoginBloc>().add(BiometricLoginEvent()),
                                             borderRadius: BorderRadius.circular(14.r),
-                                            border: Border.all(
-                                              color: const Color(0xFFF1F1F1),
-                                              width: 1,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.08),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 4),
+                                            child: Container(
+                                              width: 56.w,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(14.r),
+                                                border: Border.all(color: const Color(0xFFF1F1F1)),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.05),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(0, 4),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Icon(
-                                              icon,
-                                              size: 26.sp,
-                                              color: const Color(0xFF444444),
+                                              child: Icon(
+                                                Platform.isIOS ? Icons.face_retouching_natural : Icons.fingerprint,
+                                                size: 28.sp,
+                                                color: const Color(0xFF444444),
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       );
                                     },
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20.h),
-
-                                ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 40.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "new_to_cropmeal".tr(),
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Color(0xff62707D),
-                                    fontFamily: 'Nunito',
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignUpPresenter(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    "Register",
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Nunito',
-                                      fontSize: 15.sp,
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 30.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "new_to_cropmeal".tr(),
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: const Color(0xff62707D),
+                                  fontFamily: 'Nunito',
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const SignUpPresenter()),
+                                ),
+                                child: Text(
+                                  "Register",
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Nunito',
+                                    fontSize: 15.sp,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
