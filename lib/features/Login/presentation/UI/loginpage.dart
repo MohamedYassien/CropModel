@@ -29,9 +29,32 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
+  bool _showPasswordIcon = false;
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  final FocusNode _passwordFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _passwordFocusNode.addListener(() {
+      setState(() {
+        _showPasswordIcon = _passwordFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _passwordFocusNode.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _login(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
@@ -119,6 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             SizedBox(height: 40.h),
+
+                            /// EMAIL FIELD (no icon)
                             CustomTextField(
                               hintText: "email_address".tr(),
                               controller: _emailController,
@@ -126,27 +151,59 @@ class _LoginPageState extends State<LoginPage> {
                               enabled: !isLoading,
                               validator: (value) => Helpers.validateEmail(value),
                             ),
+
                             SizedBox(height: 16.h),
+
+
                             CustomTextField(
                               hintText: "password_required".tr(),
                               controller: _passwordController,
                               obscureText: _obscurePassword,
+                              focusNode: _passwordFocusNode,
                               enabled: !isLoading,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  size: 22.sp,
+                              suffixIcon: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                transitionBuilder: (child, animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: ScaleTransition(
+                                      scale: animation,
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: _showPasswordIcon
+                                    ? IconButton(
+                                  key: const ValueKey('visible'),
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    size: 24.sp,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                  onPressed: () => setState(
+                                        () => _obscurePassword = !_obscurePassword,
+                                  ),
+                                )
+                                    : const SizedBox(
+                                  key: ValueKey('hidden'),
                                 ),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                               ),
                             ),
+
                             SizedBox(height: 12.h),
+
                             Align(
-                              alignment: isArabic ? Alignment.centerLeft : Alignment.centerRight,
+                              alignment: isArabic
+                                  ? Alignment.centerLeft
+                                  : Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const Forgetpasswordscreen()),
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                      const Forgetpasswordscreen()),
                                 ),
                                 child: Text(
                                   "forgot_password".tr(),
@@ -157,26 +214,31 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
+
                             SizedBox(height: 20.h),
+
                             IntrinsicHeight(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Expanded(
                                     child: ElevatedButton(
-                                      onPressed: isLoading ? null : () => _login(context),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _login(context),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.buttonColor,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18.r),
+                                          borderRadius:
+                                          BorderRadius.circular(18.r),
                                         ),
-                                        elevation: 2,
                                       ),
                                       child: isLoading
                                           ? SizedBox(
                                         height: 20.h,
                                         width: 20.w,
-                                        child: const CircularProgressIndicator(
+                                        child:
+                                        const CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color: Colors.white,
                                         ),
@@ -186,41 +248,47 @@ class _LoginPageState extends State<LoginPage> {
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18.sp,
-                                          fontFamily: 'Nunito',
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
                                   ),
                                   FutureBuilder<bool>(
-                                    future: BiometricService().checkBiometricAvailability(),
+                                    future: BiometricService()
+                                        .checkBiometricAvailability(),
                                     builder: (context, snapshot) {
-                                      if (!(snapshot.data ?? false)) return const SizedBox.shrink();
+                                      if (!(snapshot.data ?? false)) {
+                                        return const SizedBox.shrink();
+                                      }
 
                                       return Row(
                                         children: [
                                           SizedBox(width: 12.w),
                                           InkWell(
-                                            onTap: isLoading ? null : () => context.read<LoginBloc>().add(BiometricLoginEvent()),
-                                            borderRadius: BorderRadius.circular(14.r),
+                                            onTap: isLoading
+                                                ? null
+                                                : () => context
+                                                .read<LoginBloc>()
+                                                .add(
+                                                BiometricLoginEvent()),
                                             child: Container(
                                               width: 56.w,
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(14.r),
-                                                border: Border.all(color: const Color(0xFFF1F1F1)),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.05),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 4),
-                                                  ),
-                                                ],
+                                                borderRadius:
+                                                BorderRadius.circular(14.r),
+                                                border: Border.all(
+                                                    color:
+                                                    const Color(0xFFF1F1F1)),
                                               ),
                                               child: Icon(
-                                                Platform.isIOS ? Icons.face_retouching_natural : Icons.fingerprint,
+                                                Platform.isIOS
+                                                    ? Icons
+                                                    .face_retouching_natural
+                                                    : Icons.fingerprint,
                                                 size: 28.sp,
-                                                color: const Color(0xFF444444),
+                                                color:
+                                                const Color(0xFF444444),
                                               ),
                                             ),
                                           ),
@@ -233,6 +301,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
+
                         Padding(
                           padding: EdgeInsets.only(bottom: 30.h),
                           child: Row(
@@ -243,20 +312,20 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   color: const Color(0xff62707D),
-                                  fontFamily: 'Nunito',
                                 ),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const SignUpPresenter()),
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                      const SignUpPresenter()),
                                 ),
                                 child: Text(
                                   "Register",
                                   style: TextStyle(
                                     color: AppColors.primaryColor,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'Nunito',
                                     fontSize: 15.sp,
                                   ),
                                 ),
