@@ -11,8 +11,8 @@ import '../bloc/favouriteBloc/favorites_bloc.dart';
 import '../bloc/favouriteBloc/favorites_event.dart';
 import '../bloc/favouriteBloc/favorites_state.dart';
 import '../bloc/restaurantBloc/restaurantBloc.dart';
+import '../bloc/restaurantBloc/restaurantEvent.dart';
 import '../bloc/restaurantBloc/restaurantState.dart';
-import '../bloc/restaurantEvent.dart';
 import 'favourite_screen.dart';
 
 class RestaurantListScreen extends StatefulWidget {
