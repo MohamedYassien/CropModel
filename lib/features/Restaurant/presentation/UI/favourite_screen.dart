@@ -4,139 +4,111 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:cropmodel/core/shared/data.dart';
 import '../../../RestaurantDetails/presentaion/UI/restaurant_details.dart';
 import '../../data/model/restaurant_model.dart';
 import '../bloc/favouriteBloc/favorites_bloc.dart';
 import '../bloc/favouriteBloc/favorites_event.dart';
 import '../bloc/favouriteBloc/favorites_state.dart';
-import '../bloc/restaurantBloc/restaurantBloc.dart';
-import '../bloc/restaurantBloc/restaurantEvent.dart';
-import '../bloc/restaurantBloc/restaurantState.dart';
-import 'favourite_screen.dart';
 
-class RestaurantListScreen extends StatefulWidget {
+
+class FavoriteScreen extends StatelessWidget {
   final Function(int)? onNavigate;
-  const RestaurantListScreen({super.key, this.onNavigate});
-
-  @override
-  State<RestaurantListScreen> createState() => _RestaurantListScreenState();
-}
-
-class _RestaurantListScreenState extends State<RestaurantListScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+  const FavoriteScreen({super.key, this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => RestaurantBloc()..add(LoadRestaurantsEvent())),
-        BlocProvider(create: (context) => FavoritesBloc()..add(LoadFavoritesEvent())),
-      ],
+    return BlocProvider(
+      create: (context) => FavoritesBloc()..add(LoadFavoritesEvent()),
       child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            centerTitle: true,
-            title: Text(
-              'Restaurants',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            'Favorites',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
             ),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
-              onPressed: () => widget.onNavigate?.call(0),
-            ),
-            actions: [
-              Builder(builder: (context) {
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            Builder(
+              builder: (context) {
                 return Padding(
                   padding: EdgeInsets.only(right: 5.w),
-                  child: Row(
-                    children: [
-                    IconButton(onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const FavoriteScreen())).then((_) {
-                        context.read<FavoritesBloc>().add(LoadFavoritesEvent());
-                      });
-                    }, icon: Icon(Icons.favorite)),
-                      IconButton(
-                        onPressed: () {
-                          Scaffold.of(context).openEndDrawer();
-                        },
-                        icon: Icon(Icons.menu_rounded,
-                            size: 40.sp, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-          body: BlocBuilder<RestaurantBloc, RestaurantState>(
-            builder: (context, state) {
-              if (state is RestaurantLoading) {
-                return _buildShimmerLoading();
-              } else if (state is RestaurantLoaded) {
-                final filtered = state.restaurants.where((r) {
-                  if (_searchQuery.trim().isEmpty) return true;
-                  final q = _searchQuery.toLowerCase();
-                  return r.name.toLowerCase().contains(q) ||
-                      r.location.toLowerCase().contains(q) ||
-                      r.description.toLowerCase().contains(q);
-                }).toList();
-
-                return Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.w, vertical: 10.h),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {
-                            _searchQuery = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          prefixIcon: Icon(Icons.search,
-                              color: Colors.grey[600], size: 22.sp),
-                          filled: true,
-                          fillColor: const Color(0xffF7F7F7),
-                          contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildRestaurantList(context, filtered),
-                    ),
-                  ],
-                );
-              } else if (state is RestaurantError) {
-                return Center(
-                  child: Text(
-                    state.message,
-                    style: TextStyle(fontSize: 14.sp),
+                  child: IconButton(
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                    icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
                   ),
                 );
               }
-              return const SizedBox.shrink();
-            },
+            ),
+          ],
+        ),
+        body: BlocBuilder<FavoritesBloc, FavoritesState>(
+          builder: (context, state) {
+            if (state is FavoritesLoading) {
+              return _buildShimmerLoading();
+            } else if (state is FavoritesLoaded) {
+              if (state.favoriteRestaurants.isEmpty) {
+                return _buildEmptyState();
+              }
+              return _buildFavoriteList(context, state.favoriteRestaurants);
+            } else if (state is FavoritesError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+        endDrawer: EndDrawer(onNavigate: onNavigate),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.favorite_border,
+            size: 80.w,
+            color: Colors.grey[300],
           ),
+          SizedBox(height: 16.h),
+          Text(
+            'No favorites yet',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'Tap the heart icon to add restaurants to favorites',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -162,8 +134,7 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
     );
   }
 
-  Widget _buildRestaurantList(
-      BuildContext context, List<RestaurantModel> restaurants) {
+  Widget _buildFavoriteList(BuildContext context, List<RestaurantModel> restaurants) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       itemCount: restaurants.length,
@@ -178,10 +149,7 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
                   restaurantId: restaurant.id,
                 ),
               ),
-            ).then((_) {
-              if (!mounted) return;
-              setState(() {});
-            });
+            );
           },
           child: Container(
             margin: EdgeInsets.only(bottom: 12.h),
@@ -301,25 +269,10 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
                   children: [
                     Row(
                       children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              final ids = AppData.instance.starredRestaurantIds;
-                              if (ids.contains(restaurant.id)) {
-                                ids.remove(restaurant.id);
-                              } else {
-                                ids.add(restaurant.id);
-                              }
-                            });
-                          },
-                          child: Icon(
-                            AppData.instance.starredRestaurantIds
-                                    .contains(restaurant.id)
-                                ? Icons.star
-                                : Icons.star_border,
-                            size: 18.w,
-                            color: Colors.amber,
-                          ),
+                        Icon(
+                          Icons.star,
+                          size: 16.w,
+                          color: Colors.amber,
                         ),
                         SizedBox(width: 2.w),
                         Text(
@@ -333,28 +286,16 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
                       ],
                     ),
                     SizedBox(height: 6.h),
-                    BlocBuilder<FavoritesBloc, FavoritesState>(
-                      builder: (context, favoritesState) {
-                        bool isFavorite = false;
-                        if (favoritesState is FavoritesLoaded) {
-                          isFavorite = favoritesState.favoriteRestaurants
-                              .any((r) => r.id == restaurant.id);
-                        }
-
-                        return IconButton(
-                          onPressed: () {
-                            context
-                                .read<FavoritesBloc>()
-                                .add(ToggleFavoriteEvent(restaurant));
-                          },
-                          icon: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite ? Colors.red : Colors.grey,
-                            size: 20.w,
-                          ),
-                        );
+                    IconButton(
+                      onPressed: () {
+                        context.read<FavoritesBloc>().add(RemoveFavoriteEvent(restaurant.id));
                       },
-                    )
+                      icon: Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                        size: 20.w,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -362,21 +303,6 @@ class _RestaurantListScreenState extends State<RestaurantListScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -18,19 +18,27 @@ class MenuCategoryModel {
           .toList() ?? [],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'items': items.map((item) => item.toJson()).toList(),
+    };
+  }
 }
 
 class MenuItemModel {
   final String name;
   final String description;
   final double price;
-  final String imageUrl;  // ✅ Added
+  final String imageUrl;
 
   MenuItemModel({
     required this.name,
     required this.description,
     required this.price,
-    required this.imageUrl,  // ✅ Added
+    required this.imageUrl,
   });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
@@ -38,7 +46,16 @@ class MenuItemModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      imageUrl: json['imageUrl'] ?? '',  // ✅ Added
+      imageUrl: json['imageUrl'] ?? '',  // 
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+    };
   }
 }
