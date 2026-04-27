@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../data/model/restaurant_model.dart';
+import '../../../data/model/restaurant_model.dart';
 
 abstract class RestaurantState extends Equatable {
   const RestaurantState();
