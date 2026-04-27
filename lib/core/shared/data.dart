@@ -10,8 +10,11 @@ class AppData {
 
   UserModel? currentUser;
 
+  final Set<String> starredRestaurantIds = {};
+
   void clearSession() {
     currentUser = null;
     myRooms = [];
+    starredRestaurantIds.clear();
   }
 }

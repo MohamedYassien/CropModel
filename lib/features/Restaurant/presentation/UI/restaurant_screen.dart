@@ -1,82 +1,127 @@
 import 'package:cropmodel/core/shared/end_drawer.dart';
-import 'package:cropmodel/features/room/presentation/UI/my_rooms_presenter.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/text_font_transformer.dart';
-import '../../../Login/presentation/UI/loginpage.dart';
-import '../../../Login/presentation/UI/widgets/showLogoutDialog.dart';
+import 'package:cropmodel/core/shared/data.dart';
 import '../../../RestaurantDetails/presentaion/UI/restaurant_details.dart';
 import '../../data/model/restaurant_model.dart';
 import '../bloc/restaurantBloc.dart';
 import '../bloc/restaurantEvent.dart';
 import '../bloc/restaurantState.dart';
 
-class RestaurantListScreen extends StatelessWidget {
+class RestaurantListScreen extends StatefulWidget {
   final Function(int)? onNavigate;
   const RestaurantListScreen({super.key, this.onNavigate});
+
+  @override
+  State<RestaurantListScreen> createState() => _RestaurantListScreenState();
+}
+
+class _RestaurantListScreenState extends State<RestaurantListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => RestaurantBloc()..add(LoadRestaurantsEvent()),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
           backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            'Restaurants',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+            title: Text(
+              'Restaurants',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
+              onPressed: () => widget.onNavigate?.call(0),
+            ),
+            actions: [
+              Builder(builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.only(right: 5.w),
+                  child: IconButton(
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                    icon: Icon(Icons.menu_rounded,
+                        size: 40.sp, color: Colors.black),
+                  ),
+                );
+              }),
+            ],
           ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, size: 20.w, color: Colors.black),
-            onPressed: () => onNavigate?.call(0),
-          ),
-          actions: [
-            Builder(
-                builder: (context) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: 5.w),
-                    child: IconButton(
-                      onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                      icon: Icon(Icons.menu_rounded, size: 40.sp, color: Colors.black),
+          body: BlocBuilder<RestaurantBloc, RestaurantState>(
+            builder: (context, state) {
+              if (state is RestaurantLoading) {
+                return _buildShimmerLoading();
+              } else if (state is RestaurantLoaded) {
+                final filtered = state.restaurants.where((r) {
+                  if (_searchQuery.trim().isEmpty) return true;
+                  final q = _searchQuery.toLowerCase();
+                  return r.name.toLowerCase().contains(q) ||
+                      r.location.toLowerCase().contains(q) ||
+                      r.description.toLowerCase().contains(q);
+                }).toList();
+
+                return Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 10.h),
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search',
+                          prefixIcon: Icon(Icons.search,
+                              color: Colors.grey[600], size: 22.sp),
+                          filled: true,
+                          fillColor: const Color(0xffF7F7F7),
+                          contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14.r),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
                     ),
-                  );
-                }
-            ),
-          ],
-        ),
-        body: BlocBuilder<RestaurantBloc, RestaurantState>(
-          builder: (context, state) {
-            if (state is RestaurantLoading) {
-              return _buildShimmerLoading();
-            } else if (state is RestaurantLoaded) {
-              return _buildRestaurantList(context, state.restaurants);
-            } else if (state is RestaurantError) {
-              return Center(
-                child: Text(
-                  state.message,
-                  style: TextStyle(fontSize: 14.sp),
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-        endDrawer: EndDrawer(onNavigate: onNavigate)
-      ),
+                    Expanded(
+                      child: _buildRestaurantList(context, filtered),
+                    ),
+                  ],
+                );
+              } else if (state is RestaurantError) {
+                return Center(
+                  child: Text(
+                    state.message,
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          endDrawer: EndDrawer(onNavigate: widget.onNavigate)),
     );
   }
 
@@ -101,7 +146,8 @@ class RestaurantListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRestaurantList(BuildContext context, List<RestaurantModel> restaurants) {
+  Widget _buildRestaurantList(
+      BuildContext context, List<RestaurantModel> restaurants) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       itemCount: restaurants.length,
@@ -114,10 +160,12 @@ class RestaurantListScreen extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => RestaurantDetailsScreen(
                   restaurantId: restaurant.id,
-
                 ),
               ),
-            );
+            ).then((_) {
+              if (!mounted) return;
+              setState(() {});
+            });
           },
           child: Container(
             margin: EdgeInsets.only(bottom: 12.h),
@@ -211,10 +259,25 @@ class RestaurantListScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.star,
-                          size: 16.w,
-                          color: Colors.amber,
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              final ids = AppData.instance.starredRestaurantIds;
+                              if (ids.contains(restaurant.id)) {
+                                ids.remove(restaurant.id);
+                              } else {
+                                ids.add(restaurant.id);
+                              }
+                            });
+                          },
+                          child: Icon(
+                            AppData.instance.starredRestaurantIds
+                                    .contains(restaurant.id)
+                                ? Icons.star
+                                : Icons.star_border,
+                            size: 18.w,
+                            color: Colors.amber,
+                          ),
                         ),
                         SizedBox(width: 2.w),
                         Text(
@@ -251,5 +314,4 @@ class RestaurantListScreen extends StatelessWidget {
       ),
     );
   }
-
 }

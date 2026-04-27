@@ -2,6 +2,7 @@ import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/shared/app_message.dart';
 import 'package:cropmodel/features/Menu/presentation/UI/widgets/MenuItemCard.dart';
 import 'package:cropmodel/features/room/data/model/room.dart';
+import 'package:cropmodel/features/cart/domain/usecases/add_item_to_cart_usecase.dart';
 import 'package:cropmodel/features/room/domain/usecases/add_menu_item_to_room_usecase.dart';
 import 'package:cropmodel/features/room/domain/usecases/get_open_rooms_usecase.dart';
 import 'package:cropmodel/features/room/presentation/UI/my_rooms_presenter.dart';
@@ -35,6 +36,7 @@ class _MenuScreenState extends State<MenuScreen> {
   final GetOpenRoomsUseCase _getOpenRoomsUseCase = GetOpenRoomsUseCase();
   final AddMenuItemToRoomUseCase _addMenuItemToRoomUseCase =
       AddMenuItemToRoomUseCase();
+  final AddItemToCartUseCase _addItemToCartUseCase = AddItemToCartUseCase();
 
   @override
   Widget build(BuildContext context) {
@@ -389,54 +391,155 @@ class _MenuScreenState extends State<MenuScreen> {
                   Icons.check_circle);
               return;
             }
-            _showPickRoomBottomSheet(context, items[index]);
+            _showPickDestinationBottomSheet(context, items[index]);
           },
         );
       },
     );
   }
 
-  void _showPickRoomBottomSheet(BuildContext context, MenuItemModel item) {
+  void _showPickDestinationBottomSheet(
+      BuildContext context, MenuItemModel item) {
     final openRooms = _getOpenRoomsUseCase.call();
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Add to room',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Nunito',
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 14.h),
-              if (openRooms.isEmpty)
-                Text(
-                  'No open rooms yet. Create a room first.',
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontFamily: 'Nunito',
-                    color: const Color.fromARGB(255, 96, 96, 96),
+        return StatefulBuilder(builder: (ctx, setSheetState) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
                   ),
-                )
-              else
-                ...openRooms.map((room) => _buildRoomTile(ctx, room, item)),
-              SizedBox(height: 10.h),
-            ],
-          ),
-        );
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  item.name,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Nunito',
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  '${item.price.toStringAsFixed(2)} EGP',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Nunito',
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48.h,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _addItemToCartUseCase.call(item);
+                      Navigator.pop(ctx);
+                      AppMessage.showSnackBar(
+                        context,
+                        'Added to cart',
+                        const Color(0xFF71BC55),
+                        Icons.check_circle,
+                      );
+                    },
+                    icon: Icon(Icons.shopping_cart_outlined, size: 20.sp),
+                    label: Text(
+                      'Add to Cart',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Nunito',
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: ExpansionTile(
+                    tilePadding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+                    childrenPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                    shape: const RoundedRectangleBorder(),
+                    collapsedShape: const RoundedRectangleBorder(),
+                    leading: Icon(Icons.group, color: AppColors.primaryColor),
+                    title: Text(
+                      'Add to Room',
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${openRooms.length} open room(s)',
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 12.sp,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    children: openRooms.isEmpty
+                        ? [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: Text(
+                                'No open rooms yet. Create a room first.',
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontFamily: 'Nunito',
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ),
+                          ]
+                        : openRooms
+                            .map((room) => _buildRoomTile(ctx, room, item))
+                            .toList(),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+              ],
+            ),
+          );
+        });
       },
     );
   }
