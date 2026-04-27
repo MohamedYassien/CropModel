@@ -33,12 +33,15 @@ class MenuItemModel {
   final String description;
   final double price;
   final String imageUrl;
+  final String? notes;
+
 
   MenuItemModel({
     required this.name,
     required this.description,
     required this.price,
     required this.imageUrl,
+    this.notes,
   });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
@@ -46,7 +49,8 @@ class MenuItemModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      imageUrl: json['imageUrl'] ?? '',  // 
+      imageUrl: json['imageUrl'] ?? '',
+      notes: json['notes'],
     );
   }
 
@@ -56,6 +60,7 @@ class MenuItemModel {
       'description': description,
       'price': price,
       'imageUrl': imageUrl,
+      'notes': notes,
     };
   }
 }

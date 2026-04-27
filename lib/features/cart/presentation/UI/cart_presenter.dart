@@ -11,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
 import '../bloc/cart_state.dart';
+import '../../data/model/cart_item.dart';
 
 class CartPresenter extends StatefulWidget {
   const CartPresenter({super.key});
@@ -66,6 +67,7 @@ class _CartPresenterState extends State<CartPresenter> {
             ),
           ),
         ),
+
         body: BlocBuilder<CartBloc, CartState>(
           builder: (context, state) {
             if (state is! CartLoaded) {
@@ -82,16 +84,12 @@ class _CartPresenterState extends State<CartPresenter> {
                     SizedBox(height: 16.h),
                     Text(
                       'Your cart is empty',
-                      style: getDynamicStyle(context,
-                          size: 16.sp,
-                          weight: FontWeight.w600,
-                          color: Colors.grey[500]),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'Add items from menu to get started',
-                      style: getDynamicStyle(context,
-                          size: 12.sp, color: Colors.grey[400]),
+                      style: getDynamicStyle(
+                        context,
+                        size: 16.sp,
+                        weight: FontWeight.w600,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
@@ -102,11 +100,12 @@ class _CartPresenterState extends State<CartPresenter> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.w, vertical: 10.h),
                     itemCount: state.items.length,
                     itemBuilder: (context, index) {
                       final cartItem = state.items[index];
+
                       return Container(
                         margin: EdgeInsets.only(bottom: 12.h),
                         padding: EdgeInsets.all(12.w),
@@ -123,6 +122,7 @@ class _CartPresenterState extends State<CartPresenter> {
                         ),
                         child: Row(
                           children: [
+
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12.r),
                               child: CachedNetworkImage(
@@ -132,61 +132,118 @@ class _CartPresenterState extends State<CartPresenter> {
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) =>
                                     Shimmer.fromColors(
-                                  baseColor: Colors.grey[300]!,
-                                  highlightColor: Colors.grey[100]!,
-                                  child: Container(
-                                    width: 70.w,
-                                    height: 70.w,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  width: 70.w,
-                                  height: 70.w,
-                                  color: Colors.grey[200],
-                                  child: Icon(Icons.restaurant,
-                                      color: Colors.grey[400], size: 30.sp),
-                                ),
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(
+                                        width: 70.w,
+                                        height: 70.w,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    Container(
+                                      width: 70.w,
+                                      height: 70.w,
+                                      color: Colors.grey[200],
+                                      child: Icon(Icons.restaurant,
+                                          color: Colors.grey[400], size: 30.sp),
+                                    ),
                               ),
                             ),
+
                             SizedBox(width: 12.w),
+
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+
                                   Text(
                                     cartItem.item.name,
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w700,
-                                      fontFamily: 'Nunito',
                                       color: Colors.black,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
+
                                   SizedBox(height: 4.h),
+
                                   Text(
                                     '${cartItem.item.price.toStringAsFixed(2)} EGP',
                                     style: TextStyle(
                                       fontSize: 13.sp,
-                                      fontFamily: 'Nunito',
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primaryColor,
                                     ),
                                   ),
+
                                   SizedBox(height: 2.h),
+
                                   Text(
                                     '${cartItem.totalPrice.toStringAsFixed(2)} EGP total',
                                     style: TextStyle(
                                       fontSize: 11.sp,
-                                      fontFamily: 'Nunito',
                                       color: Colors.grey[500],
                                     ),
                                   ),
+
+
+                                  if (cartItem.notes != null &&
+                                      cartItem.notes!.isNotEmpty) ...[
+                                    SizedBox(height: 6.h),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.w,
+                                                vertical: 4.h),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFFF8E1),
+                                              borderRadius:
+                                              BorderRadius.circular(6.r),
+                                            ),
+                                            child: Text(
+                                              cartItem.notes!,
+                                              style: TextStyle(
+                                                fontSize: 11.sp,
+                                                color:
+                                                const Color(0xFFF57F17),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.edit,
+                                            size: 16.sp,
+                                            color: AppColors.primaryColor,
+                                          ),
+                                          onPressed: () =>
+                                              _showEditNotesDialog(
+                                                  context, cartItem),
+                                        )
+                                      ],
+                                    ),
+                                  ] else
+                                    TextButton(
+                                      onPressed: () =>
+                                          _showEditNotesDialog(
+                                              context, cartItem),
+                                      child: Text(
+                                        "Add note",
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
+
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey[50],
@@ -194,39 +251,46 @@ class _CartPresenterState extends State<CartPresenter> {
                               ),
                               child: Row(
                                 children: [
+
                                   InkWell(
                                     onTap: () {
                                       context.read<CartBloc>().add(
-                                            DecrementCartItemRequested(
-                                                cartItem.item),
-                                          );
+                                        DecrementCartItemRequested(
+                                          cartItem.item,
+                                          notes: cartItem.notes,
+                                        ),
+                                      );
                                     },
-                                    child: Container(
+                                    child: Padding(
                                       padding: EdgeInsets.all(8.w),
                                       child: Icon(Icons.remove,
                                           size: 18.sp,
                                           color: AppColors.primaryColor),
                                     ),
                                   ),
-                                  Container(
+
+                                  Padding(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w, vertical: 4.h),
+                                        horizontal: 8.w),
                                     child: Text(
                                       '${cartItem.quantity}',
                                       style: TextStyle(
                                         fontSize: 14.sp,
-                                        fontFamily: 'Nunito',
                                         fontWeight: FontWeight.w700,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
+
                                   InkWell(
                                     onTap: () {
                                       context.read<CartBloc>().add(
-                                          AddCartItemRequested(cartItem.item));
+                                        AddCartItemRequested(
+                                          cartItem.item,
+                                          notes: cartItem.notes,
+                                        ),
+                                      );
                                     },
-                                    child: Container(
+                                    child: Padding(
                                       padding: EdgeInsets.all(8.w),
                                       child: Icon(Icons.add,
                                           size: 18.sp,
@@ -242,13 +306,12 @@ class _CartPresenterState extends State<CartPresenter> {
                     },
                   ),
                 ),
+
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20.r)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.08),
@@ -261,26 +324,57 @@ class _CartPresenterState extends State<CartPresenter> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+
                                 Text(
                                   'Total',
-                                  style: getDynamicStyle(context,
-                                      size: 12.sp,
-                                      weight: FontWeight.w500,
-                                      color: Colors.grey[600]),
+                                  style: getDynamicStyle(
+                                    context,
+                                    size: 12.sp,
+                                    weight: FontWeight.w500,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
+
                                 SizedBox(height: 2.h),
+
                                 Text(
                                   '${state.total.toStringAsFixed(2)} EGP',
-                                  style: getDynamicStyle(context,
-                                      size: 18.sp,
-                                      weight: FontWeight.bold,
-                                      color: AppColors.primaryColor),
+                                  style: getDynamicStyle(
+                                    context,
+                                    size: 18.sp,
+                                    weight: FontWeight.bold,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+
+                                SizedBox(height: 4.h),
+
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 14.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      '15 - 25 min',
+                                      style: getDynamicStyle(
+                                        context,
+                                        size: 11.sp,
+                                        weight: FontWeight.w500,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 4.h),
                                 Row(
@@ -302,14 +396,21 @@ class _CartPresenterState extends State<CartPresenter> {
                                 ),
                               ],
                             ),
+
                             Text(
-                              '${state.items.length} item(s)',
-                              style: getDynamicStyle(context,
-                                  size: 12.sp, color: Colors.grey[500]),
+                              '${state.items.length} items',
+                              style: getDynamicStyle(
+                                context,
+                                size: 12.sp,
+                                color: Colors.grey[500],
+                              ),
                             ),
                           ],
                         ),
+
                         SizedBox(height: 12.h),
+
+                        /// CHECKOUT BUTTON
                         SizedBox(
                           width: double.infinity,
                           height: 50.h,
@@ -317,13 +418,12 @@ class _CartPresenterState extends State<CartPresenter> {
                             onPressed: () {
                               AppMessage.showSnackBar(
                                 context,
-                                'Checkout - Order placed successfully!',
+                                'Order placed successfully!',
                                 const Color(0xFF71BC55),
                                 Icons.check_circle,
                               );
-                              context
-                                  .read<CartBloc>()
-                                  .add(ClearCartRequested());
+
+                              context.read<CartBloc>().add(ClearCartRequested());
                               Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
@@ -352,6 +452,48 @@ class _CartPresenterState extends State<CartPresenter> {
             );
           },
         ),
+      ),
+    );
+  }
+
+
+  void _showEditNotesDialog(BuildContext context, CartItem cartItem) {
+    final controller =
+    TextEditingController(text: cartItem.notes ?? "");
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Edit Notes"),
+        content: TextField(
+          controller: controller,
+          maxLines: 2,
+          decoration: const InputDecoration(
+            hintText: "e.g. No onions, Extra cheese",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newNotes = controller.text.trim();
+
+              context.read<CartBloc>().add(
+                UpdateCartItemNotesRequested(
+                  cartItem.item,
+                  oldNotes: cartItem.notes,
+                  newNotes: newNotes.isEmpty ? null : newNotes,
+                ),
+              );
+
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          )
+        ],
       ),
     );
   }

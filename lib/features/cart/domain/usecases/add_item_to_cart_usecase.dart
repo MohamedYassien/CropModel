@@ -8,7 +8,7 @@ class AddItemToCartUseCase {
   AddItemToCartUseCase({CartService? cartService})
       : _cartService = cartService ?? CartService();
 
-  void call(MenuItemModel item) {
-    _cartService.addItem(item);
+  void call(MenuItemModel item,{String? notes}) {
+    _cartService.addItem(item,notes: notes);
   }
 }

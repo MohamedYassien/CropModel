@@ -40,16 +40,25 @@ class RoomService {
     room.orders.add(order);
   }
 
-  void addMenuItemToRoom({required Room room, required MenuItemModel item}) {
+  void addMenuItemToRoom({required Room room, required MenuItemModel item, String? notes}) {
+    // Create a new item with notes
+    final itemWithNotes = MenuItemModel(
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      imageUrl: item.imageUrl,
+      notes: notes,
+    );
+
     final existingIndex = room.orders.indexWhere(
       (o) => o.user.email == guestUser.email,
     );
 
     if (existingIndex >= 0) {
-      room.orders[existingIndex].items.add(item);
+      room.orders[existingIndex].items.add(itemWithNotes);
       return;
     }
 
-    room.orders.add(Order(user: guestUser, items: [item]));
+    room.orders.add(Order(user: guestUser, items: [itemWithNotes]));
   }
 }

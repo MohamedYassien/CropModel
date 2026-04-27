@@ -84,9 +84,9 @@ class _MenuScreenState extends State<MenuScreen> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category Pills
+
                   _buildCategoryList(categories),
-                  // Grid Items
+
                   Expanded(child: _buildMenuGrid(categories)),
                 ],
               );
@@ -361,11 +361,13 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+// 🔥 ONLY THIS PART CHANGED INSIDE _buildMenuGrid
+
   Widget _buildMenuGrid(List<MenuCategoryModel> categories) {
     if (categories.isEmpty) return const SizedBox.shrink();
 
     final currentCategory =
-        categories[_selectedCategoryIndex.clamp(0, categories.length - 1)];
+    categories[_selectedCategoryIndex.clamp(0, categories.length - 1)];
     final items = currentCategory.items;
 
     return GridView.builder(
@@ -381,16 +383,6 @@ class _MenuScreenState extends State<MenuScreen> {
         return MenuItemCard(
           item: items[index],
           onAdd: () {
-            final room = widget.room;
-            if (room != null) {
-              _addMenuItemToRoomUseCase.call(room: room, item: items[index]);
-              AppMessage.showSnackBar(
-                  context,
-                  "added_to".tr(namedArgs: {'roomName': room.name}),
-                  const Color(0xFF71BC55),
-                  Icons.check_circle);
-              return;
-            }
             _showPickDestinationBottomSheet(context, items[index]);
           },
         );
@@ -401,6 +393,7 @@ class _MenuScreenState extends State<MenuScreen> {
   void _showPickDestinationBottomSheet(
       BuildContext context, MenuItemModel item) {
     final openRooms = _getOpenRoomsUseCase.call();
+    final notesController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -411,132 +404,176 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
       builder: (ctx) {
         return StatefulBuilder(builder: (ctx, setSheetState) {
-          return Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
             ),
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40.w,
-                    height: 4.h,
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    item.name,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Nunito',
+                      color: Colors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    '${item.price.toStringAsFixed(2)} EGP',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Nunito',
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  TextField(
+                    controller: notesController,
+                    decoration: InputDecoration(
+                      hintText: 'Add notes (e.g., No onions, Extra cheese)',
+                      hintStyle: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 13.sp,
+                        color: Colors.grey[400],
+                      ),
+                      prefixIcon: Icon(Icons.edit_note, color: Colors.grey[400]),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 14.h,
+                      ),
+                    ),
+                    style: TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 14.sp,
+                      color: Colors.black,
+                    ),
+                    maxLines: 2,
+                    textInputAction: TextInputAction.done,
+                  ),
+                  SizedBox(height: 20.h),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48.h,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _addItemToCartUseCase.call(
+                          item,
+                          notes: notesController.text.trim().isEmpty
+                              ? null
+                              : notesController.text.trim(),
+                        );
+
+                        Navigator.pop(ctx);
+
+                        AppMessage.showSnackBar(
+                          context,
+                          'Added to cart',
+                          const Color(0xFF71BC55),
+                          Icons.check_circle,
+                        );
+                      },
+                      icon: Icon(Icons.shopping_cart_outlined, size: 20.sp),
+                      label: Text(
+                        'Add to Cart',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Nunito',
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2.r),
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Nunito',
-                    color: Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  '${item.price.toStringAsFixed(2)} EGP',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48.h,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      _addItemToCartUseCase.call(item);
-                      Navigator.pop(ctx);
-                      AppMessage.showSnackBar(
-                        context,
-                        'Added to cart',
-                        const Color(0xFF71BC55),
-                        Icons.check_circle,
-                      );
-                    },
-                    icon: Icon(Icons.shopping_cart_outlined, size: 20.sp),
-                    label: Text(
-                      'Add to Cart',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Nunito',
+                    child: ExpansionTile(
+                      tilePadding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+                      childrenPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                      shape: const RoundedRectangleBorder(),
+                      collapsedShape: const RoundedRectangleBorder(),
+                      leading: Icon(Icons.group, color: AppColors.primaryColor),
+                      title: Text(
+                        'Add to Room',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.r),
+                      subtitle: Text(
+                        '${openRooms.length} open room(s)',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          fontSize: 12.sp,
+                          color: Colors.grey[500],
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: ExpansionTile(
-                    tilePadding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-                    childrenPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                    shape: const RoundedRectangleBorder(),
-                    collapsedShape: const RoundedRectangleBorder(),
-                    leading: Icon(Icons.group, color: AppColors.primaryColor),
-                    title: Text(
-                      'Add to Room',
-                      style: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
-                        color: Colors.black,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${openRooms.length} open room(s)',
-                      style: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontSize: 12.sp,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                    children: openRooms.isEmpty
-                        ? [
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.h),
-                              child: Text(
-                                'No open rooms yet. Create a room first.',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontFamily: 'Nunito',
-                                  color: Colors.grey[500],
-                                ),
-                              ),
+                      children: openRooms.isEmpty
+                          ? [
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: Text(
+                            'No open rooms yet. Create a room first.',
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              fontFamily: 'Nunito',
+                              color: Colors.grey[500],
                             ),
-                          ]
-                        : openRooms
-                            .map((room) => _buildRoomTile(ctx, room, item))
-                            .toList(),
+                          ),
+                        ),
+                      ]
+                          : openRooms
+                          .map((room) => _buildRoomTile(ctx, room, item, notesController))
+                          .toList(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10.h),
-              ],
+                  SizedBox(height: 10.h),
+                ],
+              ),
             ),
           );
         });
@@ -545,10 +582,10 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Widget _buildRoomTile(
-    BuildContext bottomSheetContext,
-    Room room,
-    MenuItemModel item,
-  ) {
+      BuildContext bottomSheetContext,
+      Room room,
+      MenuItemModel item,
+      TextEditingController notesController,) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
@@ -574,7 +611,10 @@ class _MenuScreenState extends State<MenuScreen> {
         size: 22.sp,
       ),
       onTap: () {
-        _addMenuItemToRoomUseCase.call(room: room, item: item);
+        final notes = notesController.text.trim().isEmpty 
+            ? null 
+            : notesController.text.trim();
+        _addMenuItemToRoomUseCase.call(room: room, item: item, notes: notes);
         Navigator.pop(bottomSheetContext);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -615,7 +655,7 @@ class _MenuScreenState extends State<MenuScreen> {
             },
           ),
         ),
-        // Grid shimmer
+
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),

@@ -6,17 +6,30 @@ class LoadCartRequested extends CartEvent {}
 
 class AddCartItemRequested extends CartEvent {
   final MenuItemModel item;
-  AddCartItemRequested(this.item);
+  final String? notes;
+  AddCartItemRequested(this.item,{this.notes});
+
+
 }
 
 class DecrementCartItemRequested extends CartEvent {
   final MenuItemModel item;
-  DecrementCartItemRequested(this.item);
+  final String? notes;
+  DecrementCartItemRequested(this.item,{this.notes});
 }
 
 class RemoveCartItemRequested extends CartEvent {
   final MenuItemModel item;
-  RemoveCartItemRequested(this.item);
+  final String? notes;
+  RemoveCartItemRequested(this.item,{this.notes});
+}
+
+class UpdateCartItemNotesRequested extends CartEvent {
+  final MenuItemModel item;
+  final String? oldNotes;
+  final String? newNotes;
+
+  UpdateCartItemNotesRequested(this.item, {this.oldNotes, this.newNotes});
 }
 
 class ClearCartRequested extends CartEvent {}
