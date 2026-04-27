@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cropmodel/core/constants/app_colors.dart';
 import 'package:cropmodel/core/utils/text_font_transformer.dart';
+import 'package:cropmodel/features/cart/presentation/UI/cart_presenter.dart';
 import 'package:cropmodel/features/Profile/presentation/UI/profile_presenter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,6 @@ class BottomNavigationBar extends StatefulWidget {
 }
 
 class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
-
   late int currentIndex = widget.index;
 
   void changePage(int index) {
@@ -27,11 +27,14 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
     });
   }
 
-
   List<Widget> get pages => [
-    homepage(onNavigate: changePage,),
-    RestaurantListScreen(onNavigate: changePage,),
-  ];
+        homepage(
+          onNavigate: changePage,
+        ),
+        RestaurantListScreen(
+          onNavigate: changePage,
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,7 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: EdgeInsets.only(bottom: 15.h, left: 15.w, right: 15.w),
+              padding: EdgeInsets.only(bottom: 15.h, left: 5.w, right: 5.w),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(174.r),
                 child: BackdropFilter(
@@ -54,7 +57,6 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
                       borderRadius: BorderRadius.circular(174.r),
                       color: Colors.transparent,
                     ),
-
                     child: Stack(
                       children: [
                         Container(
@@ -72,13 +74,16 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
                             ),
                           ),
                         ),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildNavItem('home'.tr(), Icons.home_outlined, 0),
-                            _buildNavItem('restaurants'.tr(), Icons.restaurant, 1),
-                            _buildNavItem('profile'.tr(), Icons.person_2_outlined, 2),
+                            _buildNavItem(
+                                'restaurants'.tr(), Icons.restaurant, 1),
+                            _buildNavItem(
+                                'cart'.tr(), Icons.shopping_cart_outlined, 2),
+                            _buildNavItem(
+                                'profile'.tr(), Icons.person_2_outlined, 3),
                           ],
                         ),
                       ],
@@ -98,10 +103,13 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
 
     return GestureDetector(
       onTap: () {
-        if(index == 2){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfilePresenter()));
-        }
-        else {
+        if (index == 2) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const CartPresenter()));
+        } else if (index == 3) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ProfilePresenter()));
+        } else {
           setState(() {
             currentIndex = index;
           });
@@ -110,7 +118,7 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
       child: Center(
         child: Container(
           height: 65.h,
-          width: currentIndex == 1 ? 110.w : 80.w,
+          width: currentIndex == 1 ? 90.w : 80.w,
           decoration: BoxDecoration(
             color: isSelected
                 ? Color(0xff000000).withOpacity(0.14)
@@ -128,15 +136,15 @@ class _CustomBottomNavigationBarState extends State<BottomNavigationBar> {
                     : AppColors.primaryColor.withOpacity(0.7),
               ),
               SizedBox(height: 6.h),
-              Text(
-                text,
-                style: getDynamicStyle(context,size: isSelected ? 13.sp : 12.sp, weight: FontWeight.bold, color: AppColors.primaryColor )
-              ),
+              Text(text,
+                  style: getDynamicStyle(context,
+                      size: isSelected ? 13.sp : 12.sp,
+                      weight: FontWeight.bold,
+                      color: AppColors.primaryColor)),
             ],
           ),
         ),
       ),
     );
   }
-
 }
