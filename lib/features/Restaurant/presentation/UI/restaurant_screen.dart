@@ -8,7 +8,7 @@ import 'package:cropmodel/core/shared/data.dart';
 import '../../../RestaurantDetails/presentaion/UI/restaurant_details.dart';
 import '../../data/model/restaurant_model.dart';
 import '../bloc/restaurantBloc.dart';
-import '../bloc/restaurantEvent.dart';
+import '../bloc/restaurantBloc/restaurantEvent.dart';
 import '../bloc/restaurantState.dart';
 
 class RestaurantListScreen extends StatefulWidget {

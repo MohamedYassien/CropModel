@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cropmodel/core/shared/data.dart';
+import 'package:cropmodel/core/utils/real_delivery_time_utils.dart';
 import '../../../Menu/presentation/UI/menu_screen.dart';
 import '../bloc/restaurant_details_bloc.dart';
 import '../bloc/restaurant_details_event.dart';
@@ -28,6 +29,27 @@ class RestaurantDetailsScreen extends StatefulWidget {
 }
 
 class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
+  String _deliveryTime = 'Calculating...';
+  String _distance = 'Calculating...';
+
+  Future<void> _calculateDeliveryDetails(double restaurantLat, double restaurantLng) async {
+    final deliveryTime = await RealDeliveryTimeUtils.calculateRealDeliveryTime(
+      restaurantLat,
+      restaurantLng,
+    );
+    final distance = await RealDeliveryTimeUtils.getDistanceText(
+      restaurantLat,
+      restaurantLng,
+    );
+    
+    if (mounted) {
+      setState(() {
+        _deliveryTime = deliveryTime;
+        _distance = distance;
+      });
+    }
+  }
+
   Future<void> openInGoogleMaps(double lat, double lng) async {
     final Uri googleMapsUri = Uri.parse("google.navigation:q=$lat,$lng&mode=d");
     final Uri appleMapsUri = Uri.parse("https://maps.apple.com/?q=$lat,$lng");
@@ -60,6 +82,11 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
                 return _buildShimmerLoading();
               } else if (state is RestaurantDetailsLoaded) {
                 final restaurant = state.restaurant;
+                
+                // Calculate delivery details when restaurant is loaded
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _calculateDeliveryDetails(restaurant.latitude, restaurant.longitude);
+                });
 
                 final LatLng restaurantLocation = LatLng(
                   restaurant.latitude,
@@ -174,6 +201,40 @@ class _RestaurantDetailsScreenState extends State<RestaurantDetailsScreen> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 16.w,
+                                color: Colors.grey[600],
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                _deliveryTime,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Icon(
+                                Icons.location_on,
+                                size: 16.w,
+                                color: Colors.grey[600],
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                _distance,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
