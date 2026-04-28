@@ -29,23 +29,21 @@ class RealDeliveryTimeUtils {
     bool serviceEnabled;
     LocationPermission permission;
 
+    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return null;
     }
 
+    // Check location permissions (don't request, just check)
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
+    
+    if (permission == LocationPermission.denied || 
+        permission == LocationPermission.deniedForever) {
       return null;
     }
 
+    // Get current position
     try {
       return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
