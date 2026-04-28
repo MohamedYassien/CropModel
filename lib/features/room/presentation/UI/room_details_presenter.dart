@@ -333,7 +333,6 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
                                 child: Row(
                                   children: [
 
-                                    /// IMAGE
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(10.r),
                                       child: Image.network(
@@ -353,7 +352,6 @@ class _RoomDetailsPresenterState extends State<RoomDetailsPresenter> {
 
                                     SizedBox(width: 10.w),
 
-                                    /// DETAILS
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
